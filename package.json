@@ -1,15 +1,20 @@
 {
-  "name": "cardsjs",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "typescript": "~5.6.2",
-    "vite": "^6.0.5"
-  }
+	"name": "cardsjs",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "concurrently \"vite\" \"vitepress dev docs\"",
+		"build": "tsc && vite build vitepress build docs",
+		"preview": "vite preview",
+		"docs:dev": "vitepress dev docs",
+		"docs:build": "vitepress build docs",
+		"docs:preview": "vitepress preview docs"
+	},
+	"devDependencies": {
+		"concurrently": "^9.1.2",
+		"typescript": "~5.6.2",
+		"vite": "^6.0.5",
+		"vitepress": "^1.5.0"
+	}
 }
