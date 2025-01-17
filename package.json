@@ -5,8 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "concurrently \"vite\" \"vitepress dev docs\"",
-		"build": "tsc && vite build vitepress build docs",
-		"preview": "vite preview",
+		"build": "tsc && vite build && vitepress build docs",
+		"preview": "npx http-server dist",
 		"docs:dev": "vitepress dev docs",
 		"docs:build": "vitepress build docs",
 		"docs:preview": "vitepress preview docs"
