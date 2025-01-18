@@ -1,8 +1,16 @@
 import { defineConfig } from "vite";
+import { resolve } from "path";
 
 export default defineConfig(({ command }) => {
 	const config = {
-		// Base config here
+		build: {
+			rollupOptions: {
+				input: {
+					main: resolve(__dirname, "index.html"),
+					card: resolve(__dirname, "card/index.html"),
+				},
+			},
+		},
 	};
 
 	if (command === "serve") {

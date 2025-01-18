@@ -1,16 +1,36 @@
+// TODO: Types should be removed from this file and imported instead
+type CardElements = {
+	front: HTMLDivElement;
+	back: HTMLDivElement;
+	parent: HTMLDivElement;
+	wrapper: HTMLDivElement;
+};
+
+type CardFunctions = {
+	flipCard: (delay?: number) => void;
+	getFlipSpeed: () => string;
+	blindFlip: () => void;
+};
+
+type DeckBase = {
+	id?: string;
+	position?: number;
+};
+
 type Card = {
 	faceUp: boolean;
 	flipEnabled: boolean;
 	state: "available" | "busy";
-	location: any;
-};
+	location: DeckBase | null;
+} & CardElements &
+	CardFunctions;
 
-const createCard = (): Card => {
+export const createCard = (): Card => {
 	// PROPERTIES
-	const faceUp = false;
-	const flipEnabled: boolean = true;
-	const state: "available" = "available";
-	const location = null;
+	let faceUp = false;
+	let flipEnabled: boolean = true;
+	let state: "available" = "available";
+	let location: DeckBase | null = null;
 	// location will be a deckBase, when added to one. Need a type for this
 
 	// FUNCTIONS
@@ -28,35 +48,36 @@ const createCard = (): Card => {
 		return backDom;
 	})();
 
+	const parent = (() => {
+		const parent = document.createElement("div");
+		parent.classList.add("card");
+		return parent;
+	})();
+
 	// - This creates the parent DOM container.
 	// - It contains both the front and the back as children.
 	// - The cardWrapper is necessary because for card flipping to work,
 	//   a parent needs to have position: relative, and the child position absolute.
-	const card = (() => {
-		const cardWrapper = document.createElement("div");
-		const newCard = document.createElement("div");
-
-		cardWrapper.classList.add("card-wrapper");
-		cardWrapper.appendChild(newCard);
-
-		newCard.classList.add("card");
-		newCard.appendChild(back);
-		front.classList.toggle("flipped");
-		back.classList.toggle("flipped");
-
-		return cardWrapper;
+	const wrapper = (() => {
+		const wrapper = document.createElement("div");
+		wrapper.classList.add("card-wrapper");
+		return wrapper;
 	})();
 
-	function flipCard(delay = 0) {
-		const cardParent = this.card.firstElementChild;
+	(function buildCard() {
+		wrapper.appendChild(parent);
+		parent.appendChild(back);
+		front.classList.toggle("flipped");
+		back.classList.toggle("flipped");
+	})();
 
+	function flipCard(this: Card, delay = 0) {
 		// flipEnabled stops the user from flipping a card rapidly over and over.
-
 		if (this.flipEnabled === true) {
 			this.flipEnabled = false;
 
 			if (this.faceUp === false) {
-				cardParent.appendChild(this.front);
+				this.parent.appendChild(this.front);
 			}
 
 			setTimeout(() => {
@@ -68,17 +89,23 @@ const createCard = (): Card => {
 				this.faceUp = true;
 				const waitForFlip = () => {
 					this.flipEnabled = true;
-					this.card.removeEventListener("transitionend", waitForFlip);
+					this.wrapper.removeEventListener(
+						"transitionend",
+						waitForFlip
+					);
 				};
-				this.card.addEventListener("transitionend", waitForFlip);
+				this.wrapper.addEventListener("transitionend", waitForFlip);
 			} else {
 				const removeFront = () => {
-					this.card.removeEventListener("transitionend", removeFront);
-					cardParent.removeChild(this.front);
+					this.wrapper.removeEventListener(
+						"transitionend",
+						removeFront
+					);
+					this.parent.removeChild(this.front);
 					this.faceUp = false;
 					this.flipEnabled = true;
 				};
-				this.card.addEventListener("transitionend", removeFront);
+				this.wrapper.addEventListener("transitionend", removeFront);
 			}
 		}
 	}
@@ -89,10 +116,9 @@ const createCard = (): Card => {
 		return speed;
 	}
 
-	function blindFlip() {
-		const cardParent = this.card.firstElementChild;
+	function blindFlip(this: Card) {
 		if (this.faceUp === false) {
-			cardParent.appendChild(this.front);
+			parent.appendChild(this.front);
 		}
 
 		this.back.classList.toggle("flipped");
@@ -100,7 +126,7 @@ const createCard = (): Card => {
 		if (this.faceUp === false) {
 			this.faceUp = true;
 		} else {
-			cardParent.removeChild(this.front);
+			this.parent.removeChild(this.front);
 			this.faceUp = false;
 		}
 		this.front.classList.toggle("flipped");
@@ -116,7 +142,8 @@ const createCard = (): Card => {
 		// Properties that are Dom related
 		front,
 		back,
-		card,
+		parent,
+		wrapper,
 
 		// Functions
 		flipCard,
@@ -124,5 +151,3 @@ const createCard = (): Card => {
 		blindFlip,
 	};
 };
-
-export default createCard;
