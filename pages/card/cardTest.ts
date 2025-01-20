@@ -1,5 +1,5 @@
-import { createCard } from "../src/components/card";
-import "../src/styles/card.css";
+import { createCard } from "../../src/components/card";
+import "../../src/styles/card.css";
 
 const testCard = createCard();
 
