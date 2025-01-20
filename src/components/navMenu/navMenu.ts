@@ -15,8 +15,12 @@ const navMenuData: NavItem[] = [
 		slug: "/docs/",
 	},
 	{
-		text: "Single Card Testing",
+		text: "Card",
 		slug: "/card/",
+	},
+	{
+		text: "Deck",
+		slug: "/deck/",
 	},
 ];
 

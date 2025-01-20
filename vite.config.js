@@ -3,17 +3,45 @@ import { resolve } from "path";
 import fs from "fs";
 import path from "path";
 
+function getPages() {
+	const pagesDir = resolve(__dirname, "pages");
+	const pages = {};
+
+	try {
+		const dirs = fs.readdirSync(pagesDir);
+
+		dirs.forEach((dir) => {
+			const fullPath = path.join(pagesDir, dir, "index.html");
+
+			if (fs.existsSync(fullPath) && dir !== "docs") {
+				pages[dir] = resolve(__dirname, `pages/${dir}/index.html`);
+			}
+		});
+
+		if (fs.existsSync(resolve(__dirname, "index.html"))) {
+			pages.main = resolve(__dirname, "index.html");
+		}
+	} catch (error) {
+		console.error("Error scanning directories:", error);
+	}
+
+	return pages;
+}
+
 function pagesPlugin() {
-  return {
+	return {
 		name: "pages-plugin",
 		configureServer(server) {
 			// For dev server, add custom routes
 			server.middlewares.use((req, res, next) => {
+				const routes = getPages();
+				const routeSlugs = Object.keys(routes);
+
 				const url = req.url;
-				// If accessing /card, serve the content from /pages/card
-				if (url?.startsWith("/card")) {
+				if (routeSlugs.some((path) => url?.startsWith(`/${path}`))) {
 					req.url = `/pages${url}`;
 				}
+
 				next();
 			});
 		},
@@ -51,33 +79,9 @@ function pagesPlugin() {
 				}
 			}
 		},
-  };
+	};
 }
 
-function getPages() {
-	const pagesDir = resolve(__dirname, "pages");
-	const pages = {};
-
-	try {
-		const dirs = fs.readdirSync(pagesDir);
-
-		dirs.forEach((dir) => {
-			const fullPath = path.join(pagesDir, dir, "index.html");
-
-			if (fs.existsSync(fullPath) && dir !== "docs") {
-				pages[dir] = resolve(__dirname, `pages/${dir}/index.html`);
-			}
-		});
-
-		if (fs.existsSync(resolve(__dirname, "index.html"))) {
-			pages.main = resolve(__dirname, "index.html");
-		}
-	} catch (error) {
-		console.error("Error scanning directories:", error);
-	}
-
-	return pages;
-}
 
 export default defineConfig(({ command }) => {
 	const config = {
