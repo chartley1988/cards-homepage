@@ -51,7 +51,7 @@ const navMenu = (data: NavItem[]): void => {
 
 	const navTarget = document.getElementById("app");
 	if (navTarget) {
-		navTarget.append(nav);
+		navTarget.prepend(nav);
 	}
 };
 
