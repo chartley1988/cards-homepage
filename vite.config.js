@@ -2,6 +2,13 @@ import { defineConfig } from "vite";
 
 export default defineConfig(({ command }) => {
 	const config = {
+		base: "/",
+		server: {
+			force: true,
+		},
+		build: {
+			trailingSlash: true,
+		},
 		// Base config here
 	};
 
