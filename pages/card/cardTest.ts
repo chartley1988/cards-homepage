@@ -1,10 +1,18 @@
-import { createCard } from "../../src/components/card";
+import { createCard } from "../../src/components/card/card";
 import "../../src/styles/card.css";
+import "./styles.css";
 
-const testCard = createCard();
+function instanceCard() {
+	const card = createCard();
+	card.wrapper.addEventListener("click", () => {
+		card.flipCard();
+	});
 
-document.body.appendChild(testCard.wrapper);
+	return card;
+}
 
-testCard.wrapper.addEventListener("click", () => {
-	testCard.flipCard();
-});
+const app = document.getElementById("app");
+if (app) {
+	const testCard = instanceCard();
+	app.appendChild(testCard.wrapper);
+}

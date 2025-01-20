@@ -1,29 +1,4 @@
-// TODO: Types should be removed from this file and imported instead
-type CardElements = {
-	front: HTMLDivElement;
-	back: HTMLDivElement;
-	parent: HTMLDivElement;
-	wrapper: HTMLDivElement;
-};
-
-type CardFunctions = {
-	flipCard: (delay?: number) => void;
-	getFlipSpeed: () => string;
-	blindFlip: () => void;
-};
-
-type DeckBase = {
-	id?: string;
-	position?: number;
-};
-
-type Card = {
-	faceUp: boolean;
-	flipEnabled: boolean;
-	state: "available" | "busy";
-	location: DeckBase | null;
-} & CardElements &
-	CardFunctions;
+import type { Card, DeckBase } from "../../types/card.types";
 
 export const createCard = (): Card => {
 	// PROPERTIES
