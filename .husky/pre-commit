@@ -1,0 +1,4 @@
+npm run lint:staged
+
+# Uncomment the line below to disable commit. Useful for testing hooks
+# exit 1

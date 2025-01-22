@@ -10,12 +10,26 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "lint": "eslint .",
+    "lint:staged": "lint-staged",
+    "format": "prettier . --check",
     "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md,yml, css, scss, html}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "concurrently": "^9.1.2",
     "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
     "globals": "^15.14.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.1",
