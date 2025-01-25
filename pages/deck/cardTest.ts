@@ -5,11 +5,9 @@ import "../../src/styles/theme.css";
 import "./styles.css";
 import "../../src/components/navMenu/navMenu";
 import addDeckBase from "../../src/legacy/scripts/cardFoundations/deckBase";
-import Deck from "../../src/components/deck/deck";
 import Pile from "../../src/components/pile/pile";
 import PlayingCard from "../../src/components/card/playingCard/playingCard";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import PlayingCardDeck from "../../src/components/card/playingCard/playingCardDeck";
 function instanceCard() {
   const card = createCard();
   card.wrapper.addEventListener("click", () => {
