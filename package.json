@@ -9,12 +9,15 @@
     "preview": "vite build && vite preview",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "test": "vitest"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "jsdom": "^26.0.0",
     "typescript": "~5.6.2",
     "vite": "^6.0.5",
-    "vitepress": "^1.5.0"
+    "vitepress": "^1.5.0",
+    "vitest": "^3.0.4"
   }
 }
