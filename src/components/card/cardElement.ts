@@ -4,22 +4,24 @@ import Card from "./card";
 type CardElement<T extends Card> = {
   card: T;
   location: Pile<T> | null;
-  front: HTMLDivElement | null;
-  back: HTMLDivElement | null;
+  front: HTMLDivElement;
+  back: HTMLDivElement;
   wrapper: HTMLDivElement;
-  flipCard: () => void;
+  flip: () => void;
   getFlipSpeed: () => string;
   blindFlip: () => void;
 };
 
 export const CardElement = <T extends Card>(
-  front: HTMLDivElement = document.createElement("div"),
-  back: HTMLDivElement = document.createElement("div"),
-  thisCard: T = new Card() as T
+  _front = document.createElement("div"),
+  _back = document.createElement("div"),
+  thisCard = new Card() as T
 ): CardElement<T> => {
   let card = thisCard;
   let flipEnabled = true;
   let location = null;
+  let front = _front;
+  let back = _back;
 
   // FUNCTIONS
   const parent = (() => {
@@ -43,7 +45,7 @@ export const CardElement = <T extends Card>(
     back.classList.toggle("flipped");
   })();
 
-  const flipCard = (delay = 0) => {
+  const flip = (delay = 0) => {
     if (flipEnabled === false) return;
     else {
       flipEnabled = false;
@@ -84,6 +86,7 @@ export const CardElement = <T extends Card>(
   };
 
   //! Can we incorporate this into regular flip?
+  //! It is showing animation when flipping from faceup to facedown still
   const blindFlip = () => {
     if (card.faceUp === false) {
       parent.appendChild(front);
@@ -107,10 +110,31 @@ export const CardElement = <T extends Card>(
     get location() {
       return location;
     },
-    front,
-    back,
+    get front() {
+      return front;
+    },
+    get back() {
+      return back;
+    },
+    //! I think we want to keep this as only a getter?
+    /*
+    set front(newFront) {
+      if (!card.faceUp) {
+        newFront.classList.add("flipped");
+      }
+      newFront.classList.add("card-front");
+      front = newFront;
+    },
+    set back(newBack) {
+      if (card.faceUp) {
+        newBack.classList.add("flipped");
+      }
+      newBack.classList.add("card-back");
+      back = newBack;
+    },
+    */
     wrapper,
-    flipCard,
+    flip,
     getFlipSpeed,
     blindFlip,
   };
