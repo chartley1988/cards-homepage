@@ -79,7 +79,7 @@ test("pile can pass cards", () => {
 test("Changing a value in the deck, will change it in the pile", () => {
   const deck = StandardDeckOfCards();
   const drawPile = deck.createPile();
-  drawPile.addCards(deck.cards);
+  drawPile.receiveCard(deck.cards);
   const player1 = deck.createPile();
   drawPile.passCard(player1);
   // the decks "last card" is the first one to get passed.
@@ -90,7 +90,7 @@ test("Changing a value in the deck, will change it in the pile", () => {
 test("deleting a card from the deck will delete it from piles", () => {
   const deck = StandardDeckOfCards();
   const drawPile = deck.createPile();
-  drawPile.addCards(deck.cards);
+  drawPile.receiveCard(deck.cards);
   const player1 = deck.createPile();
   drawPile.passCard(player1);
   deck.removeCard(deck.cards[51]);

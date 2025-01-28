@@ -14,11 +14,11 @@ export default class Pile<T extends Card> {
     return this._cards;
   }
 
-  private _getCardIndex = (card: T) => {
+  private _getCardIndex = (card: T): number => {
     return this.cards.indexOf(card);
   };
 
-  addCards = (cards: T | T[], conditions: () => Boolean = () => true) => {
+  receiveCard = (cards: T | T[], conditions: () => Boolean = () => true) => {
     if (conditions() === false) {
       return false;
     }
@@ -37,7 +37,7 @@ export default class Pile<T extends Card> {
     card: T = this._cards[this._cards.length - 1],
     rules: () => Boolean = () => true
   ) => {
-    if (target.addCards(card, rules) === false) return false;
+    if (target.receiveCard(card, rules) === false) return false;
     else {
       this._cards.splice(this._getCardIndex(card), 1);
       return true;
