@@ -1,4 +1,3 @@
-import { createCard } from "../../src/components/card/cardDom";
 import { CardElement } from "../../src/components/card/cardElement";
 import "../../src/styles/style.css";
 import "../../src/styles/card.css";
@@ -6,16 +5,17 @@ import "../../src/styles/theme.css";
 import "./styles.css";
 import "../../src/components/navMenu/navMenu";
 import addDeckBase from "../../src/legacy/scripts/cardFoundations/deckBase";
-import Pile from "../../src/components/pile/pile";
-import Card from "../../src/components/card/card";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
 import PlayingCardFrontAndBack from "../../src/components/card/playingCard/playingCardElement";
 
 function instanceCard() {
-  const card = createCard();
+  const front = document.createElement("div");
+  front.classList.add("eh", "gfhfdgh", "yolo");
+  front.innerHTML = "heyyyy";
+  const card = CardElement(front);
   card.wrapper.addEventListener("click", () => {
-    card.flipCard();
+    card.flip();
   });
 
   return card;
@@ -29,7 +29,7 @@ const instanceCard2 = () => {
     card
   );
   cardElly.wrapper.addEventListener("click", () => {
-    cardElly.flipCard();
+    cardElly.flip();
   });
 
   return cardElly;
