@@ -32,15 +32,22 @@ if (app) {
 
   // Deck
   const playingCards = StandardDeckOfCards();
-  const drawPile = new Pile(playingCards.getCards());
-  const player1 = new Pile();
-  const cards = playingCards.getCards();
-  const aceSpades = new PlayingCard("A", "spade");
-  const joker = new PlayingCard("joker", "joker");
-  const joker2 = new PlayingCard("joker", "joker");
-  console.log(joker === joker2);
-  console.log(JSON.stringify(joker) === JSON.stringify(joker2));
-  playingCards.removeCard(joker);
-  playingCards.removeCard(joker);
-  console.log(player1);
+  const drawPile = playingCards.createPile(playingCards.cards);
+  const player1 = playingCards.createPile();
+  const player2 = playingCards.createPile();
+  drawPile.shuffle();
+  drawPile.passCard(player1);
+  drawPile.passCard(player1);
+  drawPile.passCard(player1);
+  drawPile.passCard(player1);
+  drawPile.passCard(player1);
+
+  drawPile.passCard(player2);
+  drawPile.passCard(player2);
+  drawPile.passCard(player2);
+  drawPile.passCard(player2);
+  drawPile.passCard(player2);
+
+  console.log(player1.cards);
+  console.log(player2.cards);
 }

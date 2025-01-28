@@ -2,15 +2,19 @@
  * Bare Bones Card, only prop is facedUp
  */
 export default class Card {
-  faceUp: Boolean;
+  private _faceUp: Boolean;
   constructor() {
-    this.faceUp = false;
+    this._faceUp = false;
+  }
+
+  get faceUp() {
+    return this._faceUp;
   }
 
   /**
    * changes whether card is faceUp or not
    */
-  flip() {
-    this.faceUp = !this.faceUp;
-  }
+  flip = () => {
+    this._faceUp = !this._faceUp;
+  };
 }
