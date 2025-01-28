@@ -1,4 +1,5 @@
 import { createCard } from "../../src/components/card/cardDom";
+import { CardElement } from "../../src/components/card/cardElement";
 import "../../src/styles/style.css";
 import "../../src/styles/card.css";
 import "../../src/styles/theme.css";
@@ -16,13 +17,23 @@ function instanceCard() {
 
   return card;
 }
+const instanceCard2 = () => {
+  const card = new PlayingCard("5", "diamond");
+
+  const cardElly = CardElement(card);
+  cardElly.wrapper.addEventListener("click", () => {
+    cardElly.flipCard();
+  });
+
+  return cardElly;
+};
 
 const app = document.getElementById("app");
 if (app) {
   const deckBase = addDeckBase();
   const deckBase2 = addDeckBase();
   const testCard = instanceCard();
-  const testCard2 = instanceCard();
+  const testCard2 = instanceCard2();
   const p2DrawPile = document.getElementById("p2DrawPile");
   p2DrawPile?.appendChild(deckBase.container);
   deckBase.container?.appendChild(testCard.wrapper);
