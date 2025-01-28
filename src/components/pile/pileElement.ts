@@ -1,18 +1,55 @@
-import Deck from "../cardFoundations/DeckClass";
-import { Animate } from "../animations/animate";
 import Pile from "./pile";
 import Card from "../card/card";
+import { CardElement } from "../card/cardElement";
 
 type PileElement<T extends Card> = {
   type: "stack" | "cascade";
   pile: Pile<T>;
+  cardElements: CardElement<T>[];
+  container: HTMLDivElement;
+  cascadePercent: number[];
+  cascadeDuration: number;
+  cascade: () => Promise<unknown>;
+  slideCard: (
+    cardElement: CardElement<T>,
+    vector2: number[],
+    duration: number
+  ) => void;
+  spinCard: (
+    cardElement: CardElement<T>,
+    degrees: string,
+    duration: number
+  ) => Promise<Animation>;
+  zoomCard: (
+    cardElement: CardElement<T>,
+    factor: number,
+    duration: number
+  ) => Promise<Animation>;
+  slideDeck: (vector2: number[], duration: number) => void;
+  moveCardToPile: (
+    destinationPile: PileElement<T>,
+    cardElement?: CardElement<T>,
+    gameRules?: () => boolean,
+    animationCallback?: (
+      destination: PileElement<T>,
+      cardThatWasPassed: CardElement<T>
+    ) => Promise<boolean>
+  ) => Boolean;
+  cascadeValueSetter: (percent: number[], duration: number) => void;
+  reset: () => void;
+  animateMoveCardToNewDeck: (
+    destination: PileElement<T>,
+    cardThatWasPassed: CardElement<T>
+  ) => Promise<boolean>;
+  topCard: CardElement<T>;
 };
 
 // Adds a base the size of the card to be the basis of deck layouts.\
 const pileElement = <T extends Card>(
-  type = "stack",
-  pile = new Pile(new Card()) as T
-): PileElement => {
+  pile = new Pile<T>(),
+  cardElements = [CardElement<T>()],
+  type: "stack" | "cascade" = "stack"
+): PileElement<T> => {
   let cascadePercent = [0, 0.001];
   let cascadeDuration = 0;
   if (type === "stack") {
@@ -22,78 +59,167 @@ const pileElement = <T extends Card>(
     cascadePercent = [0, 0.18];
     cascadeDuration = 0;
   }
+  const { cards } = pile;
 
-  let deck = new Deck(); // Must always equal an array of cards.
   const container = document.createElement("div");
-  container.classList.add("layout-deck-base");
+  container.classList.add("deck-base");
 
-  function slideCard(card, vector2, duration) {
-    const animatedCard = Object.assign({}, Animate(), card);
-    const slide = animatedCard.slide(animatedCard.card, vector2, duration);
-    return slide.finished;
-  }
+  // Animation Properties //! Find a better way to do all of this... I'm just trying to make it work...
+  let translate: string = "";
+  let scale = `scale(1)`;
+  let rotate = `rotate(0deg)`;
+  let transform = `${translate} ${scale} ${rotate}`;
+  const slideCard = async (
+    cardElement: CardElement<T>,
+    vector2: number[],
+    duration: number
+  ) => {
+    if (vector2.length !== 2) {
+      console.error("Error: vector2 must be an array of 2 values, x and y.");
+    }
 
-  function spinCard(card, degrees, duration) {
-    const animatedCard = Object.assign({}, Animate(), card);
-    const spin = animatedCard.spin(animatedCard.card, degrees, duration);
-    return spin.finished;
-  }
+    translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
+    transform = `${translate} ${scale} ${rotate}`;
 
-  function zoomCard(card, factor, duration) {
-    const animatedCard = Object.assign({}, Animate(), card);
-    const zoom = animatedCard.zoom(animatedCard.card, factor, duration);
-    return zoom.finished;
-  }
+    const keys = {
+      transform: transform,
+    };
 
-  function slideDeck(deck, vector2, duration) {
-    const animatedDeck = Object.assign({}, Animate(), deck);
-    const slide = animatedDeck.slide(animatedDeck.container, vector2, duration);
-    return slide.finished;
-  }
+    const options = {
+      duration: duration,
+      easing: "ease-out",
+      delay: 0,
+      direction: "normal" as PlaybackDirection,
+    };
 
-  function cascade() {
-    this.reset();
+    const anim = cardElement.wrapper.animate(keys, options);
+    await anim.finished.then(() => {
+      cardElement.wrapper.style.transform = transform;
+    });
+  };
+
+  const spinCard = async (
+    cardElement: CardElement<T>,
+    degrees: string,
+    duration: number
+  ) => {
+    rotate = `rotate(${degrees}deg)`;
+    transform = `${translate} ${scale} ${rotate}`;
+
+    const keys = {
+      transform: transform,
+    };
+
+    const options = {
+      duration: duration,
+      easing: "linear",
+      delay: 0,
+      direction: "normal" as PlaybackDirection,
+    };
+
+    const anim = cardElement.wrapper.animate(keys, options);
+    await anim.finished.then(() => {
+      cardElement.wrapper.style.transform = transform;
+    });
+
+    return anim;
+  };
+
+  const zoomCard = async (
+    cardElement: CardElement<T>,
+    factor: number,
+    duration: number
+  ) => {
+    scale = `scale(${factor})`;
+    transform = `${translate} ${scale} ${rotate}`;
+
+    const keys = {
+      transform: transform,
+    };
+
+    const options = {
+      duration: duration,
+      easing: "ease-out",
+      delay: 0,
+      direction: "normal" as PlaybackDirection,
+    };
+
+    const anim = cardElement.wrapper.animate(keys, options);
+    await anim.finished.then(() => {
+      cardElement.wrapper.style.transform = transform;
+    });
+
+    return anim;
+  };
+
+  const slideDeck = async (vector2: number[], duration: number) => {
+    if (vector2.length !== 2) {
+      console.error("Error: vector2 must be an array of 2 values, x and y.");
+    }
+
+    translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
+    transform = `${translate} ${scale} ${rotate}`;
+
+    const keys = {
+      transform: transform,
+    };
+
+    const options = {
+      duration: duration,
+      easing: "ease-out",
+      delay: 0,
+      direction: "normal" as PlaybackDirection,
+    };
+
+    const anim = container.animate(keys, options);
+    await anim.finished.then(() => {
+      container.style.transform = transform;
+    });
+  };
+
+  const cascade = () => {
+    reset();
     const promise = new Promise((resolve) => {
       const arrayFinished = []; // Array of .finished promises returned by animate
-      for (let i = 0; i < this.deck.cards.length; i++) {
-        const card = this.deck.cards[i];
+      for (let i = 0; i < cardElements.length; i++) {
         const vector2 = [];
-        const cardElement = this.deck.cards[i].card;
-        vector2[0] =
-          this.cascadePercent[0] * parseInt(cardElement.offsetWidth) * i;
-        vector2[1] =
-          this.cascadePercent[1] * parseInt(cardElement.offsetHeight) * i;
-        const slide = slideCard(card, vector2, this.cascadeDuration);
+        const cardElement = cardElements[i].wrapper;
+        vector2[0] = cascadePercent[0] * cardElement.offsetWidth * i;
+        vector2[1] = cascadePercent[1] * cardElement.offsetHeight * i;
+        const slide = slideCard(cardElements[i], vector2, cascadeDuration);
         arrayFinished.push(slide);
       }
       resolve(Promise.all(arrayFinished).then(() => {}));
     });
     return promise;
-  }
+  };
 
   // sets a new value to the percent of cascade, and a one time use duration
   // then performs the cascade and resets duration to 0
-  function cascadeValueSetter(percent, duration) {
-    this.cascadePercent = percent;
-    this.cascadeDuration = duration;
-    this.cascade();
-    this.cascadeDuration = 0;
-  }
+  const cascadeValueSetter = (percent: number[], duration: number) => {
+    cascadePercent = percent;
+    cascadeDuration = duration;
+    cascade();
+    cascadeDuration = 0;
+  };
 
   // slimmed down move card to deck
-  function moveCardToDeck(
-    destinationDeckBase, // only need to know the destination DeckBase, as we know its coming from *this*Deckbase
-    card = this.deck.cards[this.deck.cards.length - 1],
-    gameRules = true, // ability to pass in rules for passing the card from one deckbase to another
-    animationCallback = this.animateMoveCardToNewDeck // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
-  ) {
+  const moveCardToPile = (
+    destinationPile: PileElement<T>,
+    cardElement = cardElements[cards.length - 1],
+    gameRules = () => true, // ability to pass in rules for passing the card from one deckbase to another
+    animationCallback = animateMoveCardToNewDeck // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
+  ) => {
+    //! I dont like card.state
+    /*
     if (card.state !== "available") {
       return false;
     }
+      */
     // will return either the card that got passed, or false if the rules aren't "true"
-    const cardPassed = this.deck.passCard(
-      destinationDeckBase.deck,
-      card,
+    const cardPassed = pile.passCard(
+      destinationPile.pile,
+      cardElement.card,
       gameRules
     );
 
@@ -101,42 +227,47 @@ const pileElement = <T extends Card>(
     if (cardPassed === false) {
       return false;
     }
-    card.state = "busy";
-    card.location = destinationDeckBase; // changes location info of card
+
+    //! I dont like card.state
+    // card.state = "busy";
 
     // if the animation callback is set to null, don't animate anything and return
     if (animationCallback === null) {
-      this.cascade();
-      destinationDeckBase.cascade();
-      card.state = "available";
-      return card;
+      cascade();
+      destinationPile.cascade();
+      //! I dont like card.state
+      //card.state = "available";
+      return true;
     }
 
     // the card got passed, and this is the animation we want to show.
-    animationCallback(this, destinationDeckBase, cardPassed).then(() => {
-      card.state = "available";
+
+    animationCallback(destinationPile, cardElement).then(() => {
+      //! I dont like card.state
+      // card.state = "available";
+      return true;
     });
+
     // card.state isn't true until animationCallback is done
 
-    return card;
-  }
+    return true;
+  };
 
   // Only to do with animations.
   // I had to now reference where things used to be in objects, because the card
   // has been moved in the Objects, but not visually on the screen
   async function animateMoveCardToNewDeck(
-    source,
-    destination,
-    cardThatWasPassed
+    destination: PileElement<T>,
+    cardThatWasPassed: CardElement<T>
   ) {
     let topCard = cardThatWasPassed;
-    topCard.card.style.zIndex = 100;
-    const sourceBox = source.container.getBoundingClientRect();
+    topCard.wrapper.style.zIndex = "100";
+    const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
     const destinationOffset = calculateOffset(
-      topCard.card,
+      topCard,
       destination,
-      destination.deck.cards.length - 1
+      cardElements.length - 1
     );
 
     const vector2 = [];
@@ -144,30 +275,36 @@ const pileElement = <T extends Card>(
     vector2[1] = destinationBox.y + destinationOffset[1] - sourceBox.y;
 
     await slideCard(topCard, vector2, 600);
-    await destination.container.appendChild(topCard.card);
+    destination.container.appendChild(topCard.wrapper);
     await slideCard(topCard, destinationOffset, 0);
-    spinCard(topCard, 0, 0);
+    spinCard(topCard, "0", 0);
 
-    topCard.card.style.zIndex = destination.deck.cards.length - 1;
-    sortZIndex(source);
-    return Promise.resolve(true);
+    topCard.wrapper.style.zIndex = String(destination.cardElements.length - 1);
+
     //////////////////Helper Functions ////////////////
-    function sortZIndex(deckBase) {
-      for (let index = 0; index < deckBase.deck.cards.length; index++) {
-        const card = deckBase.deck.cards[index].card;
-        card.style.zIndex = index;
-      }
+    for (let index = 0; index < cards.length; index++) {
+      const card = cardElements[index];
+      card.wrapper.style.zIndex = String(index);
     }
-    function calculateOffset(element, deckBase, index) {
+    return Promise.resolve(true);
+
+    function calculateOffset(
+      cardElement: CardElement<T>,
+      pileElement: PileElement<T>,
+      index: number
+    ) {
       index < 0 ? (index = 1) : (index = index);
       const vector = [];
       vector[0] =
-        deckBase.cascadePercent[0] * parseFloat(element.offsetWidth) * index;
+        pileElement.cascadePercent[0] * cardElement.wrapper.offsetWidth * index;
       vector[1] =
-        deckBase.cascadePercent[1] * parseFloat(element.offsetHeight) * index;
+        pileElement.cascadePercent[1] *
+        cardElement.wrapper.offsetHeight *
+        index;
       return vector;
     }
-
+    //! I dont think this ever worked?
+    /*
     function resizeContainer(deckBase) {
       const cardHeight = parseFloat(deckBase.deck.cards[0].card.offsetHeight);
       const cardWidth = parseFloat(deckBase.deck.cards[0].card.offsetWidth);
@@ -197,36 +334,39 @@ const pileElement = <T extends Card>(
         // If y is a positive percent
       }
     }
+      */
     ///////////////////////////////////////////////////
   }
   // resets the container of the DeckBase
-  function reset() {
-    while (this.container.firstElementChild) {
-      this.container.removeChild(this.container.firstElementChild);
+  const reset = () => {
+    while (container.firstElementChild) {
+      container.removeChild(container.firstElementChild);
     }
 
-    for (let i = 0; i < this.deck.cards.length; i++) {
-      const card = this.deck.cards[i];
-      this.container.appendChild(card.card);
+    for (let i = 0; i < cardElements.length; i++) {
+      const card = cardElements[i];
+      container.appendChild(card.wrapper);
     }
-  }
+  };
 
   return {
+    type,
+    pile,
+    cardElements,
     container,
-    deck,
     cascadePercent,
     cascadeDuration,
     slideCard,
     spinCard,
     zoomCard,
     slideDeck,
-    moveCardToDeck,
+    moveCardToPile,
     cascade,
     cascadeValueSetter,
     reset,
     animateMoveCardToNewDeck,
     get topCard() {
-      return this.deck.cards[this.deck.cards.length - 1];
+      return cardElements[cardElements.length - 1];
     },
   };
 };

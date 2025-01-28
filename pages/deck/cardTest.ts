@@ -1,4 +1,5 @@
 import { CardElement } from "../../src/components/card/cardElement";
+import pileElement from "../../src/components/pile/pileElement";
 import "../../src/styles/style.css";
 import "../../src/styles/card.css";
 import "../../src/styles/theme.css";
@@ -8,6 +9,7 @@ import addDeckBase from "../../src/legacy/scripts/cardFoundations/deckBase";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
 import PlayingCardFrontAndBack from "../../src/components/card/playingCard/playingCardElement";
+import Card from "../../src/components/card/card";
 
 function instanceCard() {
   const front = document.createElement("div");
@@ -68,4 +70,21 @@ if (app) {
 
   console.log(player1.cards);
   console.log(player2.cards);
+  const player1CardElements: CardElement<PlayingCard>[] = [];
+  player1.cards.forEach((card) => {
+    const frontnback = PlayingCardFrontAndBack(card);
+    const cardElly = CardElement(frontnback.frontDiv, frontnback.backDiv, card);
+    player1CardElements.push(cardElly);
+  });
+
+  const player1PileElement = pileElement(player1, player1CardElements);
+  const p1Draw = document.getElementById("p1DrawPile");
+  p1Draw?.appendChild(player1PileElement.container);
+  player1PileElement.reset();
+  const player1HandPile = pileElement<PlayingCard>();
+  const p1Hand = document.getElementById("p1Hand");
+  p1Hand?.appendChild(player1HandPile.container);
+  player1PileElement.container.addEventListener("click", () => {
+    player1PileElement.moveCardToPile(player1HandPile);
+  });
 }

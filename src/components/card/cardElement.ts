@@ -1,7 +1,7 @@
 import Pile from "../pile/pile";
 import Card from "./card";
 
-type CardElement<T extends Card> = {
+export type CardElement<T extends Card> = {
   card: T;
   location: Pile<T> | null;
   front: HTMLDivElement;
