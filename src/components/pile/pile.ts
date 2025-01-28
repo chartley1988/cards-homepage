@@ -1,12 +1,11 @@
 import Card from "../card/card";
-import Deck from "../deck/deck";
 
 /**
  * The cards in a Pile are a REFERENCE to the cards in the deck
  */
 export default class Pile<T extends Card> {
   private _cards: T[];
-  constructor(_deck: Deck<T>, cards: T[] = []) {
+  constructor(cards: T[] = []) {
     this._cards = [...cards];
   }
 

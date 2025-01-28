@@ -19,7 +19,7 @@ export default class Deck<T extends Card> {
   constructor(cards: T[] = []) {
     this._cards = cards;
     this._piles = [];
-    this._graveyard = new Pile<T>(this); // to remove a card already in play it has to be passed to a pile... this is the graveyard pile it goes to. Rare use case.
+    this._graveyard = new Pile<T>(); // to remove a card already in play it has to be passed to a pile... this is the graveyard pile it goes to. Rare use case.
   }
 
   get cards() {
@@ -46,7 +46,7 @@ export default class Deck<T extends Card> {
    */
 
   createPile = (cards: T[] = []) => {
-    const pile = new Pile(this, cards);
+    const pile = new Pile(cards);
     this._piles.push(pile);
     return pile;
   };

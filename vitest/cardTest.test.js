@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import Card from "../src/components/card/card";
-import PlayingCard from "../src/components/card/playingCard/playingCard";
+import PlayingCard from "../src/components/card/playingCard/playingCardClass";
 import Deck from "../src/components/deck/deck";
 import Pile from "../src/components/pile/pile";
 import StandardDeckOfCards from "../src/components/card/playingCard/standardDeckOfCards";
@@ -55,9 +55,9 @@ test("pile can pass cards", () => {
   const fourOfSpades = new PlayingCard("4", "spade");
   deck.addCards(aceOfSpades);
   deck.addCards([twoOfSpades, threeOfSpades, fourOfSpades]);
-  const drawPile = new Pile(deck, deck.cards);
+  const drawPile = new Pile(deck.cards);
   expect(drawPile.cards).toStrictEqual(deck.cards);
-  const playerHand = new Pile(deck);
+  const playerHand = new Pile();
   drawPile.passCard(playerHand, aceOfSpades);
   // draw pile will no longer have ace of spades
   expect(drawPile.cards).toStrictEqual([
