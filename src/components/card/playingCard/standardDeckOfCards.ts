@@ -1,5 +1,5 @@
 import Deck from "../../deck/deck";
-import PlayingCard from "./playingCard";
+import PlayingCard from "./playingCardClass";
 
 type suit = "diamond" | "spade" | "heart" | "club";
 type cardNumber =

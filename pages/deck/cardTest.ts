@@ -7,8 +7,11 @@ import "./styles.css";
 import "../../src/components/navMenu/navMenu";
 import addDeckBase from "../../src/legacy/scripts/cardFoundations/deckBase";
 import Pile from "../../src/components/pile/pile";
-import PlayingCard from "../../src/components/card/playingCard/playingCard";
+import Card from "../../src/components/card/card";
+import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
+import PlayingCardFrontAndBack from "../../src/components/card/playingCard/playingCardElement";
+
 function instanceCard() {
   const card = createCard();
   card.wrapper.addEventListener("click", () => {
@@ -18,9 +21,13 @@ function instanceCard() {
   return card;
 }
 const instanceCard2 = () => {
-  const card = new PlayingCard("5", "diamond");
-
-  const cardElly = CardElement(card);
+  const card = new PlayingCard("K", "spade");
+  const playingCardFrontAndBackDivs = PlayingCardFrontAndBack(card);
+  const cardElly = CardElement(
+    playingCardFrontAndBackDivs.frontDiv,
+    playingCardFrontAndBackDivs.backDiv,
+    card
+  );
   cardElly.wrapper.addEventListener("click", () => {
     cardElly.flipCard();
   });

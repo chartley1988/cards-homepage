@@ -1,40 +1,30 @@
 import Pile from "../pile/pile";
 import Card from "./card";
+
 type CardElement<T extends Card> = {
   card: T;
   location: Pile<T> | null;
-  front: HTMLDivElement;
-  back: HTMLDivElement;
-  parent: HTMLDivElement;
+  front: HTMLDivElement | null;
+  back: HTMLDivElement | null;
   wrapper: HTMLDivElement;
   flipCard: () => void;
   getFlipSpeed: () => string;
   blindFlip: () => void;
 };
 
-export const CardElement = <T extends Card>(thisCard: T): CardElement<T> => {
+export const CardElement = <T extends Card>(
+  front: HTMLDivElement = document.createElement("div"),
+  back: HTMLDivElement = document.createElement("div"),
+  thisCard: T = new Card() as T
+): CardElement<T> => {
   let card = thisCard;
   let flipEnabled = true;
   let location = null;
 
   // FUNCTIONS
-  const front = (() => {
-    const frontDom = document.createElement("div");
-    frontDom.classList.add("front"); // Generic to all cards
-    frontDom.dataset.number = "front";
-    return frontDom;
-  })();
-
-  const back = (() => {
-    const backDom = document.createElement("div");
-    backDom.classList.add("back");
-    backDom.dataset.number = "back";
-    return backDom;
-  })();
-
   const parent = (() => {
     const parent = document.createElement("div");
-    parent.classList.add("card");
+    parent.classList.add("card-parent");
     return parent;
   })();
 
@@ -46,6 +36,8 @@ export const CardElement = <T extends Card>(thisCard: T): CardElement<T> => {
 
   (() => {
     wrapper.appendChild(parent);
+    front.classList.add("card-front");
+    back.classList.add("card-back");
     parent.appendChild(back);
     front.classList.toggle("flipped");
     back.classList.toggle("flipped");
@@ -117,7 +109,6 @@ export const CardElement = <T extends Card>(thisCard: T): CardElement<T> => {
     },
     front,
     back,
-    parent,
     wrapper,
     flipCard,
     getFlipSpeed,
