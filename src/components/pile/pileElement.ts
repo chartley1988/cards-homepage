@@ -76,8 +76,6 @@ const pileElement = <T extends Card>(
     if (vector2.length !== 2) {
       console.error("Error: vector2 must be an array of 2 values, x and y.");
     }
-    cardElement.transform.active = true;
-    cardElement.stopPropagation();
     let { translate, scale, rotate } = cardElement.transform;
     translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
     const transform = `${translate} ${scale} ${rotate}`;
@@ -94,21 +92,21 @@ const pileElement = <T extends Card>(
     };
 
     const anim = cardElement.wrapper.animate(keys, options);
+    cardElement.wrapper.dispatchEvent(new Event("animationstart"));
     await anim.finished.then(() => {
       cardElement.wrapper.style.transform = transform;
-      cardElement.transform.active = false;
-      cardElement.startPropagation();
+      cardElement.wrapper.dispatchEvent(new Event("animationend"));
     });
   };
 
   const spinCard = async (cardElement: CardElement<T>, duration: number) => {
     if (cardElement.transform.active) return new Promise(() => undefined);
-    cardElement.transform.active = true;
-    cardElement.stopPropagation();
+
     cardElement.transform.rotate === `rotate(0deg)`
       ? (cardElement.transform.rotate = "rotate(90deg)")
       : (cardElement.transform.rotate = "rotate(0deg)");
-    let { translate, scale, rotate } = cardElement.transform;
+
+    const { translate, scale, rotate } = cardElement.transform;
     const transform = `${translate} ${scale} ${rotate}`;
 
     const keys = {
@@ -123,15 +121,16 @@ const pileElement = <T extends Card>(
     };
 
     const anim = cardElement.wrapper.animate(keys, options);
+    cardElement.wrapper.dispatchEvent(new Event("animationstart"));
     await anim.finished.then(() => {
       cardElement.wrapper.style.transform = transform;
-      cardElement.transform.active = false;
-      cardElement.startPropagation();
+      cardElement.wrapper.dispatchEvent(new Event("animationend"));
     });
 
     return anim;
   };
 
+  //! I haven't tested this
   const zoomCard = async (
     cardElement: CardElement<T>,
     factor: number,
@@ -264,14 +263,13 @@ const pileElement = <T extends Card>(
   // has been moved in the Objects, but not visually on the screen
   async function animateMoveCardToNewDeck(
     destination: PileElement<T>,
-    cardThatWasPassed: CardElement<T>
+    cardElement: CardElement<T>
   ) {
-    let topCard = cardThatWasPassed;
-    topCard.wrapper.style.zIndex = String(destination.cards.length + 1000);
+    cardElement.wrapper.style.zIndex = String(destination.cards.length + 1000);
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
     const destinationOffset = calculateOffset(
-      topCard,
+      cardElement,
       destination,
       cardElements.length - 1
     );
@@ -280,18 +278,18 @@ const pileElement = <T extends Card>(
     vector2[0] = destinationBox.x + destinationOffset[0] - sourceBox.x;
     vector2[1] = destinationBox.y + destinationOffset[1] - sourceBox.y;
 
-    await slideCard(topCard, vector2, 600);
-    destination.container.appendChild(topCard.wrapper);
-    await slideCard(topCard, destinationOffset, 0);
-    //spinCard(topCard, "0", 0);
+    await slideCard(cardElement, vector2, 6000);
+    destination.container.appendChild(cardElement.wrapper);
+    await slideCard(cardElement, destinationOffset, 0);
+    //spinCard(cardElement, "0", 0);
 
-    topCard.wrapper.style.zIndex = String(destination.cardElements.length);
+    cardElement.wrapper.style.zIndex = String(destination.cardElements.length);
 
     for (let index = 0; index < destination.cardElements.length; index++) {
       const card = destination.cardElements[index];
       card.wrapper.style.zIndex = String(index);
     }
-    destination.cardElements.push(cardThatWasPassed);
+    destination.cardElements.push(cardElement);
 
     return Promise.resolve(true);
 

@@ -16,8 +16,6 @@ export type CardElement<T extends Card> = {
   flip: () => void;
   getFlipSpeed: () => string;
   blindFlip: () => void;
-  stopPropagation: () => void;
-  startPropagation: () => void;
 };
 
 export const CardElement = <T extends Card>(
@@ -67,6 +65,14 @@ export const CardElement = <T extends Card>(
     parent.appendChild(back);
     front.classList.toggle("flipped");
     back.classList.toggle("flipped");
+    wrapper.addEventListener("animationstart", () => {
+      transform.active = true;
+      stopPropagation();
+    });
+    wrapper.addEventListener("animationend", () => {
+      transform.active = false;
+      startPropagation();
+    });
   })();
 
   const flip = (delay = 0) => {
@@ -176,7 +182,5 @@ export const CardElement = <T extends Card>(
     flip,
     getFlipSpeed,
     blindFlip,
-    stopPropagation,
-    startPropagation,
   };
 };
