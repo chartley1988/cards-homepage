@@ -5,6 +5,7 @@ import { CardElement } from "../card/cardElement";
 type PileElement<T extends Card> = {
   type: "stack" | "cascade";
   pile: Pile<T>;
+  cards: T[];
   cardElements: CardElement<T>[];
   container: HTMLDivElement;
   cascadePercent: number[];
@@ -15,6 +16,7 @@ type PileElement<T extends Card> = {
     vector2: number[],
     duration: number
   ) => void;
+  getTopCardElement: () => CardElement<T>;
   spinCard: (
     cardElement: CardElement<T>,
     degrees: string,
@@ -202,14 +204,24 @@ const pileElement = <T extends Card>(
     cascade();
     cascadeDuration = 0;
   };
+  //
+  const getTopCardElement = (): CardElement<T> => {
+    const topCard = cards[cards.length - 1];
+    let topCardElement = CardElement<T>();
+    cardElements.forEach((element) => {
+      if (element.card === topCard) topCardElement = element;
+    });
+    return topCardElement;
+  };
 
   // slimmed down move card to deck
   const moveCardToPile = (
     destinationPile: PileElement<T>,
-    cardElement = cardElements[cards.length - 1],
+    cardElement = getTopCardElement(),
     gameRules = () => true, // ability to pass in rules for passing the card from one deckbase to another
     animationCallback = animateMoveCardToNewDeck // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) => {
+    if (cardElements.indexOf(cardElement) === -1) return false;
     //! I dont like card.state
     /*
     if (card.state !== "available") {
@@ -233,6 +245,7 @@ const pileElement = <T extends Card>(
 
     // if the animation callback is set to null, don't animate anything and return
     if (animationCallback === null) {
+      cardElements.splice(cardElements.indexOf(cardElement), 1);
       cascade();
       destinationPile.cascade();
       //! I dont like card.state
@@ -245,6 +258,7 @@ const pileElement = <T extends Card>(
     animationCallback(destinationPile, cardElement).then(() => {
       //! I dont like card.state
       // card.state = "available";
+      cardElements.splice(cardElements.indexOf(cardElement), 1);
       return true;
     });
 
@@ -261,7 +275,8 @@ const pileElement = <T extends Card>(
     cardThatWasPassed: CardElement<T>
   ) {
     let topCard = cardThatWasPassed;
-    topCard.wrapper.style.zIndex = "100";
+    topCard.stopPropagation();
+    topCard.wrapper.style.zIndex = String(destination.cards.length + 1000);
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
     const destinationOffset = calculateOffset(
@@ -277,15 +292,17 @@ const pileElement = <T extends Card>(
     await slideCard(topCard, vector2, 600);
     destination.container.appendChild(topCard.wrapper);
     await slideCard(topCard, destinationOffset, 0);
-    spinCard(topCard, "0", 0);
+    //spinCard(topCard, "0", 0);
 
-    topCard.wrapper.style.zIndex = String(destination.cardElements.length - 1);
+    topCard.wrapper.style.zIndex = String(destination.cardElements.length);
 
-    //////////////////Helper Functions ////////////////
-    for (let index = 0; index < cards.length; index++) {
-      const card = cardElements[index];
+    for (let index = 0; index < destination.cardElements.length; index++) {
+      const card = destination.cardElements[index];
       card.wrapper.style.zIndex = String(index);
     }
+    destination.cardElements.push(cardThatWasPassed);
+    topCard.startPropagation();
+
     return Promise.resolve(true);
 
     function calculateOffset(
@@ -352,10 +369,14 @@ const pileElement = <T extends Card>(
   return {
     type,
     pile,
+    get cards() {
+      return pile.cards;
+    },
     cardElements,
     container,
     cascadePercent,
     cascadeDuration,
+    getTopCardElement,
     slideCard,
     spinCard,
     zoomCard,

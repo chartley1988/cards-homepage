@@ -10,6 +10,8 @@ export type CardElement<T extends Card> = {
   flip: () => void;
   getFlipSpeed: () => string;
   blindFlip: () => void;
+  stopPropagation: () => void;
+  startPropagation: () => void;
 };
 
 export const CardElement = <T extends Card>(
@@ -17,11 +19,19 @@ export const CardElement = <T extends Card>(
   _back = document.createElement("div"),
   thisCard = new Card() as T
 ): CardElement<T> => {
-  let card = thisCard;
+  const card = thisCard;
   let flipEnabled = true;
-  let location = null;
-  let front = _front;
-  let back = _back;
+  const location = null;
+  const front = _front;
+  const back = _back;
+  const listenerList = [
+    "click",
+    "touch",
+    "dblclick",
+    "keydown",
+    "focus",
+    "mousedown",
+  ];
 
   // FUNCTIONS
   const parent = (() => {
@@ -76,6 +86,20 @@ export const CardElement = <T extends Card>(
         wrapper.addEventListener("transitionend", removeFront);
       }
     }
+  };
+
+  const stopProp = (e: Event) => {
+    e.stopPropagation();
+  };
+  const stopPropagation = () => {
+    listenerList.forEach((listener) => {
+      wrapper.addEventListener(listener, stopProp);
+    });
+  };
+  const startPropagation = () => {
+    listenerList.forEach((listener) => {
+      wrapper.removeEventListener(listener, stopProp);
+    });
   };
 
   //! Is this ever used?
@@ -137,5 +161,7 @@ export const CardElement = <T extends Card>(
     flip,
     getFlipSpeed,
     blindFlip,
+    stopPropagation,
+    startPropagation,
   };
 };

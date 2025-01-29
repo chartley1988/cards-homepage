@@ -54,7 +54,7 @@ if (app) {
   const playingCards = StandardDeckOfCards();
   const drawPile = playingCards.createPile(playingCards.cards);
   const player1 = playingCards.createPile();
-  const player2 = playingCards.createPile();
+  const player1HAND = playingCards.createPile();
   drawPile.shuffle();
   drawPile.passCard(player1);
   drawPile.passCard(player1);
@@ -62,29 +62,46 @@ if (app) {
   drawPile.passCard(player1);
   drawPile.passCard(player1);
 
-  drawPile.passCard(player2);
-  drawPile.passCard(player2);
-  drawPile.passCard(player2);
-  drawPile.passCard(player2);
-  drawPile.passCard(player2);
+  drawPile.passCard(player1HAND);
+  drawPile.passCard(player1HAND);
+  drawPile.passCard(player1HAND);
+  drawPile.passCard(player1HAND);
+  drawPile.passCard(player1HAND);
 
-  console.log(player1.cards);
-  console.log(player2.cards);
   const player1CardElements: CardElement<PlayingCard>[] = [];
+  const player1CardElements2: CardElement<PlayingCard>[] = [];
+
   player1.cards.forEach((card) => {
     const frontnback = PlayingCardFrontAndBack(card);
     const cardElly = CardElement(frontnback.frontDiv, frontnback.backDiv, card);
     player1CardElements.push(cardElly);
   });
 
-  const player1PileElement = pileElement(player1, player1CardElements);
-  const p1Draw = document.getElementById("p1DrawPile");
-  p1Draw?.appendChild(player1PileElement.container);
-  player1PileElement.reset();
-  const player1HandPile = pileElement<PlayingCard>();
+  player1HAND.cards.forEach((card) => {
+    const frontnback = PlayingCardFrontAndBack(card);
+    const cardElly = CardElement(frontnback.frontDiv, frontnback.backDiv, card);
+    player1CardElements2.push(cardElly);
+  });
+
+  const p1DrawPileElement = pileElement(player1, player1CardElements);
+  const p1DrawDOM = document.getElementById("p1DrawPile");
+  p1DrawDOM?.appendChild(p1DrawPileElement.container);
+  p1DrawPileElement.reset();
+  p1DrawPileElement.container.addEventListener("dblclick", () => {
+    p1DrawPileElement.moveCardToPile(player1HandPile);
+    console.log(p1DrawPileElement.cardElements.length);
+    console.log(p1DrawPileElement.cards.length);
+  });
+  p1DrawPileElement.container.addEventListener("click", () => {
+    p1DrawPileElement.getTopCardElement().flip();
+  });
+
+  const player1HandPile = pileElement(player1HAND, player1CardElements2);
   const p1Hand = document.getElementById("p1Hand");
   p1Hand?.appendChild(player1HandPile.container);
-  player1PileElement.container.addEventListener("click", () => {
-    player1PileElement.moveCardToPile(player1HandPile);
+  player1HandPile.reset();
+  player1HandPile.container.addEventListener("dblclick", () => {
+    player1HandPile.moveCardToPile(p1DrawPileElement);
+    console.log(player1HandPile.cardElements.length);
   });
 }
