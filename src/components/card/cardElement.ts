@@ -7,6 +7,12 @@ export type CardElement<T extends Card> = {
   front: HTMLDivElement;
   back: HTMLDivElement;
   wrapper: HTMLDivElement;
+  transform: {
+    active: Boolean;
+    translate: string;
+    scale: string;
+    rotate: string;
+  };
   flip: () => void;
   getFlipSpeed: () => string;
   blindFlip: () => void;
@@ -31,7 +37,15 @@ export const CardElement = <T extends Card>(
     "keydown",
     "focus",
     "mousedown",
+    "mouseenter",
+    "mouseexit",
   ];
+  const transform = {
+    active: false,
+    translate: "translate(0px, 0px)",
+    scale: `scale(1)`,
+    rotate: `rotate(0deg)`,
+  };
 
   // FUNCTIONS
   const parent = (() => {
@@ -158,6 +172,7 @@ export const CardElement = <T extends Card>(
     },
     */
     wrapper,
+    transform,
     flip,
     getFlipSpeed,
     blindFlip,

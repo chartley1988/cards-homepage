@@ -19,9 +19,8 @@ type PileElement<T extends Card> = {
   getTopCardElement: () => CardElement<T>;
   spinCard: (
     cardElement: CardElement<T>,
-    degrees: string,
     duration: number
-  ) => Promise<Animation>;
+  ) => Promise<Animation> | Promise<unknown>;
   zoomCard: (
     cardElement: CardElement<T>,
     factor: number,
@@ -67,21 +66,21 @@ const pileElement = <T extends Card>(
   container.classList.add("deck-base");
 
   // Animation Properties //! Find a better way to do all of this... I'm just trying to make it work...
-  let translate: string = "";
-  let scale = `scale(1)`;
-  let rotate = `rotate(0deg)`;
-  let transform = `${translate} ${scale} ${rotate}`;
+
   const slideCard = async (
     cardElement: CardElement<T>,
     vector2: number[],
     duration: number
   ) => {
+    if (cardElement.transform.active) return;
     if (vector2.length !== 2) {
       console.error("Error: vector2 must be an array of 2 values, x and y.");
     }
-
+    cardElement.transform.active = true;
+    cardElement.stopPropagation();
+    let { translate, scale, rotate } = cardElement.transform;
     translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
-    transform = `${translate} ${scale} ${rotate}`;
+    const transform = `${translate} ${scale} ${rotate}`;
 
     const keys = {
       transform: transform,
@@ -97,16 +96,20 @@ const pileElement = <T extends Card>(
     const anim = cardElement.wrapper.animate(keys, options);
     await anim.finished.then(() => {
       cardElement.wrapper.style.transform = transform;
+      cardElement.transform.active = false;
+      cardElement.startPropagation();
     });
   };
 
-  const spinCard = async (
-    cardElement: CardElement<T>,
-    degrees: string,
-    duration: number
-  ) => {
-    rotate = `rotate(${degrees}deg)`;
-    transform = `${translate} ${scale} ${rotate}`;
+  const spinCard = async (cardElement: CardElement<T>, duration: number) => {
+    if (cardElement.transform.active) return new Promise(() => undefined);
+    cardElement.transform.active = true;
+    cardElement.stopPropagation();
+    cardElement.transform.rotate === `rotate(0deg)`
+      ? (cardElement.transform.rotate = "rotate(90deg)")
+      : (cardElement.transform.rotate = "rotate(0deg)");
+    let { translate, scale, rotate } = cardElement.transform;
+    const transform = `${translate} ${scale} ${rotate}`;
 
     const keys = {
       transform: transform,
@@ -122,6 +125,8 @@ const pileElement = <T extends Card>(
     const anim = cardElement.wrapper.animate(keys, options);
     await anim.finished.then(() => {
       cardElement.wrapper.style.transform = transform;
+      cardElement.transform.active = false;
+      cardElement.startPropagation();
     });
 
     return anim;
@@ -132,8 +137,10 @@ const pileElement = <T extends Card>(
     factor: number,
     duration: number
   ) => {
+    let { translate, scale, rotate } = cardElement.transform;
+
     scale = `scale(${factor})`;
-    transform = `${translate} ${scale} ${rotate}`;
+    const transform = `${translate} ${scale} ${rotate}`;
 
     const keys = {
       transform: transform,
@@ -159,8 +166,8 @@ const pileElement = <T extends Card>(
       console.error("Error: vector2 must be an array of 2 values, x and y.");
     }
 
-    translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
-    transform = `${translate} ${scale} ${rotate}`;
+    const translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
+    const transform = `${translate} scale(1) rotate(0deg)`;
 
     const keys = {
       transform: transform,
@@ -222,12 +229,7 @@ const pileElement = <T extends Card>(
     animationCallback = animateMoveCardToNewDeck // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) => {
     if (cardElements.indexOf(cardElement) === -1) return false;
-    //! I dont like card.state
-    /*
-    if (card.state !== "available") {
-      return false;
-    }
-      */
+
     // will return either the card that got passed, or false if the rules aren't "true"
     const cardPassed = pile.passCard(
       destinationPile.pile,
@@ -240,30 +242,20 @@ const pileElement = <T extends Card>(
       return false;
     }
 
-    //! I dont like card.state
-    // card.state = "busy";
-
     // if the animation callback is set to null, don't animate anything and return
+    //! untested
     if (animationCallback === null) {
-      cardElements.splice(cardElements.indexOf(cardElement), 1);
+      destinationPile.cardElements.push(
+        cardElements.splice(cardElements.indexOf(cardElement), 1)[0]
+      );
       cascade();
       destinationPile.cascade();
-      //! I dont like card.state
-      //card.state = "available";
       return true;
     }
 
     // the card got passed, and this is the animation we want to show.
-
-    animationCallback(destinationPile, cardElement).then(() => {
-      //! I dont like card.state
-      // card.state = "available";
-      cardElements.splice(cardElements.indexOf(cardElement), 1);
-      return true;
-    });
-
-    // card.state isn't true until animationCallback is done
-
+    cardElements.splice(cardElements.indexOf(cardElement), 1);
+    animationCallback(destinationPile, cardElement);
     return true;
   };
 
@@ -275,7 +267,6 @@ const pileElement = <T extends Card>(
     cardThatWasPassed: CardElement<T>
   ) {
     let topCard = cardThatWasPassed;
-    topCard.stopPropagation();
     topCard.wrapper.style.zIndex = String(destination.cards.length + 1000);
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
@@ -301,7 +292,6 @@ const pileElement = <T extends Card>(
       card.wrapper.style.zIndex = String(index);
     }
     destination.cardElements.push(cardThatWasPassed);
-    topCard.startPropagation();
 
     return Promise.resolve(true);
 

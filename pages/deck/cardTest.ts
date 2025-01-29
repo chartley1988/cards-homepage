@@ -89,8 +89,6 @@ if (app) {
   p1DrawPileElement.reset();
   p1DrawPileElement.container.addEventListener("dblclick", () => {
     p1DrawPileElement.moveCardToPile(player1HandPile);
-    console.log(p1DrawPileElement.cardElements.length);
-    console.log(p1DrawPileElement.cards.length);
   });
   p1DrawPileElement.container.addEventListener("click", () => {
     p1DrawPileElement.getTopCardElement().flip();
@@ -100,8 +98,11 @@ if (app) {
   const p1Hand = document.getElementById("p1Hand");
   p1Hand?.appendChild(player1HandPile.container);
   player1HandPile.reset();
-  player1HandPile.container.addEventListener("dblclick", () => {
+  player1HandPile.container.addEventListener("click", () => {
     player1HandPile.moveCardToPile(p1DrawPileElement);
-    console.log(player1HandPile.cardElements.length);
+  });
+
+  player1HandPile.container.addEventListener("mouseenter", () => {
+    player1HandPile.spinCard(player1HandPile.getTopCardElement(), 1000);
   });
 }
