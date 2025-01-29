@@ -2,7 +2,7 @@ import Pile from "./pile";
 import Card from "../card/card";
 import { CardElement } from "../card/cardElement";
 
-type PileElement<T extends Card> = {
+export type PileElement<T extends Card> = {
   type: "stack" | "cascade";
   pile: Pile<T>;
   cards: T[];
@@ -46,7 +46,7 @@ type PileElement<T extends Card> = {
 };
 
 // Adds a base the size of the card to be the basis of deck layouts.\
-const pileElement = <T extends Card>(
+export const pileElement = <T extends Card>(
   pile = new Pile<T>(),
   cardElements = [CardElement<T>()],
   type: "stack" | "cascade" = "stack"
@@ -160,6 +160,7 @@ const pileElement = <T extends Card>(
     return anim;
   };
 
+  //! I havent tested this
   const slideDeck = async (vector2: number[], duration: number) => {
     if (vector2.length !== 2) {
       console.error("Error: vector2 must be an array of 2 values, x and y.");
@@ -185,6 +186,7 @@ const pileElement = <T extends Card>(
     });
   };
 
+  //! I havent tested this
   const cascade = () => {
     reset();
     const promise = new Promise((resolve) => {
@@ -210,7 +212,11 @@ const pileElement = <T extends Card>(
     cascade();
     cascadeDuration = 0;
   };
-  //
+
+  /**
+   * Card Elements have animations, and must remain part of the original Pile until the animation is complete. The card objects are moved instantly, this function checks for top card object, and returns matching cardElement.
+   * @returns The cardElement that is on the top of the pile
+   */
   const getTopCardElement = (): CardElement<T> => {
     const topCard = cards[cards.length - 1];
     let topCardElement = CardElement<T>();
@@ -379,5 +385,3 @@ const pileElement = <T extends Card>(
     },
   };
 };
-
-export default pileElement;

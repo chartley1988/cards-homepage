@@ -1,7 +1,8 @@
 import PlayingCard from "./playingCardClass";
 import "./playingCard.css";
+import { CardElement } from "../cardElement";
 
-const PlayingCardFrontAndBack = (card: PlayingCard) => {
+const PlayingCardElement = (card: PlayingCard) => {
   // Properties
   const number = card.number;
   const suit = card.symbol;
@@ -21,7 +22,7 @@ const PlayingCardFrontAndBack = (card: PlayingCard) => {
     top_left.classList.add("top-left");
     top_left.dataset.suit = suit;
     bottom_right.classList.add("bottom-right");
-    bottom_right.dataset.suit = suit;
+    top_left.dataset.suit = suit;
     // Adds Suit and Number to opposite corners of cards
     [top_left, bottom_right].forEach((node) => {
       const cornerNumber = document.createElement("div");
@@ -200,10 +201,7 @@ const PlayingCardFrontAndBack = (card: PlayingCard) => {
     return card;
   })();
 
-  return {
-    frontDiv,
-    backDiv,
-  };
+  return CardElement(frontDiv, backDiv, card);
 };
 
-export default PlayingCardFrontAndBack;
+export default PlayingCardElement;
