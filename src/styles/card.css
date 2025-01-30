@@ -15,7 +15,7 @@
   user-select: none; /* Standard syntax */
 }
 
-.card-wrapper {
+.card-container {
   position: absolute;
   display: flex;
   flex-direction: column;

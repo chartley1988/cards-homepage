@@ -15,7 +15,7 @@ function instanceCard() {
   front.classList.add("eh", "gfhfdgh", "yolo");
   front.innerHTML = "heyyyy";
   const card = CardElement();
-  card.wrapper.addEventListener("click", () => {
+  card.container.addEventListener("click", () => {
     card.flip();
   });
 
@@ -25,7 +25,7 @@ const instanceCard2 = () => {
   const card = new PlayingCard("K", "spade");
   const cardElly = PlayingCardElement(card);
 
-  cardElly.wrapper.addEventListener("click", () => {
+  cardElly.container.addEventListener("click", () => {
     cardElly.flip();
   });
 
@@ -40,10 +40,10 @@ if (app) {
   const testCard2 = instanceCard2();
   const p2DrawPile = document.getElementById("p2DrawPile");
   p2DrawPile?.appendChild(deckBase.container);
-  deckBase.container?.appendChild(testCard.wrapper);
+  deckBase.container?.appendChild(testCard.container);
   const p1DrawPile = document.getElementById("p1Discard");
   p1DrawPile?.appendChild(deckBase2.container);
-  deckBase2.container?.appendChild(testCard2.wrapper);
+  deckBase2.container?.appendChild(testCard2.container);
 
   // Deck
   const playingCards = StandardDeckOfCards();

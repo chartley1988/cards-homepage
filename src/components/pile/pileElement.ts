@@ -60,7 +60,7 @@ export const pileElement = <T extends Card>(
     cascadePercent = [0.18, 0];
     cascadeDuration = 0;
   }
-  const { cards } = pile;
+  const cards = pile.cards;
 
   const container = document.createElement("div");
   container.classList.add("deck-base");
@@ -95,13 +95,13 @@ export const pileElement = <T extends Card>(
       direction: "normal" as PlaybackDirection,
     };
 
-    const anim = cardElement.wrapper.animate(keys, options);
-    cardElement.wrapper.dispatchEvent(new Event("animationstart"));
+    const anim = cardElement.container.animate(keys, options);
+    cardElement.container.dispatchEvent(new Event("animationstart"));
     await anim.finished.then(() => {
-      cardElement.wrapper.style.transform = transform;
+      cardElement.container.style.transform = transform;
       cardElement;
 
-      cardElement.wrapper.dispatchEvent(new Event("animationend"));
+      cardElement.container.dispatchEvent(new Event("animationend"));
     });
   };
 
@@ -126,11 +126,11 @@ export const pileElement = <T extends Card>(
       direction: "normal" as PlaybackDirection,
     };
 
-    const anim = cardElement.wrapper.animate(keys, options);
-    cardElement.wrapper.dispatchEvent(new Event("animationstart"));
+    const anim = cardElement.container.animate(keys, options);
+    cardElement.container.dispatchEvent(new Event("animationstart"));
     await anim.finished.then(() => {
-      cardElement.wrapper.style.transform = transform;
-      cardElement.wrapper.dispatchEvent(new Event("animationend"));
+      cardElement.container.style.transform = transform;
+      cardElement.container.dispatchEvent(new Event("animationend"));
     });
 
     return anim;
@@ -158,9 +158,9 @@ export const pileElement = <T extends Card>(
       direction: "normal" as PlaybackDirection,
     };
 
-    const anim = cardElement.wrapper.animate(keys, options);
+    const anim = cardElement.container.animate(keys, options);
     await anim.finished.then(() => {
-      cardElement.wrapper.style.transform = transform;
+      cardElement.container.style.transform = transform;
     });
 
     return anim;
@@ -199,7 +199,7 @@ export const pileElement = <T extends Card>(
       const arrayFinished = []; // Array of .finished promises returned by animate
       for (let i = 0; i < cardElements.length; i++) {
         const vector2 = [];
-        const cardElement = cardElements[i].wrapper;
+        const cardElement = cardElements[i].container;
         vector2[0] = cascadePercent[0] * cardElement.offsetWidth * i;
         vector2[1] = cascadePercent[1] * cardElement.offsetHeight * i;
         const slide = slideCard(cardElements[i], vector2, cascadeDuration);
@@ -274,19 +274,19 @@ export const pileElement = <T extends Card>(
     destination: PileElement<T>,
     cardElement: CardElement<T>
   ) {
-    cardElement.wrapper.style.zIndex = String(destination.cards.length + 1000);
-
     //! Offset wasnt working... i rewrote but left out cascade percent
-    // gets the bounds of all necessary items...
+    cardElement.container.style.zIndex = String(
+      destination.cards.length + 1000
+    );
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
 
     const destinationCascade = [
       destination.cascadePercent[0] *
-        cardElement.wrapper.offsetWidth *
+        cardElement.container.offsetWidth *
         (destination.cards.length - 1),
       destination.cascadePercent[1] *
-        cardElement.wrapper.offsetHeight *
+        cardElement.container.offsetHeight *
         (destination.cards.length - 1),
     ];
 
@@ -295,23 +295,25 @@ export const pileElement = <T extends Card>(
     vector2[1] = destinationBox.y - sourceBox.y + destinationCascade[1];
     //! Offset wasnt working... i rewrote but left out cascade percent
 
-    await slideCard(cardElement, vector2, 1000);
-    destination.container.appendChild(cardElement.wrapper);
+    await slideCard(cardElement, vector2, 600);
+    destination.container.appendChild(cardElement.container);
 
     //! This should be a func
     let { translate, scale, rotate } = cardElement.transform;
     translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
     cardElement.transform.translate = translate;
-    cardElement.wrapper.style.transform = `${translate} ${scale} ${rotate}`;
+    cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
     //! This should be a func
 
     //spinCard(cardElement, "0", 0);
 
-    cardElement.wrapper.style.zIndex = String(destination.cardElements.length);
+    cardElement.container.style.zIndex = String(
+      destination.cardElements.length
+    );
 
     for (let index = 0; index < destination.cardElements.length; index++) {
       const card = destination.cardElements[index];
-      card.wrapper.style.zIndex = String(index);
+      card.container.style.zIndex = String(index);
     }
     destination.cardElements.push(cardElement);
     destination.cascade();
@@ -360,13 +362,15 @@ export const pileElement = <T extends Card>(
 
     for (let i = 0; i < cardElements.length; i++) {
       const card = cardElements[i];
-      container.appendChild(card.wrapper);
+      container.appendChild(card.container);
     }
   };
 
   return {
     type,
-    pile,
+    get pile() {
+      return pile;
+    },
     get cards() {
       return pile.cards;
     },

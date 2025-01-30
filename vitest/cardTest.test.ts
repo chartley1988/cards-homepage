@@ -60,7 +60,6 @@ test("pile can pass cards", () => {
   const playerHand = deck.createPile("hand");
   drawPile.passCard(playerHand, aceOfSpades);
   // draw pile will no longer have ace of spades
-  console.log(drawPile.cards);
   expect(drawPile.cards).toStrictEqual([
     twoOfSpades,
     threeOfSpades,

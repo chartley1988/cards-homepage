@@ -6,7 +6,7 @@ export type CardElement<T extends Card> = {
   location: Pile<T> | null;
   front: HTMLDivElement;
   back: HTMLDivElement;
-  wrapper: HTMLDivElement;
+  container: HTMLDivElement;
   faceUp: Boolean;
   transform: {
     active: Boolean;
@@ -53,24 +53,24 @@ export const CardElement = <T extends Card>(
     return parent;
   })();
 
-  const wrapper = (() => {
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("card-wrapper");
-    return wrapper;
+  const container = (() => {
+    const container = document.createElement("div");
+    container.classList.add("card-container");
+    return container;
   })();
 
   (() => {
-    wrapper.appendChild(parent);
+    container.appendChild(parent);
     front.classList.add("card-front");
     back.classList.add("card-back");
     parent.appendChild(back);
     front.classList.toggle("flipped");
     back.classList.toggle("flipped");
-    wrapper.addEventListener("animationstart", () => {
+    container.addEventListener("animationstart", () => {
       transform.active = true;
       stopPropagation();
     });
-    wrapper.addEventListener("animationend", () => {
+    container.addEventListener("animationend", () => {
       transform.active = false;
       startPropagation();
     });
@@ -94,17 +94,17 @@ export const CardElement = <T extends Card>(
         card.flip();
         const waitForFlip = () => {
           flipEnabled = true;
-          wrapper.removeEventListener("transitionend", waitForFlip);
+          container.removeEventListener("transitionend", waitForFlip);
         };
-        wrapper.addEventListener("transitionend", waitForFlip);
+        container.addEventListener("transitionend", waitForFlip);
       } else {
         const removeFront = () => {
-          wrapper.removeEventListener("transitionend", removeFront);
+          container.removeEventListener("transitionend", removeFront);
           parent.removeChild(front);
           card.flip();
           flipEnabled = true;
         };
-        wrapper.addEventListener("transitionend", removeFront);
+        container.addEventListener("transitionend", removeFront);
       }
     }
   };
@@ -114,12 +114,12 @@ export const CardElement = <T extends Card>(
   };
   const stopPropagation = () => {
     listenerList.forEach((listener) => {
-      wrapper.addEventListener(listener, stopProp);
+      container.addEventListener(listener, stopProp);
     });
   };
   const startPropagation = () => {
     listenerList.forEach((listener) => {
-      wrapper.removeEventListener(listener, stopProp);
+      container.removeEventListener(listener, stopProp);
     });
   };
 
@@ -181,7 +181,7 @@ export const CardElement = <T extends Card>(
       back = newBack;
     },
     */
-    wrapper,
+    container,
     transform,
     flip,
     getFlipSpeed,

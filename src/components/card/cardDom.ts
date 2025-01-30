@@ -31,16 +31,16 @@ export const createCard = (): CardDom => {
 
   // - This creates the parent DOM container.
   // - It contains both the front and the back as children.
-  // - The cardWrapper is necessary because for card flipping to work,
+  // - The container is necessary because for card flipping to work,
   //   a parent needs to have position: relative, and the child position absolute.
-  const wrapper = (() => {
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("card-wrapper");
-    return wrapper;
+  const container = (() => {
+    const container = document.createElement("div");
+    container.classList.add("card-container");
+    return container;
   })();
 
   (function buildCard() {
-    wrapper.appendChild(parent);
+    container.appendChild(parent);
     parent.appendChild(back);
     front.classList.toggle("flipped");
     back.classList.toggle("flipped");
@@ -64,17 +64,17 @@ export const createCard = (): CardDom => {
         this.faceUp = true;
         const waitForFlip = () => {
           this.flipEnabled = true;
-          this.wrapper.removeEventListener("transitionend", waitForFlip);
+          this.container.removeEventListener("transitionend", waitForFlip);
         };
-        this.wrapper.addEventListener("transitionend", waitForFlip);
+        this.container.addEventListener("transitionend", waitForFlip);
       } else {
         const removeFront = () => {
-          this.wrapper.removeEventListener("transitionend", removeFront);
+          this.container.removeEventListener("transitionend", removeFront);
           this.parent.removeChild(this.front);
           this.faceUp = false;
           this.flipEnabled = true;
         };
-        this.wrapper.addEventListener("transitionend", removeFront);
+        this.container.addEventListener("transitionend", removeFront);
       }
     }
   }
@@ -112,7 +112,7 @@ export const createCard = (): CardDom => {
     front,
     back,
     parent,
-    wrapper,
+    container,
 
     // Functions
     flipCard,

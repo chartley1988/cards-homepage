@@ -2,7 +2,7 @@ type CardElements = {
   front: HTMLDivElement;
   back: HTMLDivElement;
   parent: HTMLDivElement;
-  wrapper: HTMLDivElement;
+  container: HTMLDivElement;
 };
 
 type CardFunctions = {

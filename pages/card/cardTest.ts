@@ -44,6 +44,8 @@ if (app) {
   window.addEventListener("DOMContentLoaded", () => {
     deal(5, draw, [hand1, hand2]);
   });
+  hand1.cascade();
+  hand1.pile;
 
   draw.container.addEventListener("dblclick", () => {
     main.getPile("draw").moveCardToPile(currentPlayer.getPile("hand"));
