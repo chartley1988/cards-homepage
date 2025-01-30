@@ -1,5 +1,7 @@
 import Card from "../card/card";
+import { CardElement } from "../card/cardElement";
 import Pile from "../pile/pile";
+import { PileElement, pileElement } from "../pile/pileElement";
 
 /**
  * A deck is all of the cards to be used in your game.
@@ -15,11 +17,18 @@ import Pile from "../pile/pile";
 export default class Deck<T extends Card> {
   private _cards: T[];
   private _piles: Pile<T>[];
+  pileElements: PileElement<T>[];
   private _graveyard: Pile<T>;
-  constructor(cards: T[] = []) {
+  private _cardBuilder: (card: T) => CardElement<T>;
+  constructor(
+    cards: T[],
+    cardBuilder: (card: T) => CardElement<T> = (card: T) => CardElement(card)
+  ) {
     this._cards = cards;
     this._piles = [];
-    this._graveyard = new Pile<T>(); // to remove a card already in play it has to be passed to a pile... this is the graveyard pile it goes to. Rare use case.
+    this._graveyard = new Pile<T>("graveyard"); // to remove a card already in play it has to be passed to a pile... this is the graveyard pile it goes to. Rare use case.
+    this._cardBuilder = cardBuilder;
+    this.pileElements = [];
   }
 
   get cards() {
@@ -44,11 +53,20 @@ export default class Deck<T extends Card> {
    * This will create a pile for draw piles, discard piles, hands. Anywhere cards can go!
    * @returns Piles
    */
-
-  createPile = (cards: T[] = []) => {
-    const pile = new Pile(cards);
+  createPile = (name: string, cards: T[] = []) => {
+    const pile = new Pile(name, cards);
     this._piles.push(pile);
     return pile;
+  };
+
+  createPileElement = (name: string, cards: T[] = []) => {
+    const pile = this.createPile(name, cards);
+    const pileElem = pileElement(
+      pile,
+      cards.map((card) => this._cardBuilder(card))
+    );
+    this.pileElements.push(pileElem);
+    return pileElem;
   };
 
   // just totally eliminates a card from existence
@@ -58,6 +76,8 @@ export default class Deck<T extends Card> {
    * @returns true if card was removed
    * @returns false if card was not found in deck
    */
+
+  //! This will need to pop them from pile elements too
   removeCard = (card: T) => {
     this.cards.forEach((item) => {
       if (JSON.stringify(item) === JSON.stringify(card)) {
