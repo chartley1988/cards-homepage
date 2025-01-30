@@ -57,7 +57,7 @@ export const pileElement = <T extends Card>(
     cascadePercent = [0, -0.003];
     cascadeDuration = 0;
   } else if (type === "cascade") {
-    cascadePercent = [0, 0.18];
+    cascadePercent = [0.18, 0];
     cascadeDuration = 0;
   }
   const { cards } = pile;
@@ -213,7 +213,8 @@ export const pileElement = <T extends Card>(
   // sets a new value to the percent of cascade, and a one time use duration
   // then performs the cascade and resets duration to 0
   const cascadeValueSetter = (percent: number[], duration: number) => {
-    cascadePercent = percent;
+    cascadePercent[0] = percent[0];
+    cascadePercent[1] = percent[1];
     cascadeDuration = duration;
     cascade();
     cascadeDuration = 0;
@@ -273,38 +274,64 @@ export const pileElement = <T extends Card>(
     destination: PileElement<T>,
     cardElement: CardElement<T>
   ) {
-    //! Offset wasnt working... i rewrote but left out cascade percent
     cardElement.wrapper.style.zIndex = String(destination.cards.length + 1000);
+
+    //! Offset wasnt working... i rewrote but left out cascade percent
+    // gets the bounds of all necessary items...
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
-    const cardBox = cardElement.wrapper.getBoundingClientRect();
+
+    //! this is only true if no cards are moving there currently
     let destinationTopCard =
       destination.cardElements[destination.cardElements.length - 1];
-    let thatOffset = [];
+
+    // offset from source to destination boxes
+    let destinationOffset = [];
+
+    // figuring out the difference due to cascade percent from source to destination
+    // X offset
+    const cascadeOffsetX = cascadePercent[0] * cardElement.wrapper.offsetWidth;
+    const destinationOffsetX =
+      destination.cascadePercent[0] * cardElement.wrapper.offsetWidth;
+    let cascadedifferenceX = cascadeOffsetX - destinationOffsetX;
+    // Y offset
+    const cascadeOffsetY = cascadePercent[1] * cardElement.wrapper.offsetHeight;
+    const destinationOffsetY =
+      destination.cascadePercent[1] * cardElement.wrapper.offsetHeight;
+    let cascadedifferenceY = cascadeOffsetY - destinationOffsetY;
+
+    // if there are
     if (destinationTopCard === undefined) {
-      thatOffset = [0, 0];
+      destinationOffset = [0, 0];
+      cascadedifferenceX = 0;
+      cascadedifferenceY = 0;
     } else {
       const destTopCardBox = destinationTopCard.wrapper.getBoundingClientRect();
-      thatOffset = [
+      destinationOffset = [
         destinationBox.x - destTopCardBox.x,
         destinationBox.y - destTopCardBox.y,
       ];
     }
 
-    const thisOffset = [sourceBox.x - cardBox.x, sourceBox.y - cardBox.y];
-
     const vector2 = [];
-    vector2[0] = destinationBox.x - thatOffset[0] - sourceBox.x - thisOffset[0];
-    vector2[1] = destinationBox.y - thatOffset[1] - sourceBox.y;
-    -thisOffset[1];
+    vector2[0] =
+      destinationBox.x -
+      destinationOffset[0] -
+      sourceBox.x -
+      cascadedifferenceX;
+    vector2[1] =
+      destinationBox.y -
+      destinationOffset[1] -
+      sourceBox.y -
+      cascadedifferenceY;
     //! Offset wasnt working... i rewrote but left out cascade percent
 
-    await slideCard(cardElement, vector2, 600);
+    await slideCard(cardElement, vector2, 1000);
     destination.container.appendChild(cardElement.wrapper);
 
     //! This should be a func
     let { translate, scale, rotate } = cardElement.transform;
-    translate = `translate(${thatOffset[0]}px, ${thatOffset[1]}px)`;
+    translate = `translate(${destinationOffset[0]}px, ${destinationOffset[1]}px)`;
     cardElement.transform.translate = translate;
     cardElement.wrapper.style.transform = `${translate} ${scale} ${rotate}`;
     //! This should be a func
