@@ -5,8 +5,10 @@ import Card from "../card/card";
  */
 export default class Pile<T extends Card> {
   private _cards: T[];
-  constructor(cards: T[] = []) {
+  name: string;
+  constructor(name: string, cards: T[] = []) {
     this._cards = [...cards];
+    this.name = name;
   }
 
   get cards() {

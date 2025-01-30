@@ -47,8 +47,8 @@ export type PileElement<T extends Card> = {
 
 // Adds a base the size of the card to be the basis of deck layouts.\
 export const pileElement = <T extends Card>(
-  pile = new Pile<T>(),
-  cardElements = [CardElement<T>()],
+  pile: Pile<T>,
+  cardElements: CardElement<T>[] = [],
   type: "stack" | "cascade" = "stack"
 ): PileElement<T> => {
   let cascadePercent = [0, 0.001];
@@ -76,8 +76,12 @@ export const pileElement = <T extends Card>(
     if (vector2.length !== 2) {
       console.error("Error: vector2 must be an array of 2 values, x and y.");
     }
+    //! This should be a func
     let { translate, scale, rotate } = cardElement.transform;
     translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
+    cardElement.transform.translate = translate;
+    //! This should be a func
+
     const transform = `${translate} ${scale} ${rotate}`;
 
     const keys = {
@@ -95,6 +99,8 @@ export const pileElement = <T extends Card>(
     cardElement.wrapper.dispatchEvent(new Event("animationstart"));
     await anim.finished.then(() => {
       cardElement.wrapper.style.transform = transform;
+      cardElement;
+
       cardElement.wrapper.dispatchEvent(new Event("animationend"));
     });
   };
@@ -186,7 +192,7 @@ export const pileElement = <T extends Card>(
     });
   };
 
-  //! I havent tested this
+  //! Seems to not work on cards that have been passed
   const cascade = () => {
     reset();
     const promise = new Promise((resolve) => {
@@ -219,11 +225,7 @@ export const pileElement = <T extends Card>(
    */
   const getTopCardElement = (): CardElement<T> => {
     const topCard = cards[cards.length - 1];
-    let topCardElement = CardElement<T>();
-    cardElements.forEach((element) => {
-      if (element.card === topCard) topCardElement = element;
-    });
-    return topCardElement;
+    return cardElements.filter((element) => element.card === topCard)[0];
   };
 
   // slimmed down move card to deck
@@ -271,22 +273,42 @@ export const pileElement = <T extends Card>(
     destination: PileElement<T>,
     cardElement: CardElement<T>
   ) {
+    //! Offset wasnt working... i rewrote but left out cascade percent
     cardElement.wrapper.style.zIndex = String(destination.cards.length + 1000);
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
-    const destinationOffset = calculateOffset(
-      cardElement,
-      destination,
-      cardElements.length - 1
-    );
+    const cardBox = cardElement.wrapper.getBoundingClientRect();
+    let destinationTopCard =
+      destination.cardElements[destination.cardElements.length - 1];
+    let thatOffset = [];
+    if (destinationTopCard === undefined) {
+      thatOffset = [0, 0];
+    } else {
+      const destTopCardBox = destinationTopCard.wrapper.getBoundingClientRect();
+      thatOffset = [
+        destinationBox.x - destTopCardBox.x,
+        destinationBox.y - destTopCardBox.y,
+      ];
+    }
+
+    const thisOffset = [sourceBox.x - cardBox.x, sourceBox.y - cardBox.y];
 
     const vector2 = [];
-    vector2[0] = destinationBox.x + destinationOffset[0] - sourceBox.x;
-    vector2[1] = destinationBox.y + destinationOffset[1] - sourceBox.y;
+    vector2[0] = destinationBox.x - thatOffset[0] - sourceBox.x - thisOffset[0];
+    vector2[1] = destinationBox.y - thatOffset[1] - sourceBox.y;
+    -thisOffset[1];
+    //! Offset wasnt working... i rewrote but left out cascade percent
 
-    await slideCard(cardElement, vector2, 6000);
+    await slideCard(cardElement, vector2, 600);
     destination.container.appendChild(cardElement.wrapper);
-    await slideCard(cardElement, destinationOffset, 0);
+
+    //! This should be a func
+    let { translate, scale, rotate } = cardElement.transform;
+    translate = `translate(${thatOffset[0]}px, ${thatOffset[1]}px)`;
+    cardElement.transform.translate = translate;
+    cardElement.wrapper.style.transform = `${translate} ${scale} ${rotate}`;
+    //! This should be a func
+
     //spinCard(cardElement, "0", 0);
 
     cardElement.wrapper.style.zIndex = String(destination.cardElements.length);
@@ -296,24 +318,10 @@ export const pileElement = <T extends Card>(
       card.wrapper.style.zIndex = String(index);
     }
     destination.cardElements.push(cardElement);
+    destination.cascade();
 
     return Promise.resolve(true);
 
-    function calculateOffset(
-      cardElement: CardElement<T>,
-      pileElement: PileElement<T>,
-      index: number
-    ) {
-      index < 0 ? (index = 1) : (index = index);
-      const vector = [];
-      vector[0] =
-        pileElement.cascadePercent[0] * cardElement.wrapper.offsetWidth * index;
-      vector[1] =
-        pileElement.cascadePercent[1] *
-        cardElement.wrapper.offsetHeight *
-        index;
-      return vector;
-    }
     //! I dont think this ever worked?
     /*
     function resizeContainer(deckBase) {

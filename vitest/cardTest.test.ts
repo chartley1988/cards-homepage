@@ -25,20 +25,17 @@ test("different varieties of a new card are not the same card", () => {
   expect(aceOfSpades === newAceOfSpades).toBe(false);
 });
 
-test("can make a blank deck", () => {
-  const deck = new Deck();
-  expect(deck.cards).toStrictEqual([]);
-});
-
-test("can add cards to deck, singles or an array", () => {
-  const deck = new Deck();
+test("can initialize deck as an array of cards", () => {
   const aceOfSpades = new PlayingCard("A", "spade");
   const twoOfSpades = new PlayingCard("2", "spade");
   const threeOfSpades = new PlayingCard("3", "spade");
   const fourOfSpades = new PlayingCard("4", "spade");
-  deck.addCards(aceOfSpades);
-  expect(deck.cards).toStrictEqual([aceOfSpades]);
-  deck.addCards([twoOfSpades, threeOfSpades, fourOfSpades]);
+  const deck = new Deck([
+    aceOfSpades,
+    twoOfSpades,
+    threeOfSpades,
+    fourOfSpades,
+  ]);
   expect(deck.cards).toStrictEqual([
     aceOfSpades,
     twoOfSpades,
@@ -48,18 +45,22 @@ test("can add cards to deck, singles or an array", () => {
 });
 
 test("pile can pass cards", () => {
-  const deck = new Deck();
   const aceOfSpades = new PlayingCard("A", "spade");
   const twoOfSpades = new PlayingCard("2", "spade");
   const threeOfSpades = new PlayingCard("3", "spade");
   const fourOfSpades = new PlayingCard("4", "spade");
-  deck.addCards(aceOfSpades);
-  deck.addCards([twoOfSpades, threeOfSpades, fourOfSpades]);
-  const drawPile = new Pile(deck.cards);
+  const deck = new Deck([
+    aceOfSpades,
+    twoOfSpades,
+    threeOfSpades,
+    fourOfSpades,
+  ]);
+  const drawPile = deck.createPile("draw", deck.cards);
   expect(drawPile.cards).toStrictEqual(deck.cards);
-  const playerHand = new Pile();
+  const playerHand = deck.createPile("hand");
   drawPile.passCard(playerHand, aceOfSpades);
   // draw pile will no longer have ace of spades
+  console.log(drawPile.cards);
   expect(drawPile.cards).toStrictEqual([
     twoOfSpades,
     threeOfSpades,
@@ -78,9 +79,9 @@ test("pile can pass cards", () => {
 
 test("Changing a value in the deck, will change it in the pile", () => {
   const deck = StandardDeckOfCards();
-  const drawPile = deck.createPile();
+  const drawPile = deck.createPile("draw");
   drawPile.receiveCard(deck.cards);
-  const player1 = deck.createPile();
+  const player1 = deck.createPile("player1");
   drawPile.passCard(player1);
   // the decks "last card" is the first one to get passed.
   deck.cards[51].value = 0;
@@ -89,9 +90,9 @@ test("Changing a value in the deck, will change it in the pile", () => {
 
 test("deleting a card from the deck will delete it from piles", () => {
   const deck = StandardDeckOfCards();
-  const drawPile = deck.createPile();
+  const drawPile = deck.createPile("draw");
   drawPile.receiveCard(deck.cards);
-  const player1 = deck.createPile();
+  const player1 = deck.createPile("player1");
   drawPile.passCard(player1);
   deck.removeCard(deck.cards[51]);
   expect(player1.cards.length).toBe(0);
