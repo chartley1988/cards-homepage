@@ -39,7 +39,6 @@ if (app) {
   draw.cascade();
   hand1.cascadeValueSetter([0.18, 0], 0);
   hand2.cascadeValueSetter([0.4, 0], 0);
-  console.log(player1.getPile("hand").cascadePercent);
   player1.getPile("hand").cascadeValueSetter([0.0, 0.4], 0);
 
   window.addEventListener("DOMContentLoaded", () => {
