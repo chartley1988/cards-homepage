@@ -1,6 +1,6 @@
 :root {
   --card-flip-speed: 0.3s;
-  --card-size: 100px;
+  --card-size: 50px;
 }
 
 .card-parent * {
