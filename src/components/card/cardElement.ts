@@ -7,6 +7,7 @@ export type CardElement<T extends Card> = {
   front: HTMLDivElement;
   back: HTMLDivElement;
   wrapper: HTMLDivElement;
+  faceUp: Boolean;
   transform: {
     active: Boolean;
     translate: string;
@@ -19,9 +20,9 @@ export type CardElement<T extends Card> = {
 };
 
 export const CardElement = <T extends Card>(
+  thisCard = new Card() as T,
   _front = document.createElement("div"),
-  _back = document.createElement("div"),
-  thisCard = new Card() as T
+  _back = document.createElement("div")
 ): CardElement<T> => {
   const card = thisCard;
   let flipEnabled = true;
@@ -159,6 +160,9 @@ export const CardElement = <T extends Card>(
     },
     get back() {
       return back;
+    },
+    get faceUp() {
+      return card.faceUp;
     },
     //! I think we want to keep this as only a getter?
     /*
