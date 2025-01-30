@@ -1,5 +1,5 @@
 import { CardElement } from "../../src/components/card/cardElement";
-import pileElement from "../../src/components/pile/pileElement";
+import { pileElement } from "../../src/components/pile/pileElement";
 import "../../src/styles/style.css";
 import "../../src/styles/card.css";
 import "../../src/styles/theme.css";
@@ -8,14 +8,13 @@ import "../../src/components/navMenu/navMenu";
 import addDeckBase from "../../src/legacy/scripts/cardFoundations/deckBase";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import PlayingCardFrontAndBack from "../../src/components/card/playingCard/playingCardElement";
-import Card from "../../src/components/card/card";
+import PlayingCardElement from "../../src/components/card/playingCard/playingCardElement";
 
 function instanceCard() {
   const front = document.createElement("div");
   front.classList.add("eh", "gfhfdgh", "yolo");
   front.innerHTML = "heyyyy";
-  const card = CardElement(front);
+  const card = CardElement();
   card.wrapper.addEventListener("click", () => {
     card.flip();
   });
@@ -24,12 +23,8 @@ function instanceCard() {
 }
 const instanceCard2 = () => {
   const card = new PlayingCard("K", "spade");
-  const playingCardFrontAndBackDivs = PlayingCardFrontAndBack(card);
-  const cardElly = CardElement(
-    playingCardFrontAndBackDivs.frontDiv,
-    playingCardFrontAndBackDivs.backDiv,
-    card
-  );
+  const cardElly = PlayingCardElement(card);
+
   cardElly.wrapper.addEventListener("click", () => {
     cardElly.flip();
   });
@@ -52,9 +47,9 @@ if (app) {
 
   // Deck
   const playingCards = StandardDeckOfCards();
-  const drawPile = playingCards.createPile(playingCards.cards);
-  const player1 = playingCards.createPile();
-  const player1HAND = playingCards.createPile();
+  const drawPile = playingCards.createPile("draw", playingCards.cards);
+  const player1 = playingCards.createPile("p1");
+  const player1HAND = playingCards.createPile("p1hand");
   drawPile.shuffle();
   drawPile.passCard(player1);
   drawPile.passCard(player1);
@@ -72,14 +67,12 @@ if (app) {
   const player1CardElements2: CardElement<PlayingCard>[] = [];
 
   player1.cards.forEach((card) => {
-    const frontnback = PlayingCardFrontAndBack(card);
-    const cardElly = CardElement(frontnback.frontDiv, frontnback.backDiv, card);
+    const cardElly = PlayingCardElement(card);
     player1CardElements.push(cardElly);
   });
 
   player1HAND.cards.forEach((card) => {
-    const frontnback = PlayingCardFrontAndBack(card);
-    const cardElly = CardElement(frontnback.frontDiv, frontnback.backDiv, card);
+    const cardElly = PlayingCardElement(card);
     player1CardElements2.push(cardElly);
   });
 

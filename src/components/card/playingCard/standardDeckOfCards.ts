@@ -1,5 +1,6 @@
 import Deck from "../../deck/deck";
 import PlayingCard from "./playingCardClass";
+import PlayingCardElement from "./playingCardElement";
 
 type suit = "diamond" | "spade" | "heart" | "club";
 type cardNumber =
@@ -37,7 +38,7 @@ function StandardDeckOfCards(jokers: Boolean = false): Deck<PlayingCard> {
     cardArr.push(new PlayingCard("joker", "joker"));
     cardArr.push(new PlayingCard("joker", "joker"));
   }
-  return new Deck(cardArr);
+  return new Deck(cardArr, PlayingCardElement);
 }
 
 export default StandardDeckOfCards;
