@@ -106,6 +106,7 @@ export const pileElement = <T extends Card>(
   };
 
   const spinCard = async (cardElement: CardElement<T>, duration: number) => {
+    if (cardElement === undefined) return new Promise(() => undefined);
     if (cardElement.transform.active) return new Promise(() => undefined);
 
     cardElement.transform.rotate === `rotate(0deg)`
