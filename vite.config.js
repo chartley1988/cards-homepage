@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /// <reference types="vitest" />
 import { defineConfig } from "vite";
 import { resolve } from "path";
@@ -89,7 +90,7 @@ export default defineConfig(({ command }) => {
       },
     },
     test: {
-      include: ["./vitest/**/*"],
+      include: ["./tests/**/*"],
       environment: "jsdom",
       // ...
     },

@@ -2,7 +2,6 @@ import { test, expect } from "vitest";
 import Card from "../src/components/card/card";
 import PlayingCard from "../src/components/card/playingCard/playingCardClass";
 import Deck from "../src/components/deck/deck";
-import Pile from "../src/components/pile/pile";
 import StandardDeckOfCards from "../src/components/card/playingCard/standardDeckOfCards";
 
 test("can flip a blank card", () => {

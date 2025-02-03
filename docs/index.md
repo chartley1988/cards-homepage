@@ -11,4 +11,7 @@ features:
   - title: Running Project
     details: Instructions for dev server, building, and testing builds
     link: /running-project
+  - title: Contribution Guide
+    details: Guide for working with this project
+    link: /contribution-guide
 ---

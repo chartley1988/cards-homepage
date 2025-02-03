@@ -18,7 +18,7 @@ type cardNumber =
   | "Q"
   | "K";
 
-function StandardDeckOfCards(jokers: Boolean = false): Deck<PlayingCard> {
+function StandardDeckOfCards(jokers: boolean = false): Deck<PlayingCard> {
   // Dictionary of Standard 52 Card deck definitions
   const standardDeck: { suit: suit[]; members: cardNumber[] } = {
     suit: ["diamond", "heart", "spade", "club"],

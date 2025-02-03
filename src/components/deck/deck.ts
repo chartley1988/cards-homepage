@@ -22,7 +22,7 @@ export default class Deck<T extends Card> {
   private _cardBuilder: (card: T) => CardElement<T>;
   constructor(
     cards: T[],
-    cardBuilder: (card: T) => CardElement<T> = (card: T) => CardElement(card)
+    cardBuilder: (card: T) => CardElement<T> = (card: T) => CardElement(card),
   ) {
     this._cards = cards;
     this._piles = [];
@@ -63,7 +63,7 @@ export default class Deck<T extends Card> {
     const pile = this.createPile(name, cards);
     const pileElem = pileElement(
       pile,
-      cards.map((card) => this._cardBuilder(card))
+      cards.map((card) => this._cardBuilder(card)),
     );
     this.pileElements.push(pileElem);
     return pileElem;
@@ -83,7 +83,7 @@ export default class Deck<T extends Card> {
       if (JSON.stringify(item) === JSON.stringify(card)) {
         const removalCard = this._cards.splice(
           this.cards.findIndex((index) => index === card),
-          1
+          1,
         )[0];
         this._piles.forEach((pile) => {
           if (pile.cards.includes(removalCard)) {
