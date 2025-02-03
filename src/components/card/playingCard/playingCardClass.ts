@@ -61,7 +61,7 @@ export default class PlayingCard extends Card {
       case "8":
       case "9":
       case "10":
-        this.value = 2;
+        this.value = parseInt(number);
         break;
       case "J":
         this.value = 11;
