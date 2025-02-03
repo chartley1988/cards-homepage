@@ -15,6 +15,7 @@ export default class Card {
    * changes whether card is faceUp or not
    */
   flip = () => {
+    // a test
     this._faceUp = !this._faceUp;
   };
 }
