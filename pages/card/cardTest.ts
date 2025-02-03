@@ -44,8 +44,6 @@ if (app) {
   window.addEventListener("DOMContentLoaded", () => {
     deal(5, draw, [hand1, hand2]);
   });
-  hand1.cascade();
-  hand1.pile;
 
   draw.container.addEventListener("dblclick", () => {
     main.getPile("draw").moveCardToPile(currentPlayer.getPile("hand"));
@@ -58,6 +56,13 @@ if (app) {
     if (!main.getPile("draw").getTopCardElement().faceUp)
       main.getPile("draw").getTopCardElement().flip();
   });
+
+  hand1.container.addEventListener("dblclick", () => {
+    hand1.moveCardToPile(discard);
+  });
+  hand2.container.addEventListener("dblclick", () => {
+    hand2.moveCardToPile(discard);
+  });
 }
 
 async function deal<T extends Card>(
@@ -69,7 +74,6 @@ async function deal<T extends Card>(
   const piles = Array.isArray(to) ? to : [to];
 
   for (let i = 0; i < number * piles.length; i++) {
-    console.log(`dealing ${i}`);
     // Alternate between piles using the modulo operator
     const currentPile = piles[i % piles.length];
 

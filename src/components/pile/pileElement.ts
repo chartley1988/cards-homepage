@@ -31,7 +31,7 @@ export type PileElement<T extends Card> = {
   moveCardToPile: (
     destinationPile: PileElement<T>,
     cardElement?: CardElement<T>,
-    gameRules?: () => boolean,
+    gameRules?: boolean,
     animationCallback?: (
       destination: PileElement<T>,
       cardThatWasPassed: CardElement<T>
@@ -233,7 +233,7 @@ export const pileElement = <T extends Card>(
   const moveCardToPile = (
     destinationPile: PileElement<T>,
     cardElement = getTopCardElement(),
-    gameRules = () => true, // ability to pass in rules for passing the card from one deckbase to another
+    gameRules = true, // ability to pass in rules for passing the card from one deckbase to another
     animationCallback = animateMoveCardToNewDeck // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) => {
     if (cardElements.indexOf(cardElement) === -1) return false;
