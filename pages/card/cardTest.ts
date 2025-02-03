@@ -7,6 +7,8 @@ import StandardDeckOfCards from "../../src/components/card/playingCard/standardD
 import Player from "../../src/components/player/player";
 import Card from "../../src/components/card/card";
 import { PileElement } from "../../src/components/pile/pileElement";
+import { CardElement } from "../../src/components/card/cardElement";
+import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 
 const app = document.getElementById("app");
 if (app) {
@@ -49,6 +51,61 @@ if (app) {
     if (!main.getPile("draw").getTopCardElement().faceUp)
       main.getPile("draw").getTopCardElement().flip();
   });
+
+  hand1.container.addEventListener("dblclick", () => {
+    hand1.moveCardToPile(
+      discard,
+      hand1.getTopCardElement(),
+      rules(hand1, discard, hand1.getTopCardElement())
+    );
+  });
+  hand1.container.addEventListener("click", (e) => {
+    if (e.target instanceof HTMLElement) {
+      hand1.cardElements[
+        parseInt(findCardContainer(e.target).style.zIndex)
+      ].flip();
+    }
+  });
+  const findCardContainer = (element: HTMLElement) => {
+    if (element.classList.contains("card-container")) return element;
+    else if (element.parentElement)
+      return findCardContainer(element.parentElement);
+    else throw "something went wrong in find card container";
+  };
+
+  hand2.container.addEventListener("dblclick", (e) => {
+    if (e.target instanceof HTMLElement) {
+      const cardClicked =
+        hand2.cardElements[parseInt(findCardContainer(e.target).style.zIndex)];
+        console.log(cardClicked)
+      hand2.moveCardToPile(
+        discard,
+        cardClicked,
+        rules(hand2, discard, cardClicked)
+      );
+    }
+  });
+
+  hand2.container.addEventListener("click", (e) => {
+    if (e.target instanceof HTMLElement) {
+      const cardClicked =
+        hand2.cardElements[parseInt(findCardContainer(e.target).style.zIndex)];
+      if (cardClicked.faceUp) return;
+      console.log(cardClicked.faceUp)
+      cardClicked.flip();
+    }
+  });
+
+  const rules = (
+    sourcePile: PileElement<PlayingCard>,
+    destinationPile: PileElement<PlayingCard>,
+    card: CardElement<PlayingCard>
+  ): boolean => {
+    if (!card.faceUp) return false;
+    if (card.card.value < 6) console.log(card.card.value);
+    console.log(card.card.value);
+    return true;
+  };
 }
 
 async function deal<T extends Card>(
@@ -60,7 +117,6 @@ async function deal<T extends Card>(
   const piles = Array.isArray(to) ? to : [to];
 
   for (let i = 0; i < number * piles.length; i++) {
-    console.log(`dealing ${i}`);
     // Alternate between piles using the modulo operator
     const currentPile = piles[i % piles.length];
 

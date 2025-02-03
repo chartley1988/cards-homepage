@@ -305,18 +305,17 @@ export const pileElement = <T extends Card>(
     cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
     //! This should be a func
 
-    //spinCard(cardElement, "0", 0);
-
     cardElement.container.style.zIndex = String(
       destination.cardElements.length
     );
 
-    for (let index = 0; index < destination.cardElements.length; index++) {
-      const card = destination.cardElements[index];
-      card.container.style.zIndex = String(index);
-    }
+    // add the new card element to destination
     destination.cardElements.push(cardElement);
+    adjustZIndex(destination.cardElements);
     destination.cascade();
+
+    // adjust the ZIndex of this piles cardElements
+    adjustZIndex(cardElements);
 
     return Promise.resolve(true);
 
@@ -365,6 +364,13 @@ export const pileElement = <T extends Card>(
       container.appendChild(card.container);
     }
   };
+
+  function adjustZIndex(cardElements: CardElement<T>[]) {
+    for (let index = 0; index < cardElements.length; index++) {
+      const card = cardElements[index];
+      card.container.style.zIndex = String(index);
+    }
+  }
 
   return {
     type,
