@@ -1,6 +1,7 @@
 import Pile from "./pile";
 import Card from "../card/card";
 import { CardElement } from "../card/cardElement";
+import "../../styles/pile.css";
 
 export type PileElement<T extends Card> = {
   type: "stack" | "cascade";
@@ -30,7 +31,7 @@ export type PileElement<T extends Card> = {
   moveCardToPile: (
     destinationPile: PileElement<T>,
     cardElement?: CardElement<T>,
-    gameRules?: () => boolean,
+    gameRules?: boolean,
     animationCallback?: (
       destination: PileElement<T>,
       cardThatWasPassed: CardElement<T>,
@@ -64,8 +65,6 @@ export const pileElement = <T extends Card>(
 
   const container = document.createElement("div");
   container.classList.add("deck-base");
-
-  // Animation Properties //! Find a better way to do all of this... I'm just trying to make it work...
 
   const slideCard = async (
     cardElement: CardElement<T>,
@@ -235,8 +234,8 @@ export const pileElement = <T extends Card>(
   const moveCardToPile = (
     destinationPile: PileElement<T>,
     cardElement = getTopCardElement(),
-    gameRules = () => true, // ability to pass in rules for passing the card from one deckbase to another
-    animationCallback = animateMoveCardToNewDeck, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
+    gameRules = true, // ability to pass in rules for passing the card from one deckbase to another
+    animationCallback = animateMoveCardToNewDeck // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) => {
     if (cardElements.indexOf(cardElement) === -1) return false;
 
@@ -308,18 +307,17 @@ export const pileElement = <T extends Card>(
     cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
     //! This should be a func
 
-    //spinCard(cardElement, "0", 0);
-
     cardElement.container.style.zIndex = String(
       destination.cardElements.length,
     );
 
-    for (let index = 0; index < destination.cardElements.length; index++) {
-      const card = destination.cardElements[index];
-      card.container.style.zIndex = String(index);
-    }
+    // add the new card element to destination
     destination.cardElements.push(cardElement);
+    adjustZIndex(destination.cardElements);
     destination.cascade();
+
+    // adjust the ZIndex of this piles cardElements
+    adjustZIndex(cardElements);
 
     return Promise.resolve(true);
 
@@ -368,6 +366,13 @@ export const pileElement = <T extends Card>(
       container.appendChild(card.container);
     }
   };
+
+  function adjustZIndex(cardElements: CardElement<T>[]) {
+    for (let index = 0; index < cardElements.length; index++) {
+      const card = cardElements[index];
+      card.container.style.zIndex = String(index);
+    }
+  }
 
   return {
     type,
