@@ -14,17 +14,17 @@ export type PileElement<T extends Card> = {
   slideCard: (
     cardElement: CardElement<T>,
     vector2: number[],
-    duration: number
+    duration: number,
   ) => void;
   getTopCardElement: () => CardElement<T>;
   spinCard: (
     cardElement: CardElement<T>,
-    duration: number
+    duration: number,
   ) => Promise<Animation> | Promise<unknown>;
   zoomCard: (
     cardElement: CardElement<T>,
     factor: number,
-    duration: number
+    duration: number,
   ) => Promise<Animation>;
   slideDeck: (vector2: number[], duration: number) => void;
   moveCardToPile: (
@@ -33,14 +33,14 @@ export type PileElement<T extends Card> = {
     gameRules?: () => boolean,
     animationCallback?: (
       destination: PileElement<T>,
-      cardThatWasPassed: CardElement<T>
-    ) => Promise<boolean>
-  ) => Boolean;
+      cardThatWasPassed: CardElement<T>,
+    ) => Promise<boolean>,
+  ) => boolean;
   cascadeValueSetter: (percent: number[], duration: number) => void;
   reset: () => void;
   animateMoveCardToNewDeck: (
     destination: PileElement<T>,
-    cardThatWasPassed: CardElement<T>
+    cardThatWasPassed: CardElement<T>,
   ) => Promise<boolean>;
   topCard: CardElement<T>;
 };
@@ -49,7 +49,7 @@ export type PileElement<T extends Card> = {
 export const pileElement = <T extends Card>(
   pile: Pile<T>,
   cardElements: CardElement<T>[] = [],
-  type: "stack" | "cascade" = "stack"
+  type: "stack" | "cascade" = "stack",
 ): PileElement<T> => {
   let cascadePercent = [0, 0.001];
   let cascadeDuration = 0;
@@ -70,13 +70,14 @@ export const pileElement = <T extends Card>(
   const slideCard = async (
     cardElement: CardElement<T>,
     vector2: number[],
-    duration: number
+    duration: number,
   ) => {
     if (cardElement.transform.active) return;
     if (vector2.length !== 2) {
       console.error("Error: vector2 must be an array of 2 values, x and y.");
     }
     //! This should be a func
+    // eslint-disable-next-line prefer-const
     let { translate, scale, rotate } = cardElement.transform;
     translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
     cardElement.transform.translate = translate;
@@ -99,8 +100,6 @@ export const pileElement = <T extends Card>(
     cardElement.container.dispatchEvent(new Event("animationstart"));
     await anim.finished.then(() => {
       cardElement.container.style.transform = transform;
-      cardElement;
-
       cardElement.container.dispatchEvent(new Event("animationend"));
     });
   };
@@ -109,9 +108,10 @@ export const pileElement = <T extends Card>(
     if (cardElement === undefined) return new Promise(() => undefined);
     if (cardElement.transform.active) return new Promise(() => undefined);
 
-    cardElement.transform.rotate === `rotate(0deg)`
-      ? (cardElement.transform.rotate = "rotate(90deg)")
-      : (cardElement.transform.rotate = "rotate(0deg)");
+    cardElement.transform.rotate =
+      cardElement.transform.rotate === `rotate(0deg)`
+        ? "rotate(90deg)"
+        : "rotate(0deg)";
 
     const { translate, scale, rotate } = cardElement.transform;
     const transform = `${translate} ${scale} ${rotate}`;
@@ -141,8 +141,9 @@ export const pileElement = <T extends Card>(
   const zoomCard = async (
     cardElement: CardElement<T>,
     factor: number,
-    duration: number
+    duration: number,
   ) => {
+    // eslint-disable-next-line prefer-const
     let { translate, scale, rotate } = cardElement.transform;
 
     scale = `scale(${factor})`;
@@ -235,7 +236,7 @@ export const pileElement = <T extends Card>(
     destinationPile: PileElement<T>,
     cardElement = getTopCardElement(),
     gameRules = () => true, // ability to pass in rules for passing the card from one deckbase to another
-    animationCallback = animateMoveCardToNewDeck // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
+    animationCallback = animateMoveCardToNewDeck, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) => {
     if (cardElements.indexOf(cardElement) === -1) return false;
 
@@ -243,7 +244,7 @@ export const pileElement = <T extends Card>(
     const cardPassed = pile.passCard(
       destinationPile.pile,
       cardElement.card,
-      gameRules
+      gameRules,
     );
 
     // if the attempt to pass the card is a fail, return immediately
@@ -255,7 +256,7 @@ export const pileElement = <T extends Card>(
     //! untested
     if (animationCallback === null) {
       destinationPile.cardElements.push(
-        cardElements.splice(cardElements.indexOf(cardElement), 1)[0]
+        cardElements.splice(cardElements.indexOf(cardElement), 1)[0],
       );
       cascade();
       destinationPile.cascade();
@@ -273,11 +274,11 @@ export const pileElement = <T extends Card>(
   // has been moved in the Objects, but not visually on the screen
   async function animateMoveCardToNewDeck(
     destination: PileElement<T>,
-    cardElement: CardElement<T>
+    cardElement: CardElement<T>,
   ) {
     //! Offset wasnt working... i rewrote but left out cascade percent
     cardElement.container.style.zIndex = String(
-      destination.cards.length + 1000
+      destination.cards.length + 1000,
     );
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
@@ -300,6 +301,7 @@ export const pileElement = <T extends Card>(
     destination.container.appendChild(cardElement.container);
 
     //! This should be a func
+    // eslint-disable-next-line prefer-const
     let { translate, scale, rotate } = cardElement.transform;
     translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
     cardElement.transform.translate = translate;
@@ -309,7 +311,7 @@ export const pileElement = <T extends Card>(
     //spinCard(cardElement, "0", 0);
 
     cardElement.container.style.zIndex = String(
-      destination.cardElements.length
+      destination.cardElements.length,
     );
 
     for (let index = 0; index < destination.cardElements.length; index++) {

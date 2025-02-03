@@ -4,8 +4,6 @@ import "../../src/styles/theme.css";
 import "./styles.css";
 import "../../src/components/navMenu/navMenu";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import Handler from "../../src/components/handler/handler";
-import PlayingCardElement from "../../src/components/card/playingCard/playingCardElement";
 import Player from "../../src/components/player/player";
 import Card from "../../src/components/card/card";
 import { PileElement } from "../../src/components/pile/pileElement";
@@ -17,10 +15,6 @@ if (app) {
   const player1 = new Player("dave", deck, ["hand"]);
   const main = new Player("main", deck, ["draw", "discard"], "draw");
   const player2 = new Player("hups", deck, ["hand"]);
-
-  const game = {
-    firstClick: true,
-  };
 
   const hand1 = player1.getPile("hand");
   document.getElementById("p1Hand")?.appendChild(hand1.container);
@@ -45,13 +39,10 @@ if (app) {
     deal(5, draw, [hand1, hand2]);
   });
   hand1.cascade();
-  hand1.pile;
 
   draw.container.addEventListener("dblclick", () => {
     main.getPile("draw").moveCardToPile(currentPlayer.getPile("hand"));
-    currentPlayer === player1
-      ? (currentPlayer = player2)
-      : (currentPlayer = player1);
+    currentPlayer = currentPlayer === player1 ? player2 : player1;
   });
 
   main.getPile("draw").container.addEventListener("click", () => {
@@ -63,7 +54,7 @@ if (app) {
 async function deal<T extends Card>(
   number: number,
   from: PileElement<T>,
-  to: PileElement<T>[] | PileElement<T>
+  to: PileElement<T>[] | PileElement<T>,
 ) {
   // If `to` is a single pile, convert it to an array for simplicity
   const piles = Array.isArray(to) ? to : [to];

@@ -32,7 +32,7 @@
 }
 
 .card-parent * {
-  font-size: calc((var(--card-size) * 3.5) / 10);
+  font-size: calc((var(--card-size) * 3.5) / 13);
 }
 
 .card-front,

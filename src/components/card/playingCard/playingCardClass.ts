@@ -41,7 +41,7 @@ export default class PlayingCard extends Card {
       | "K"
       | "joker",
     suit: "diamond" | "spade" | "heart" | "club" | "joker",
-    value: number = 0
+    value: number = 0,
   ) {
     super();
     this.suit = suit;

@@ -12,7 +12,7 @@ export default class Handler<T extends Card> {
       deck: Deck<T>;
       piles: string[];
       cardInitializer?: string;
-    }[]
+    }[],
   ) {
     this._players = players.map(
       (player) =>
@@ -20,8 +20,8 @@ export default class Handler<T extends Card> {
           player.name,
           player.deck,
           player.piles,
-          player.cardInitializer // Need somewhere to put all the cards to start the game
-        )
+          player.cardInitializer, // Need somewhere to put all the cards to start the game
+        ),
     );
   }
 
@@ -34,7 +34,7 @@ export default class Handler<T extends Card> {
     from: { player: Player<T>; pile: Pile<T> },
     to:
       | { player: Player<T>; pile: Pile<T> }[]
-      | { player: Player<T>; pile: Pile<T> }
+      | { player: Player<T>; pile: Pile<T> },
   ) {
     from.pile.shuffle();
     for (let i = 0; i < number; i++) {

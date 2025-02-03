@@ -12,13 +12,19 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: "Examples",
-        items: [{ text: "Running Project", link: "/running-project" }],
+        text: "Guides",
+        items: [
+          { text: "Running Project", link: "/running-project" },
+          { text: "Contribution Guide", link: "/contribution-guide" },
+        ],
       },
     ],
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/Daver067/cards-npm-package" },
+      {
+        icon: "github",
+        link: "https://github.com/Daver067/cards-npm-package",
+      },
     ],
   },
 });

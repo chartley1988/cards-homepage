@@ -7,9 +7,9 @@ export type CardElement<T extends Card> = {
   front: HTMLDivElement;
   back: HTMLDivElement;
   container: HTMLDivElement;
-  faceUp: Boolean;
+  faceUp: boolean;
   transform: {
-    active: Boolean;
+    active: boolean;
     translate: string;
     scale: string;
     rotate: string;
@@ -22,7 +22,7 @@ export type CardElement<T extends Card> = {
 export const CardElement = <T extends Card>(
   thisCard = new Card() as T,
   _front = document.createElement("div"),
-  _back = document.createElement("div")
+  _back = document.createElement("div"),
 ): CardElement<T> => {
   const card = thisCard;
   let flipEnabled = true;

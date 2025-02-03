@@ -10,7 +10,7 @@ export default class Player<T extends Card> {
     name: string,
     deck: Deck<T>,
     piles: string[],
-    cardInitializer?: string
+    cardInitializer?: string,
   ) {
     this._deck = deck;
     this.name = name;

@@ -2,10 +2,10 @@ import type { CardDom, DeckBase } from "../../types/card.types";
 
 export const createCard = (): CardDom => {
   // PROPERTIES
-  let faceUp = false;
-  let flipEnabled: boolean = true;
-  let state: "available" = "available";
-  let location: DeckBase | null = null;
+  const faceUp = false;
+  const flipEnabled: boolean = true;
+  const state: "available" | "busy" = "available";
+  const location: DeckBase | null = null;
   // location will be a deckBase, when added to one. Need a type for this
 
   // FUNCTIONS
