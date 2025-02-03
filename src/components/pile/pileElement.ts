@@ -1,6 +1,7 @@
 import Pile from "./pile";
 import Card from "../card/card";
 import { CardElement } from "../card/cardElement";
+import "../../styles/pile.css";
 
 export type PileElement<T extends Card> = {
   type: "stack" | "cascade";
@@ -64,8 +65,6 @@ export const pileElement = <T extends Card>(
 
   const container = document.createElement("div");
   container.classList.add("deck-base");
-
-  // Animation Properties //! Find a better way to do all of this... I'm just trying to make it work...
 
   const slideCard = async (
     cardElement: CardElement<T>,
