@@ -1,21 +1,101 @@
-import { createCard } from "../../src/components/card/card";
+import { CardElement } from "../../src/components/card/cardElement";
+import { pileElement } from "../../src/components/pile/pileElement";
 import "../../src/styles/style.css";
 import "../../src/styles/card.css";
 import "../../src/styles/theme.css";
 import "./styles.css";
 import "../../src/components/navMenu/navMenu";
+import addDeckBase from "../../src/legacy/scripts/cardFoundations/deckBase";
+import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
+import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
+import PlayingCardElement from "../../src/components/card/playingCard/playingCardElement";
 
 function instanceCard() {
-	const card = createCard();
-	card.wrapper.addEventListener("click", () => {
-		card.flipCard();
-	});
+  const front = document.createElement("div");
+  front.classList.add("eh", "gfhfdgh", "yolo");
+  front.innerHTML = "heyyyy";
+  const card = CardElement();
+  card.container.addEventListener("click", () => {
+    card.flip();
+  });
 
-	return card;
+  return card;
 }
+const instanceCard2 = () => {
+  const card = new PlayingCard("K", "spade");
+  const cardElly = PlayingCardElement(card);
+
+  cardElly.container.addEventListener("click", () => {
+    cardElly.flip();
+  });
+
+  return cardElly;
+};
 
 const app = document.getElementById("app");
 if (app) {
-	const testCard = instanceCard();
-	app.appendChild(testCard.wrapper);
+  const deckBase = addDeckBase();
+  const deckBase2 = addDeckBase();
+  const testCard = instanceCard();
+  const testCard2 = instanceCard2();
+  const p2DrawPile = document.getElementById("p2DrawPile");
+  p2DrawPile?.appendChild(deckBase.container);
+  deckBase.container?.appendChild(testCard.container);
+  const p1DrawPile = document.getElementById("p1Discard");
+  p1DrawPile?.appendChild(deckBase2.container);
+  deckBase2.container?.appendChild(testCard2.container);
+
+  // Deck
+  const playingCards = StandardDeckOfCards();
+  const drawPile = playingCards.createPile("draw", playingCards.cards);
+  const player1 = playingCards.createPile("p1");
+  const player1HAND = playingCards.createPile("p1hand");
+  drawPile.shuffle();
+  drawPile.passCard(player1);
+  drawPile.passCard(player1);
+  drawPile.passCard(player1);
+  drawPile.passCard(player1);
+  drawPile.passCard(player1);
+
+  drawPile.passCard(player1HAND);
+  drawPile.passCard(player1HAND);
+  drawPile.passCard(player1HAND);
+  drawPile.passCard(player1HAND);
+  drawPile.passCard(player1HAND);
+
+  const player1CardElements: CardElement<PlayingCard>[] = [];
+  const player1CardElements2: CardElement<PlayingCard>[] = [];
+
+  player1.cards.forEach((card) => {
+    const cardElly = PlayingCardElement(card);
+    player1CardElements.push(cardElly);
+  });
+
+  player1HAND.cards.forEach((card) => {
+    const cardElly = PlayingCardElement(card);
+    player1CardElements2.push(cardElly);
+  });
+
+  const p1DrawPileElement = pileElement(player1, player1CardElements);
+  const p1DrawDOM = document.getElementById("p1DrawPile");
+  p1DrawDOM?.appendChild(p1DrawPileElement.container);
+  p1DrawPileElement.reset();
+  p1DrawPileElement.container.addEventListener("dblclick", () => {
+    p1DrawPileElement.moveCardToPile(player1HandPile);
+  });
+  p1DrawPileElement.container.addEventListener("click", () => {
+    p1DrawPileElement.getTopCardElement().flip();
+  });
+
+  const player1HandPile = pileElement(player1HAND, player1CardElements2);
+  const p1Hand = document.getElementById("p1Hand");
+  p1Hand?.appendChild(player1HandPile.container);
+  player1HandPile.reset();
+  player1HandPile.container.addEventListener("click", () => {
+    player1HandPile.moveCardToPile(p1DrawPileElement);
+  });
+
+  player1HandPile.container.addEventListener("mouseenter", () => {
+    player1HandPile.spinCard(player1HandPile.getTopCardElement(), 1000);
+  });
 }
