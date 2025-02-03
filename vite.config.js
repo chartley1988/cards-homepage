@@ -90,7 +90,7 @@ export default defineConfig(({ command }) => {
       },
     },
     test: {
-      include: ["./vitest/**/*"],
+      include: ["./tests/**/*"],
       environment: "jsdom",
       // ...
     },
