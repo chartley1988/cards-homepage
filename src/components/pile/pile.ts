@@ -19,7 +19,7 @@ export default class Pile<T extends Card> {
     return this.cards.indexOf(card);
   };
 
-  receiveCard = (cards: T | T[], conditions: Boolean = true) => {
+  receiveCard = (cards: T | T[], conditions: boolean = true) => {
     if (conditions === false) {
       return false;
     }
@@ -36,7 +36,7 @@ export default class Pile<T extends Card> {
   passCard = (
     target: Pile<T>,
     card: T = this._cards[this._cards.length - 1],
-    rules: Boolean = true
+    rules: boolean = true,
   ) => {
     if (target.receiveCard(card, rules) === false) return false;
     else {
