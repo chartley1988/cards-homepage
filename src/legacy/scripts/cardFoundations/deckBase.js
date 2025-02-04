@@ -75,7 +75,7 @@ function addDeckBase(type = "stack") {
     destinationDeckBase, // only need to know the destination DeckBase, as we know its coming from *this*Deckbase
     card = this.deck.cards[this.deck.cards.length - 1],
     gameRules = true, // ability to pass in rules for passing the card from one deckbase to another
-    animationCallback = this.animateMoveCardToNewDeck // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
+    animationCallback = this.animateMoveCardToNewDeck, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) {
     if (card.state !== "available") {
       return false;
@@ -84,7 +84,7 @@ function addDeckBase(type = "stack") {
     const cardPassed = this.deck.passCard(
       destinationDeckBase.deck,
       card,
-      gameRules
+      gameRules,
     );
 
     // if the attempt to pass the card is a fail, return immediately
@@ -117,7 +117,7 @@ function addDeckBase(type = "stack") {
   async function animateMoveCardToNewDeck(
     source,
     destination,
-    cardThatWasPassed
+    cardThatWasPassed,
   ) {
     let topCard = cardThatWasPassed;
     topCard.card.style.zIndex = 100;
@@ -126,7 +126,7 @@ function addDeckBase(type = "stack") {
     const destinationOffset = calculateOffset(
       topCard.card,
       destination,
-      destination.deck.cards.length - 1
+      destination.deck.cards.length - 1,
     );
 
     const vector2 = [];

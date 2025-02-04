@@ -10,7 +10,7 @@ function deckDisplay() {
     const uiHeader = createContainer("layout-header");
     const testPlatform = Object.assign(
       { container: createContainer("layout-test-platform") },
-      Animate()
+      Animate(),
     );
     const deckFlex1 = createContainer("layout-test-deck1");
     const deckFlex2 = createContainer("layout-test-deck2");
@@ -112,7 +112,7 @@ function deckDisplay() {
           destination.deck.cards[destination.deck.cards.length - 1];
         destinationPreviousTopCard.card.removeEventListener(
           "click",
-          destinationPreviousTopCard.boundListener
+          destinationPreviousTopCard.boundListener,
         );
       }
       // removes the click listener from the card you moved. changes the instance and adds the listener to move it back
@@ -129,11 +129,11 @@ function deckDisplay() {
       sourceNewTopCard.boundListener = moveTopCard.bind(
         sourceNewTopCard,
         source,
-        destination
+        destination,
       );
       sourceNewTopCard.card.addEventListener(
         "click",
-        sourceNewTopCard.boundListener
+        sourceNewTopCard.boundListener,
       );
     }
     // This is a super useful template for chaining
