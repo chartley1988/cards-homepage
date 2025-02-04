@@ -1,7 +1,12 @@
 import Card from "../card/card";
 import { CardElement } from "../card/cardElement";
 import Pile from "../pile/pile";
-import { PileElement, pileElement } from "../pile/pileElement";
+import {
+  createDefaultOptions,
+  PileElement,
+  pileElement,
+  pileOptions,
+} from "../pile/pileElement";
 
 /**
  * A deck is all of the cards to be used in your game.
@@ -59,12 +64,18 @@ export default class Deck<T extends Card> {
     return pile;
   };
 
-  createPileElement = (name: string, cards: T[] = []) => {
+  createPileElement = (
+    name: string,
+    cards: T[] = [],
+    options: Partial<pileOptions<T>> = {},
+  ) => {
+    const mergedOptions: pileOptions<T> = {
+      ...createDefaultOptions(),
+      ...{ cardElements: cards.map((card) => this._cardBuilder(card)) },
+      ...options,
+    };
     const pile = this.createPile(name, cards);
-    const pileElem = pileElement(
-      pile,
-      cards.map((card) => this._cardBuilder(card)),
-    );
+    const pileElem = pileElement(pile, this, mergedOptions);
     this.pileElements.push(pileElem);
     return pileElem;
   };

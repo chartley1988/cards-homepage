@@ -5,3 +5,7 @@
   height: calc(var(--card-size) * 3.5);
   border-radius: calc(0.15 * var(--card-size));
 }
+
+.card-dragging {
+  opacity: 0.5;
+}

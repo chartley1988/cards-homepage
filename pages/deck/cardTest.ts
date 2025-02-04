@@ -1,5 +1,4 @@
 import { CardElement } from "../../src/components/card/cardElement";
-import { pileElement } from "../../src/components/pile/pileElement";
 import "../../src/styles/style.css";
 import "../../src/styles/card.css";
 import "../../src/styles/theme.css";
@@ -47,39 +46,22 @@ if (app) {
 
   // Deck
   const playingCards = StandardDeckOfCards();
-  const drawPile = playingCards.createPile("draw", playingCards.cards);
-  const player1 = playingCards.createPile("p1");
-  const player1HAND = playingCards.createPile("p1hand");
-  drawPile.shuffle();
-  drawPile.passCard(player1);
-  drawPile.passCard(player1);
-  drawPile.passCard(player1);
-  drawPile.passCard(player1);
-  drawPile.passCard(player1);
+  const drawPile = playingCards.createPileElement("draw", playingCards.cards);
+  drawPile.pile.shuffle();
 
-  drawPile.passCard(player1HAND);
-  drawPile.passCard(player1HAND);
-  drawPile.passCard(player1HAND);
-  drawPile.passCard(player1HAND);
-  drawPile.passCard(player1HAND);
+  const p1DrawPileElement = playingCards.createPileElement(
+    "p1draw",
+    drawPile.cards.splice(0, 5),
+    { draggable: true },
+  );
+  const player1HandPile = playingCards.createPileElement(
+    "p1Hand",
+    drawPile.cards.splice(0, 5),
+  );
 
-  const player1CardElements: CardElement<PlayingCard>[] = [];
-  const player1CardElements2: CardElement<PlayingCard>[] = [];
-
-  player1.cards.forEach((card) => {
-    const cardElly = PlayingCardElement(card);
-    player1CardElements.push(cardElly);
-  });
-
-  player1HAND.cards.forEach((card) => {
-    const cardElly = PlayingCardElement(card);
-    player1CardElements2.push(cardElly);
-  });
-
-  const p1DrawPileElement = pileElement(player1, player1CardElements);
   const p1DrawDOM = document.getElementById("p1DrawPile");
   p1DrawDOM?.appendChild(p1DrawPileElement.container);
-  p1DrawPileElement.reset();
+  p1DrawPileElement.cascade();
   p1DrawPileElement.container.addEventListener("dblclick", () => {
     p1DrawPileElement.moveCardToPile(player1HandPile);
   });
@@ -87,10 +69,9 @@ if (app) {
     p1DrawPileElement.getTopCardElement().flip();
   });
 
-  const player1HandPile = pileElement(player1HAND, player1CardElements2);
   const p1Hand = document.getElementById("p1Hand");
   p1Hand?.appendChild(player1HandPile.container);
-  player1HandPile.reset();
+  player1HandPile.cascade();
   player1HandPile.container.addEventListener("click", () => {
     player1HandPile.moveCardToPile(p1DrawPileElement);
   });

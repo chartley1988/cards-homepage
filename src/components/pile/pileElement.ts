@@ -2,6 +2,21 @@ import Pile from "./pile";
 import Card from "../card/card";
 import { CardElement } from "../card/cardElement";
 import "../../styles/pile.css";
+import Deck from "../deck/deck";
+
+export type pileOptions<T extends Card> = {
+  cardElements: CardElement<T>[];
+  type: "stack" | "cascade";
+  draggable: boolean;
+  rules: () => boolean;
+};
+
+export const createDefaultOptions = <T extends Card>(): pileOptions<T> => ({
+  cardElements: [],
+  type: "stack",
+  draggable: true,
+  rules: () => true,
+});
 
 export type PileElement<T extends Card> = {
   type: "stack" | "cascade";
@@ -50,9 +65,15 @@ export type PileElement<T extends Card> = {
 // Adds a base the size of the card to be the basis of deck layouts.\
 export const pileElement = <T extends Card>(
   pile: Pile<T>,
-  cardElements: CardElement<T>[] = [],
-  type: "stack" | "cascade" = "stack",
+  deck: Deck<T>,
+  options: Partial<pileOptions<T>> = {},
 ): PileElement<T> => {
+  const mergedOptions: pileOptions<T> = {
+    ...createDefaultOptions(),
+    ...options,
+  };
+  const { type, cardElements, draggable, rules } = mergedOptions;
+
   let cascadePercent = [0, 0.001];
   let cascadeDuration = 0;
   if (type === "stack") {
@@ -64,9 +85,60 @@ export const pileElement = <T extends Card>(
   }
   const cards = pile.cards;
 
+  // Define the function before it's used
+  const allowDrop = (e: DragEvent) => {
+    e.preventDefault();
+  };
+  const drag = (e: DragEvent) => {
+    if (!(e.target instanceof HTMLElement)) return;
+    const cardElement = findCardContainer(e.target);
+    if (cardElement === null) return;
+    cardElement.container.classList.add("card-dragging");
+    const data = {
+      index: cardElement.container.style.zIndex,
+      sourcePileContainerId: container.id,
+    };
+    e.dataTransfer?.setData("application/json", JSON.stringify(data));
+  };
+  const dragend = (e: DragEvent) => {
+    if (!(e.target instanceof HTMLElement)) return;
+    const cardElement = findCardContainer(e.target);
+    if (cardElement === null || cardElement === undefined) return;
+    cardElement.container.classList.remove("card-dragging");
+  };
+  const drop = (e: DragEvent) => {
+    e.preventDefault();
+    if (!(e.target instanceof HTMLElement)) return;
+    const jsonData = e.dataTransfer?.getData("application/json");
+    if (!jsonData) throw "no json data... source probably isnt draggable";
+    const { index, sourcePileContainerId } = JSON.parse(jsonData);
+    if (!index || !sourcePileContainerId) {
+      throw "no card index during drop";
+    }
+    const sourcePile = findPileElement(sourcePileContainerId);
+    const thisPile = findPileElement(container.id);
+    if (sourcePile.container.id === container.id) {
+      return "cant drop in own container";
+    }
+    sourcePile.cardElements[parseInt(index)].container.classList.remove(
+      "card-dragging",
+    );
+    sourcePile.moveCardToPile(
+      thisPile,
+      sourcePile.cardElements[parseInt(index)],
+      rules(),
+    );
+  };
+
   const container = document.createElement("div");
   container.classList.add("deck-base");
-
+  container.id = Math.random().toString(36).slice(2, 11);
+  if (draggable) {
+    container.ondragstart = drag;
+    container.ondragend = dragend;
+    container.ondrop = drop;
+    container.ondragover = allowDrop;
+  }
   const slideCard = async (
     cardElement: CardElement<T>,
     vector2: number[],
@@ -369,16 +441,18 @@ export const pileElement = <T extends Card>(
 
     for (let i = 0; i < cardElements.length; i++) {
       const card = cardElements[i];
+      cardElements[i].container.style.zIndex = String(i);
+      cardElements[i].container.draggable = draggable;
       container.appendChild(card.container);
     }
   };
 
-  function adjustZIndex(cardElements: CardElement<T>[]) {
+  const adjustZIndex = (cardElements: CardElement<T>[]) => {
     for (let index = 0; index < cardElements.length; index++) {
       const card = cardElements[index];
       card.container.style.zIndex = String(index);
     }
-  }
+  };
 
   const findCardContainer = (element: HTMLElement) => {
     if (element.classList.contains("card-container"))
@@ -387,6 +461,10 @@ export const pileElement = <T extends Card>(
     else if (element.parentElement)
       return findCardContainer(element.parentElement);
     else throw "something went wrong in find card container";
+  };
+
+  const findPileElement = (id: string) => {
+    return deck.pileElements.filter((item) => item.container.id === id)[0];
   };
 
   return {
