@@ -44,6 +44,7 @@ export type PileElement<T extends Card> = {
     cardThatWasPassed: CardElement<T>,
   ) => Promise<boolean>;
   topCard: CardElement<T>;
+  findCardContainer: (element: HTMLElement) => null | CardElement<T>;
 };
 
 // Adds a base the size of the card to be the basis of deck layouts.\
@@ -194,7 +195,7 @@ export const pileElement = <T extends Card>(
   };
 
   //! Seems to not work on cards that have been passed
-  const cascade = () => {
+  const cascade = (duration = cascadeDuration) => {
     reset();
     const promise = new Promise((resolve) => {
       const arrayFinished = []; // Array of .finished promises returned by animate
@@ -203,7 +204,7 @@ export const pileElement = <T extends Card>(
         const cardElement = cardElements[i].container;
         vector2[0] = cascadePercent[0] * cardElement.offsetWidth * i;
         vector2[1] = cascadePercent[1] * cardElement.offsetHeight * i;
-        const slide = slideCard(cardElements[i], vector2, cascadeDuration);
+        const slide = slideCard(cardElements[i], vector2, duration);
         arrayFinished.push(slide);
       }
       resolve(Promise.all(arrayFinished).then(() => {}));
@@ -235,7 +236,7 @@ export const pileElement = <T extends Card>(
     destinationPile: PileElement<T>,
     cardElement = getTopCardElement(),
     gameRules = true, // ability to pass in rules for passing the card from one deckbase to another
-    animationCallback = animateMoveCardToNewDeck // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
+    animationCallback = animateMoveCardToNewDeck, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) => {
     if (cardElements.indexOf(cardElement) === -1) return false;
 
@@ -263,7 +264,6 @@ export const pileElement = <T extends Card>(
     }
 
     // the card got passed, and this is the animation we want to show.
-    cardElements.splice(cardElements.indexOf(cardElement), 1);
     animationCallback(destinationPile, cardElement);
     return true;
   };
@@ -275,7 +275,6 @@ export const pileElement = <T extends Card>(
     destination: PileElement<T>,
     cardElement: CardElement<T>,
   ) {
-    //! Offset wasnt working... i rewrote but left out cascade percent
     cardElement.container.style.zIndex = String(
       destination.cards.length + 1000,
     );
@@ -294,27 +293,34 @@ export const pileElement = <T extends Card>(
     const vector2 = [];
     vector2[0] = destinationBox.x - sourceBox.x + destinationCascade[0];
     vector2[1] = destinationBox.y - sourceBox.y + destinationCascade[1];
-    //! Offset wasnt working... i rewrote but left out cascade percent
 
     await slideCard(cardElement, vector2, 600);
     destination.container.appendChild(cardElement.container);
 
-    //! This should be a func
     // eslint-disable-next-line prefer-const
     let { translate, scale, rotate } = cardElement.transform;
     translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
     cardElement.transform.translate = translate;
     cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
-    //! This should be a func
 
     cardElement.container.style.zIndex = String(
       destination.cardElements.length,
     );
 
     // add the new card element to destination
+    const index = cardElements.findIndex((element) => {
+      return JSON.stringify(element) === JSON.stringify(cardElement);
+    });
+    if (index === -1) return Promise.reject(false);
+    if (index !== cardElements.length - 1) {
+      //      for (let i = index; i < cardElements.length-1; i++)
+      cardElements.splice(cardElements.indexOf(cardElement), 1);
+      cascade(400);
+    } else {
+      cardElements.splice(cardElements.indexOf(cardElement), 1);
+    }
     destination.cardElements.push(cardElement);
     adjustZIndex(destination.cardElements);
-    destination.cascade();
 
     // adjust the ZIndex of this piles cardElements
     adjustZIndex(cardElements);
@@ -374,6 +380,15 @@ export const pileElement = <T extends Card>(
     }
   }
 
+  const findCardContainer = (element: HTMLElement) => {
+    if (element.classList.contains("card-container"))
+      return cardElements[parseInt(element.style.zIndex)];
+    if (element.classList.contains("deck-base")) return null;
+    else if (element.parentElement)
+      return findCardContainer(element.parentElement);
+    else throw "something went wrong in find card container";
+  };
+
   return {
     type,
     get pile() {
@@ -396,6 +411,7 @@ export const pileElement = <T extends Card>(
     cascadeValueSetter,
     reset,
     animateMoveCardToNewDeck,
+    findCardContainer,
     get topCard() {
       return cardElements[cardElements.length - 1];
     },

@@ -53,57 +53,40 @@ if (app) {
   });
 
   hand1.container.addEventListener("dblclick", () => {
-    hand1.moveCardToPile(
-      discard,
-      hand1.getTopCardElement(),
-      rules(hand1, discard, hand1.getTopCardElement())
-    );
+    hand1.slideDeck([-100, -300], 1000);
   });
   hand1.container.addEventListener("click", (e) => {
     if (e.target instanceof HTMLElement) {
-      hand1.cardElements[
-        parseInt(findCardContainer(e.target).style.zIndex)
-      ].flip();
+      const card = hand1.findCardContainer(e.target);
+      if (card === null) return;
+      card.flip();
     }
   });
-  const findCardContainer = (element: HTMLElement) => {
-    if (element.classList.contains("card-container")) return element;
-    else if (element.parentElement)
-      return findCardContainer(element.parentElement);
-    else throw "something went wrong in find card container";
-  };
 
   hand2.container.addEventListener("dblclick", (e) => {
     if (e.target instanceof HTMLElement) {
-      const cardClicked =
-        hand2.cardElements[parseInt(findCardContainer(e.target).style.zIndex)];
-        console.log(cardClicked)
-      hand2.moveCardToPile(
-        discard,
-        cardClicked,
-        rules(hand2, discard, cardClicked)
-      );
+      const card = hand2.findCardContainer(e.target);
+      if (card === null) return;
+      hand2.moveCardToPile(discard, card, rules(hand2, discard, card));
     }
   });
 
   hand2.container.addEventListener("click", (e) => {
     if (e.target instanceof HTMLElement) {
-      const cardClicked =
-        hand2.cardElements[parseInt(findCardContainer(e.target).style.zIndex)];
-      if (cardClicked.faceUp) return;
-      console.log(cardClicked.faceUp)
-      cardClicked.flip();
+      const card = hand2.findCardContainer(e.target);
+      if (card === null) return;
+      if (card.faceUp) return;
+      card.flip();
     }
   });
 
   const rules = (
     sourcePile: PileElement<PlayingCard>,
     destinationPile: PileElement<PlayingCard>,
-    card: CardElement<PlayingCard>
+    card: CardElement<PlayingCard>,
   ): boolean => {
     if (!card.faceUp) return false;
     if (card.card.value < 6) console.log(card.card.value);
-    console.log(card.card.value);
     return true;
   };
 }
