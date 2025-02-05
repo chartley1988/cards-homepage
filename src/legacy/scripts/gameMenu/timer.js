@@ -11,23 +11,23 @@ const timer = {
   clock: buildTimeSymbol(),
   timeText: buildTimeText(),
 
-  resetTimer(){
+  resetTimer() {
     this.seconds = 0;
     this.minutes = 0;
     this.hours = 0;
     this.updateTimer();
   },
 
-  updateTimer(){
+  updateTimer() {
     this.timeString = `${this.hours}:${this.minutes}:${this.seconds}`;
     this.timeText.textContent = this.timeString;
   },
 
-  startTimer(){
+  startTimer() {
     this.timerStarted = true;
   },
 
-  stopTimer(){
+  stopTimer() {
     this.timerStarted = false;
   },
 };
@@ -35,18 +35,18 @@ const timer = {
 // appends it!
 buildClock();
 setInterval(() => {
-  if(timer.timerStarted === false) return;
+  if (timer.timerStarted === false) return;
   timer.seconds += 1;
 
-  if(timer.seconds >= 60){
+  if (timer.seconds >= 60) {
     timer.seconds = 0;
     timer.minutes += 1;
-  };
+  }
 
-  if(timer.minutes >= 60){
+  if (timer.minutes >= 60) {
     timer.minutes = 0;
     timer.hours += 1;
-  };
+  }
 
   timer.updateTimer();
 }, 1000);

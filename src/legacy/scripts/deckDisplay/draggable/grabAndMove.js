@@ -16,7 +16,7 @@ function dragOverHandler(e) {
   const afterElement = get2dDragAfterElement(
     this,
     e.clientX - offset,
-    e.clientY
+    e.clientY,
   );
   const draggable = document.querySelector(".dragging");
 
@@ -65,7 +65,7 @@ function getDragAfterElement(container, x) {
     },
     {
       offset: Number.NEGATIVE_INFINITY,
-    }
+    },
   ).element;
 }
 
@@ -98,7 +98,7 @@ function get2dDragAfterElement(container, x, y) {
     {
       offsetX: Number.NEGATIVE_INFINITY,
       offsetY: Number.NEGATIVE_INFINITY,
-    }
+    },
   ).element;
 }
 

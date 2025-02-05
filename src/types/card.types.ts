@@ -1,26 +1,18 @@
-type CardElements = {
+import Card from "../components/card/card";
+import Pile from "../components/pile/pile";
+
+export type CardElementType<T extends Card> = {
+  card: T;
+  location: Pile<T> | null;
   front: HTMLDivElement;
   back: HTMLDivElement;
-  parent: HTMLDivElement;
   container: HTMLDivElement;
-};
-
-type CardFunctions = {
-  flipCard: (delay?: number) => void;
-  getFlipSpeed: () => string;
-  blindFlip: () => void;
-};
-
-// TODO: This is in the wrong place. Need to eventually move this
-export type DeckBase = {
-  id?: string;
-  position?: number;
-};
-
-export type CardDom = {
   faceUp: boolean;
-  flipEnabled: boolean;
-  state: "available" | "busy";
-  location: DeckBase | null;
-} & CardElements &
-  CardFunctions;
+  transform: {
+    active: boolean;
+    translate: string;
+    scale: string;
+    rotate: string;
+  };
+  flip: () => void;
+};

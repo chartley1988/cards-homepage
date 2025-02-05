@@ -41,13 +41,13 @@ const interfaceUI = (function () {
     });
     //Adds input field to form
     interfaceForm.appendChild(label);
-    return input
+    return input;
   };
 
   // Creates button to flip all cards
-  const flipAllButton = document.createElement('button');
+  const flipAllButton = document.createElement("button");
   flipAllButton.type = "button";
-  
+
   flipAllButton.textContent = "Flip all Cards!";
   interfaceDiv.appendChild(flipAllButton);
 

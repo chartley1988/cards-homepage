@@ -1,29 +1,11 @@
-import Pile from "../pile/pile";
 import Card from "./card";
-
-export type CardElement<T extends Card> = {
-  card: T;
-  location: Pile<T> | null;
-  front: HTMLDivElement;
-  back: HTMLDivElement;
-  container: HTMLDivElement;
-  faceUp: boolean;
-  transform: {
-    active: boolean;
-    translate: string;
-    scale: string;
-    rotate: string;
-  };
-  flip: () => void;
-  getFlipSpeed: () => string;
-  blindFlip: () => void;
-};
+import { CardElementType } from "../../types/card.types";
 
 export const CardElement = <T extends Card>(
   thisCard = new Card() as T,
   _front = document.createElement("div"),
   _back = document.createElement("div"),
-): CardElement<T> => {
+): CardElementType<T> => {
   const card = thisCard;
   let flipEnabled = true;
   const location = null;
@@ -123,31 +105,6 @@ export const CardElement = <T extends Card>(
     });
   };
 
-  //! Is this ever used?
-  const getFlipSpeed = () => {
-    const styles = window.getComputedStyle(document.body);
-    const speed = styles.getPropertyValue("--card-flip-speed");
-    return speed;
-  };
-
-  //! Can we incorporate this into regular flip?
-  //! It is showing animation when flipping from faceup to facedown still
-  const blindFlip = () => {
-    if (card.faceUp === false) {
-      parent.appendChild(front);
-    }
-
-    back.classList.toggle("flipped");
-
-    if (card.faceUp === false) {
-      card.flip();
-    } else {
-      parent.removeChild(front);
-      card.flip();
-    }
-    front.classList.toggle("flipped");
-  };
-
   return {
     get card() {
       return card;
@@ -164,27 +121,8 @@ export const CardElement = <T extends Card>(
     get faceUp() {
       return card.faceUp;
     },
-    //! I think we want to keep this as only a getter?
-    /*
-    set front(newFront) {
-      if (!card.faceUp) {
-        newFront.classList.add("flipped");
-      }
-      newFront.classList.add("card-front");
-      front = newFront;
-    },
-    set back(newBack) {
-      if (card.faceUp) {
-        newBack.classList.add("flipped");
-      }
-      newBack.classList.add("card-back");
-      back = newBack;
-    },
-    */
     container,
     transform,
     flip,
-    getFlipSpeed,
-    blindFlip,
   };
 };
