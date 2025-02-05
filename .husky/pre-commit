@@ -1,5 +1,6 @@
-npx vitest --run
 npm run lint:staged
+npx vitest --run
+npx tsc --noEmit
 
 # Uncomment the line below to disable commit. Useful for testing hooks
 # exit 1

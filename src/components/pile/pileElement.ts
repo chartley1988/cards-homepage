@@ -1,11 +1,11 @@
 import Pile from "./pile";
 import { CardElementType } from "../../types/card.types";
 import { DragData } from "../../types/pile.types";
-import { pileOptions } from "../../types/pile.types";
+import { pileOptionsType } from "../../types/pile.types";
 
 import Card from "../card/card";
 import "../../styles/pile.css";
-import type { Layout, PileElement } from "../../types/pile.types";
+import type { Layout, PileElementType } from "../../types/pile.types";
 import Deck from "../deck/deck";
 
 // These are recipes for cascade()
@@ -18,7 +18,7 @@ const layout: Layout = {
   },
 };
 
-export const createDefaultOptions = <T extends Card>(): pileOptions<T> => ({
+export const createDefaultOptions = <T extends Card>(): pileOptionsType<T> => ({
   cardElements: [],
   type: "stack",
   draggable: true,
@@ -30,9 +30,9 @@ export const createDefaultOptions = <T extends Card>(): pileOptions<T> => ({
 export const pileElement = <T extends Card>(
   pile: Pile<T>,
   deck: Deck<T>,
-  partialOptions: Partial<pileOptions<T>> = {},
-): PileElement<T> => {
-  const options: pileOptions<T> = {
+  partialOptions: Partial<pileOptionsType<T>> = {},
+): PileElementType<T> => {
+  const options: pileOptionsType<T> = {
     ...createDefaultOptions(),
     ...partialOptions,
   };
@@ -123,7 +123,8 @@ export const pileElement = <T extends Card>(
     factor: number,
     duration: number,
   ) => {
-    let { translate, scale, rotate } = cardElement.transform;
+    let { scale } = cardElement.transform;
+    const { translate, rotate } = cardElement.transform;
 
     scale = `scale(${factor})`;
     const transform = `${translate} ${scale} ${rotate}`;
@@ -207,7 +208,7 @@ export const pileElement = <T extends Card>(
 
   // slimmed down move card to deck
   const moveCardToPile = (
-    destinationPile: PileElement<T>,
+    destinationPile: PileElementType<T>,
     cardElement = getTopCardElement(),
     gameRules = true, // ability to pass in rules for passing the card from one deckbase to another
     animationCallback = animateMoveCardToNewPile, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
@@ -246,7 +247,7 @@ export const pileElement = <T extends Card>(
   // I had to now reference where things used to be in objects, because the card
   // has been moved in the Objects, but not visually on the screen
   async function animateMoveCardToNewPile(
-    destination: PileElement<T>,
+    destination: PileElementType<T>,
     cardElement: CardElementType<T>,
   ) {
     cardElement.container.style.zIndex = String(

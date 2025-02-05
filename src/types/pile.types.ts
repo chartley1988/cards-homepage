@@ -2,7 +2,7 @@ import { CardElementType } from "./card.types";
 import Pile from "../components/pile/pile";
 import Card from "../components/card/card";
 
-export type PileElement<T extends Card> = {
+export type PileElementType<T extends Card> = {
   type: "stack" | "cascade";
   pile: Pile<T>;
   cards: T[];
@@ -28,17 +28,17 @@ export type PileElement<T extends Card> = {
   ) => Promise<Animation>;
   slideDeck: (vector1: number[], duration: number) => void;
   moveCardToPile: (
-    destinationPile: PileElement<T>,
+    destinationPile: PileElementType<T>,
     cardElement?: CardElementType<T>,
     gameRules?: boolean,
     animationCallback?: (
-      destination: PileElement<T>,
+      destination: PileElementType<T>,
       cardThatWasPassed: CardElementType<T>,
     ) => Promise<boolean>,
   ) => boolean;
   reset: () => void;
   findCardContainer: (element: HTMLElement) => null | CardElementType<T>;
-  options: pileOptions<T>;
+  options: pileOptionsType<T>;
 };
 
 export interface DragData {
@@ -46,7 +46,7 @@ export interface DragData {
   sourcePileContainerId: string;
 }
 
-export type pileOptions<T extends Card> = {
+export type pileOptionsType<T extends Card> = {
   cardElements: CardElementType<T>[];
   type: "stack" | "cascade";
   draggable: boolean;

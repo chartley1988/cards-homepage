@@ -1,5 +1,5 @@
 import Card from "../card/card";
-import { PileElement } from "../../types/pile.types";
+import { PileElementType } from "../../types/pile.types";
 import { CardElementType } from "../../types/card.types";
 
 export const slideCard = async <T extends Card>(
@@ -105,7 +105,7 @@ export const zoomCard = async <T extends Card>(
 
 //! I havent tested this
 export const slideDeck = async <T extends Card>(
-  pile: PileElement<T>,
+  pile: PileElementType<T>,
   vector2: number[],
   duration: number,
 ) => {
@@ -134,7 +134,7 @@ export const slideDeck = async <T extends Card>(
 };
 
 export const cascade = <T extends Card>(
-  pileElement: PileElement<T>,
+  pileElement: PileElementType<T>,
   duration = pileElement.cascadeDuration,
 ) => {
   pileElement.reset();
