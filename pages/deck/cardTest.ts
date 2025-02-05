@@ -8,6 +8,7 @@ import addDeckBase from "../../src/legacy/scripts/cardFoundations/deckBase";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
 import PlayingCardElement from "../../src/components/card/playingCard/playingCardElement";
+import { spinCard } from "../../src/components/animate/animate";
 
 function instanceCard() {
   const front = document.createElement("div");
@@ -77,6 +78,6 @@ if (app) {
   });
 
   player1HandPile.container.addEventListener("mouseenter", () => {
-    player1HandPile.spinCard(player1HandPile.getTopCardElement(), 1000);
+    spinCard(player1HandPile.getTopCardElement(), 1000);
   });
 }

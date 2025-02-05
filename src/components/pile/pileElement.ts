@@ -3,6 +3,7 @@ import Card from "../card/card";
 import { CardElement } from "../card/cardElement";
 import "../../styles/pile.css";
 import Deck from "../deck/deck";
+import { slideCard } from "../animate/animate";
 
 export type pileOptions<T extends Card> = {
   cardElements: CardElement<T>[];
@@ -27,22 +28,9 @@ export type PileElement<T extends Card> = {
   cascadePercent: number[];
   cascadeDuration: number;
   cascade: () => Promise<unknown>;
-  slideCard: (
-    cardElement: CardElement<T>,
-    vector2: number[],
-    duration: number,
-  ) => void;
+
   getTopCardElement: () => CardElement<T>;
-  spinCard: (
-    cardElement: CardElement<T>,
-    duration: number,
-  ) => Promise<Animation> | Promise<unknown>;
-  zoomCard: (
-    cardElement: CardElement<T>,
-    factor: number,
-    duration: number,
-  ) => Promise<Animation>;
-  slideDeck: (vector2: number[], duration: number) => void;
+
   moveCardToPile: (
     destinationPile: PileElement<T>,
     cardElement?: CardElement<T>,
@@ -139,132 +127,6 @@ export const pileElement = <T extends Card>(
     container.ondrop = drop;
     container.ondragover = allowDrop;
   }
-  const slideCard = async (
-    cardElement: CardElement<T>,
-    vector2: number[],
-    duration: number,
-  ) => {
-    if (cardElement.transform.active) return;
-    if (vector2.length !== 2) {
-      console.error("Error: vector2 must be an array of 2 values, x and y.");
-    }
-    //! This should be a func
-    // eslint-disable-next-line prefer-const
-    let { translate, scale, rotate } = cardElement.transform;
-    translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
-    cardElement.transform.translate = translate;
-    //! This should be a func
-
-    const transform = `${translate} ${scale} ${rotate}`;
-
-    const keys = {
-      transform: transform,
-    };
-
-    const options = {
-      duration: duration,
-      easing: "ease-out",
-      delay: 0,
-      direction: "normal" as PlaybackDirection,
-    };
-
-    const anim = cardElement.container.animate(keys, options);
-    cardElement.container.dispatchEvent(new Event("animationstart"));
-    await anim.finished.then(() => {
-      cardElement.container.style.transform = transform;
-      cardElement.container.dispatchEvent(new Event("animationend"));
-    });
-  };
-
-  const spinCard = async (cardElement: CardElement<T>, duration: number) => {
-    if (cardElement === undefined) return new Promise(() => undefined);
-    if (cardElement.transform.active) return new Promise(() => undefined);
-
-    cardElement.transform.rotate =
-      cardElement.transform.rotate === `rotate(0deg)`
-        ? "rotate(90deg)"
-        : "rotate(0deg)";
-
-    const { translate, scale, rotate } = cardElement.transform;
-    const transform = `${translate} ${scale} ${rotate}`;
-
-    const keys = {
-      transform: transform,
-    };
-
-    const options = {
-      duration: duration,
-      easing: "linear",
-      delay: 0,
-      direction: "normal" as PlaybackDirection,
-    };
-
-    const anim = cardElement.container.animate(keys, options);
-    cardElement.container.dispatchEvent(new Event("animationstart"));
-    await anim.finished.then(() => {
-      cardElement.container.style.transform = transform;
-      cardElement.container.dispatchEvent(new Event("animationend"));
-    });
-
-    return anim;
-  };
-
-  //! I haven't tested this
-  const zoomCard = async (
-    cardElement: CardElement<T>,
-    factor: number,
-    duration: number,
-  ) => {
-    // eslint-disable-next-line prefer-const
-    let { translate, scale, rotate } = cardElement.transform;
-
-    scale = `scale(${factor})`;
-    const transform = `${translate} ${scale} ${rotate}`;
-
-    const keys = {
-      transform: transform,
-    };
-
-    const options = {
-      duration: duration,
-      easing: "ease-out",
-      delay: 0,
-      direction: "normal" as PlaybackDirection,
-    };
-
-    const anim = cardElement.container.animate(keys, options);
-    await anim.finished.then(() => {
-      cardElement.container.style.transform = transform;
-    });
-
-    return anim;
-  };
-
-  //! I havent tested this
-  const slideDeck = async (vector2: number[], duration: number) => {
-    if (vector2.length !== 2) {
-      console.error("Error: vector2 must be an array of 2 values, x and y.");
-    }
-
-    const translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
-    const transform = `${translate} scale(1) rotate(0deg)`;
-
-    const keys = {
-      transform: transform,
-    };
-
-    const options = {
-      duration: duration,
-      easing: "ease-out",
-      delay: 0,
-      direction: "normal" as PlaybackDirection,
-    };
-
-    const anim = container.animate(keys, options);
-    await anim.finished.then(() => {
-      container.style.transform = transform;
-    });
-  };
 
   //! Seems to not work on cards that have been passed
   const cascade = (duration = cascadeDuration) => {
@@ -480,10 +342,6 @@ export const pileElement = <T extends Card>(
     cascadePercent,
     cascadeDuration,
     getTopCardElement,
-    slideCard,
-    spinCard,
-    zoomCard,
-    slideDeck,
     moveCardToPile,
     cascade,
     cascadeValueSetter,

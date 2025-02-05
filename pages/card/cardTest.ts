@@ -9,6 +9,7 @@ import Card from "../../src/components/card/card";
 import { PileElement } from "../../src/components/pile/pileElement";
 import { CardElement } from "../../src/components/card/cardElement";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
+import { slideDeck } from "../../src/components/animate/animate";
 
 const app = document.getElementById("app");
 if (app) {
@@ -53,7 +54,7 @@ if (app) {
   });
 
   hand1.container.addEventListener("dblclick", () => {
-    hand1.slideDeck([-100, -300], 1000);
+    slideDeck(hand1, [-100, -300], 1000);
   });
   hand1.container.addEventListener("click", (e) => {
     if (e.target instanceof HTMLElement) {
