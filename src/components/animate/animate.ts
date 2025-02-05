@@ -1,9 +1,9 @@
 import Card from "../card/card";
-import { CardElement } from "../card/cardElement";
-import { PileElement } from "../pile/pileElement";
+import { PileElement } from "../../types/pile.types";
+import { CardElementType } from "../../types/card.types";
 
 export const slideCard = async <T extends Card>(
-  cardElement: CardElement<T>,
+  cardElement: CardElementType<T>,
   vector2: number[],
   duration: number,
 ) => {
@@ -37,7 +37,7 @@ export const slideCard = async <T extends Card>(
 };
 
 export const spinCard = async <T extends Card>(
-  cardElement: CardElement<T>,
+  cardElement: CardElementType<T>,
   duration: number,
 ) => {
   if (cardElement === undefined) return new Promise(() => undefined);
@@ -74,7 +74,7 @@ export const spinCard = async <T extends Card>(
 
 //! I haven't tested this
 export const zoomCard = async <T extends Card>(
-  cardElement: CardElement<T>,
+  cardElement: CardElementType<T>,
   factor: number,
   duration: number,
 ) => {
@@ -143,8 +143,8 @@ export const cascade = <T extends Card>(
     for (let i = 0; i < pileElement.cardElements.length; i++) {
       const vector2 = [];
       const cardElement = pileElement.cardElements[i].container;
-      vector2[0] = pileElement.cascadePercent[0] * cardElement.offsetWidth * i;
-      vector2[1] = pileElement.cascadePercent[1] * cardElement.offsetHeight * i;
+      vector2[0] = pileElement.cascadeOffset[0] * cardElement.offsetWidth * i;
+      vector2[1] = pileElement.cascadeOffset[1] * cardElement.offsetHeight * i;
       const slide = slideCard(pileElement.cardElements[i], vector2, duration);
       arrayFinished.push(slide);
     }
