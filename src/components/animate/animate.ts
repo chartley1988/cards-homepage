@@ -1,16 +1,13 @@
+import { CardElementType } from "../../types/card.types";
+import { PileElementType } from "../../types/pile.types";
 import Card from "../card/card";
-import { CardElement } from "../card/cardElement";
-import { PileElement } from "../pile/pileElement";
 
 export const slideCard = async <T extends Card>(
-  cardElement: CardElement<T>,
-  vector2: number[],
+  cardElement: CardElementType<T>,
+  vector2: [number, number],
   duration: number,
-) => {
+): Promise<Animation | undefined> => {
   if (cardElement.transform.active) return;
-  if (vector2.length !== 2) {
-    console.error("Error: vector2 must be an array of 2 values, x and y.");
-  }
   const { scale, rotate } = cardElement.transform;
   const newTranslate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
   cardElement.transform.translate = newTranslate;
@@ -34,12 +31,13 @@ export const slideCard = async <T extends Card>(
     cardElement.container.style.transform = transform;
     cardElement.container.dispatchEvent(new Event("animationend"));
   });
+  return anim.finished;
 };
 
 export const spinCard = async <T extends Card>(
-  cardElement: CardElement<T>,
+  cardElement: CardElementType<T>,
   duration: number,
-) => {
+): Promise<Animation | undefined> => {
   if (cardElement === undefined) return new Promise(() => undefined);
   if (cardElement.transform.active) return new Promise(() => undefined);
 
@@ -74,14 +72,13 @@ export const spinCard = async <T extends Card>(
 
 //! I haven't tested this
 export const zoomCard = async <T extends Card>(
-  cardElement: CardElement<T>,
+  cardElement: CardElementType<T>,
   factor: number,
   duration: number,
 ) => {
-  // eslint-disable-next-line prefer-const
-  let { translate, scale, rotate } = cardElement.transform;
+  const { translate, rotate } = cardElement.transform;
 
-  scale = `scale(${factor})`;
+  const scale = `scale(${factor})`;
   const transform = `${translate} ${scale} ${rotate}`;
 
   const keys = {
@@ -105,7 +102,7 @@ export const zoomCard = async <T extends Card>(
 
 //! I havent tested this
 export const slideDeck = async <T extends Card>(
-  pile: PileElement<T>,
+  pile: PileElementType<T>,
   vector2: number[],
   duration: number,
 ) => {
@@ -131,24 +128,5 @@ export const slideDeck = async <T extends Card>(
   await anim.finished.then(() => {
     pile.container.style.transform = transform;
   });
-};
-
-export const cascade = <T extends Card>(
-  pileElement: PileElement<T>,
-  duration = pileElement.cascadeDuration,
-) => {
-  pileElement.reset();
-  const promise = new Promise((resolve) => {
-    const arrayFinished = []; // Array of .finished promises returned by animate
-    for (let i = 0; i < pileElement.cardElements.length; i++) {
-      const vector2 = [];
-      const cardElement = pileElement.cardElements[i].container;
-      vector2[0] = pileElement.cascadePercent[0] * cardElement.offsetWidth * i;
-      vector2[1] = pileElement.cascadePercent[1] * cardElement.offsetHeight * i;
-      const slide = slideCard(pileElement.cardElements[i], vector2, duration);
-      arrayFinished.push(slide);
-    }
-    resolve(Promise.all(arrayFinished).then(() => {}));
-  });
-  return promise;
+  return anim;
 };

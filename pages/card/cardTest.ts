@@ -9,7 +9,7 @@ import Card from "../../src/components/card/card";
 import { CardElementType } from "../../src/types/card.types";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import { slideDeck } from "../../src/components/animate/animate";
-import { PileElement } from "../../src/types/pile.types";
+import { PileElementType } from "../../src/types/pile.types";
 
 const app = document.getElementById("app");
 if (app) {
@@ -92,8 +92,8 @@ if (app) {
   });
 
   const rules = (
-    sourcePile: PileElement<PlayingCard>,
-    destinationPile: PileElement<PlayingCard>,
+    sourcePile: PileElementType<PlayingCard>,
+    destinationPile: PileElementType<PlayingCard>,
     card: CardElementType<PlayingCard>,
   ): boolean => {
     if (!card.faceUp) return false;
@@ -104,8 +104,8 @@ if (app) {
 
 async function deal<T extends Card>(
   number: number,
-  from: PileElement<T>,
-  to: PileElement<T>[] | PileElement<T>,
+  from: PileElementType<T>,
+  to: PileElementType<T>[] | PileElementType<T>,
 ) {
   // If `to` is a single pile, convert it to an array for simplicity
   const piles = Array.isArray(to) ? to : [to];

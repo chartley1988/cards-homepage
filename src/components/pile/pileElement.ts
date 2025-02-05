@@ -5,8 +5,9 @@ import { pileOptions } from "../../types/pile.types";
 
 import Card from "../card/card";
 import "../../styles/pile.css";
-import type { Layout, PileElement } from "../../types/pile.types";
+import type { Layout, PileElementType } from "../../types/pile.types";
 import Deck from "../deck/deck";
+import { slideCard } from "../animate/animate";
 
 // These are recipes for cascade()
 const layout: Layout = {
@@ -31,7 +32,7 @@ export const pileElement = <T extends Card>(
   pile: Pile<T>,
   deck: Deck<T>,
   partialOptions: Partial<pileOptions<T>> = {},
-): PileElement<T> => {
+): PileElementType<T> => {
   const options: pileOptions<T> = {
     ...createDefaultOptions(),
     ...partialOptions,
@@ -39,139 +40,11 @@ export const pileElement = <T extends Card>(
   const { type, cardElements, draggable, rules, groupDrag } = options;
   const cascadeOffset = layout[type].offset;
   const cascadeDuration = 0;
-
   const cards = pile.cards;
 
   const container = document.createElement("div");
   container.classList.add("deck-base");
   container.id = Math.random().toString(36).slice(2, 11);
-
-  //?  Chartley: Should some of these animations be here?
-  //?  Perhaps zoomCard, spinCard, and slideCard should
-  //?  live in base card class with flip(). Deck based
-  //?  animations should stay here, such as cascade.
-
-  const slideCard = async (
-    cardElement: CardElementType<T>,
-    vector2: [number, number],
-    duration: number,
-  ): Promise<Animation | undefined> => {
-    if (cardElement.transform.active) return;
-
-    const transform = `
-      translate(${vector2[0]}px, ${vector2[1]}px) 
-      ${cardElement.transform.scale} 
-      ${cardElement.transform.rotate}
-    `;
-
-    const anim = cardElement.container.animate(
-      {
-        transform: transform,
-      },
-      {
-        duration: duration,
-        easing: "ease-out",
-        delay: 0,
-        direction: "normal" as PlaybackDirection,
-      },
-    );
-
-    await anim.finished.then(() => {
-      cardElement.container.style.transform = transform;
-    });
-
-    return anim.finished;
-  };
-
-  const spinCard = async (
-    cardElement: CardElementType<T>,
-    duration: number,
-  ): Promise<Animation | undefined> => {
-    if (cardElement === undefined || cardElement.transform.active) return;
-
-    cardElement.transform.rotate =
-      cardElement.transform.rotate === `rotate(0deg)`
-        ? "rotate(90deg)"
-        : "rotate(0deg)";
-
-    const { translate, scale, rotate } = cardElement.transform;
-    const transform = `${translate} ${scale} ${rotate}`;
-
-    const anim = cardElement.container.animate(
-      {
-        transform: transform,
-      },
-
-      {
-        duration: duration,
-        easing: "linear",
-        delay: 0,
-        direction: "normal" as PlaybackDirection,
-      },
-    );
-
-    await anim.finished.then(() => {
-      cardElement.container.style.transform = transform;
-    });
-
-    return anim;
-  };
-
-  //! I haven't tested this
-  const zoomCard = async (
-    cardElement: CardElementType<T>,
-    factor: number,
-    duration: number,
-  ) => {
-    let { translate, scale, rotate } = cardElement.transform;
-
-    scale = `scale(${factor})`;
-    const transform = `${translate} ${scale} ${rotate}`;
-
-    const keys = {
-      transform: transform,
-    };
-
-    const options = {
-      duration: duration,
-      easing: "ease-out",
-      delay: 0,
-      direction: "normal" as PlaybackDirection,
-    };
-
-    const anim = cardElement.container.animate(keys, options);
-    await anim.finished.then(() => {
-      cardElement.container.style.transform = transform;
-    });
-
-    return anim;
-  };
-
-  //! I havent tested this
-  const slideDeck = async (vector2: number[], duration: number) => {
-    if (vector2.length !== 2) {
-      console.error("Error: vector2 must be an array of 2 values, x and y.");
-    }
-
-    const translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
-    const transform = `${translate} scale(1) rotate(0deg)`;
-
-    const keys = {
-      transform: transform,
-    };
-
-    const options = {
-      duration: duration,
-      easing: "ease-out",
-      delay: 0,
-      direction: "normal" as PlaybackDirection,
-    };
-
-    const anim = container.animate(keys, options);
-    await anim.finished.then(() => {
-      container.style.transform = transform;
-    });
-  };
 
   const cascade = (duration = cascadeDuration) => {
     reset();
@@ -207,7 +80,7 @@ export const pileElement = <T extends Card>(
 
   // slimmed down move card to deck
   const moveCardToPile = (
-    destinationPile: PileElement<T>,
+    destinationPile: PileElementType<T>,
     cardElement = getTopCardElement(),
     gameRules = true, // ability to pass in rules for passing the card from one deckbase to another
     animationCallback = animateMoveCardToNewPile, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
@@ -246,7 +119,7 @@ export const pileElement = <T extends Card>(
   // I had to now reference where things used to be in objects, because the card
   // has been moved in the Objects, but not visually on the screen
   async function animateMoveCardToNewPile(
-    destination: PileElement<T>,
+    destination: PileElementType<T>,
     cardElement: CardElementType<T>,
   ) {
     cardElement.container.style.zIndex = String(
@@ -270,6 +143,7 @@ export const pileElement = <T extends Card>(
     ];
 
     await slideCard(cardElement, vector2, 600);
+    cardElement.container.draggable = destination.options.draggable;
     destination.container.appendChild(cardElement.container);
 
     const { scale, rotate } = cardElement.transform;
@@ -311,12 +185,12 @@ export const pileElement = <T extends Card>(
     }
   };
 
-  function adjustZIndex(cardElements: CardElementType<T>[]) {
+  const adjustZIndex = (cardElements: CardElementType<T>[]) => {
     for (let index = 0; index < cardElements.length; index++) {
       const card = cardElements[index];
       card.container.style.zIndex = String(index);
     }
-  }
+  };
   const findCardContainer = (element: HTMLElement) => {
     if (element.classList.contains("card-container"))
       return cardElements[parseInt(element.style.zIndex)];
@@ -465,7 +339,6 @@ export const pileElement = <T extends Card>(
   }
 
   return {
-    type,
     get pile() {
       return pile;
     },
@@ -476,15 +349,11 @@ export const pileElement = <T extends Card>(
     container,
     cascadeOffset,
     cascadeDuration,
+    options,
     getTopCardElement,
-    slideCard,
-    spinCard,
-    zoomCard,
-    slideDeck,
     moveCardToPile,
     cascade,
     reset,
-    options,
     findCardContainer,
   };
 };

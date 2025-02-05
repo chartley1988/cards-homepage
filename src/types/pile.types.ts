@@ -2,8 +2,7 @@ import { CardElementType } from "./card.types";
 import Pile from "../components/pile/pile";
 import Card from "../components/card/card";
 
-export type PileElement<T extends Card> = {
-  type: "stack" | "cascade";
+export type PileElementType<T extends Card> = {
   pile: Pile<T>;
   cards: T[];
   cardElements: CardElementType<T>[];
@@ -11,28 +10,13 @@ export type PileElement<T extends Card> = {
   cascadeOffset: [number, number];
   cascadeDuration: number;
   cascade: () => Promise<unknown>;
-  slideCard: (
-    cardElement: CardElementType<T>,
-    vector2: [number, number],
-    duration: number,
-  ) => Promise<Animation | undefined>;
   getTopCardElement: () => CardElementType<T>;
-  spinCard: (
-    cardElement: CardElementType<T>,
-    duration: number,
-  ) => Promise<Animation> | Promise<unknown>;
-  zoomCard: (
-    cardElement: CardElementType<T>,
-    factor: number,
-    duration: number,
-  ) => Promise<Animation>;
-  slideDeck: (vector1: number[], duration: number) => void;
   moveCardToPile: (
-    destinationPile: PileElement<T>,
+    destinationPile: PileElementType<T>,
     cardElement?: CardElementType<T>,
     gameRules?: boolean,
     animationCallback?: (
-      destination: PileElement<T>,
+      destination: PileElementType<T>,
       cardThatWasPassed: CardElementType<T>,
     ) => Promise<boolean>,
   ) => boolean;
