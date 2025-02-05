@@ -319,9 +319,8 @@ export const pileElement = <T extends Card>(
     cardElement.container.draggable = destination.options.draggable;
     destination.container.appendChild(cardElement.container);
 
-    // eslint-disable-next-line prefer-const
-    let { translate, scale, rotate } = cardElement.transform;
-    translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
+    const { scale, rotate } = cardElement.transform;
+    const translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
     cardElement.transform.translate = translate;
     cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
 
