@@ -10,27 +10,40 @@ const app = document.getElementById("app");
 if (app) {
   const deck = StandardDeckOfCards();
 
-  const player1 = new Player("Player 1", deck, ["hand"]);
-  const main = new Player("Dealer", deck, ["draw", "discard"], "draw");
+  const player1 = new Player("Player 1", deck, [{ name: "Hand" }]);
+  const player2 = new Player("Player 2", deck, [{ name: "Hand" }]);
+  const main = new Player(
+    "Dealer",
+    deck,
+    [{ name: "Draw" }, { name: "Discard" }],
+    "Draw",
+  );
 
-  const hand1 = player1.getPile("hand");
-  hand1.type = "cascade";
+  const hand1 = player1.getPile("Hand");
+  hand1.options.type = "cascade";
   document.getElementById("p1Hand")?.appendChild(hand1.container);
 
-  const draw = main.getPile("draw");
+  const hand2 = player2.getPile("Hand");
+  hand2.options.type = "cascade";
+  document.getElementById("p2Hand")?.appendChild(hand2.container);
+
+  const draw = main.getPile("Draw");
   document.getElementById("mainDraw")?.appendChild(draw.container);
 
-  const discard = main.getPile("discard");
+  const discard = main.getPile("Discard");
   document.getElementById("mainDiscard")?.appendChild(discard.container);
 
-  draw.cascadeValueSetter([0.0, -0.005], 0);
   draw.cascade();
 
-  hand1.cascadeValueSetter([0.0, -0.015], 0);
-  await hand1.cascade();
+  hand2.cascadeOffset = [0.3, 0];
 
   for (let i = 0; i < 15; i++) {
     await draw.moveCardToPile(hand1);
+    await delay(50);
+  }
+
+  for (let i = 0; i < 15; i++) {
+    await draw.moveCardToPile(hand2);
     await delay(50);
   }
 
