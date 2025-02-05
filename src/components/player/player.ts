@@ -1,6 +1,6 @@
 import Card from "../card/card";
 import Deck from "../deck/deck";
-import { PileElement } from "../pile/pileElement";
+import { PileElement, pileOptions } from "../pile/pileElement";
 
 export default class Player<T extends Card> {
   private _deck: Deck<T>;
@@ -9,17 +9,18 @@ export default class Player<T extends Card> {
   constructor(
     name: string,
     deck: Deck<T>,
-    piles: string[],
+    piles: { name: string; options?: Partial<pileOptions<T>> }[],
     cardInitializer?: string,
   ) {
     this._deck = deck;
     this.name = name;
-    this._piles = piles.map((pileName) => {
+    this._piles = piles.map(({ name, options }) => {
+      if (options === undefined) options = {};
       // Need somewhere to put all the cards to start the game... could be 1 spot per player
-      if (pileName === cardInitializer) {
-        return deck.createPileElement(pileName, deck.cards);
+      if (name === cardInitializer) {
+        return deck.createPileElement(name, deck.cards, options);
       }
-      return deck.createPileElement(pileName);
+      return deck.createPileElement(name, [], options);
     });
   }
 

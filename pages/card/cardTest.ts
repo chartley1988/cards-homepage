@@ -15,9 +15,16 @@ const app = document.getElementById("app");
 if (app) {
   const deck = StandardDeckOfCards();
 
-  const player1 = new Player("dave", deck, ["hand"]);
-  const main = new Player("main", deck, ["draw", "discard"], "draw");
-  const player2 = new Player("hups", deck, ["hand"]);
+  const player1 = new Player("dave", deck, [
+    { name: "hand", options: { draggable: false } },
+  ]);
+  const main = new Player(
+    "main",
+    deck,
+    [{ name: "draw" }, { name: "discard" }],
+    "draw",
+  );
+  const player2 = new Player("hups", deck, [{ name: "hand" }]);
 
   const hand1 = player1.getPile("hand");
   document.getElementById("p1Hand")?.appendChild(hand1.container);
