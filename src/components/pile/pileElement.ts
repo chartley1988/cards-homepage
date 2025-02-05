@@ -34,6 +34,7 @@ export type PileElement<T extends Card> = {
   container: HTMLDivElement;
   cascadePercent: number[];
   cascadeDuration: number;
+  options: pileOptions<T>;
   cascade: () => Promise<unknown>;
 
   getTopCardElement: () => CardElement<T>;
@@ -61,13 +62,13 @@ export type PileElement<T extends Card> = {
 export const pileElement = <T extends Card>(
   pile: Pile<T>,
   deck: Deck<T>,
-  options: Partial<pileOptions<T>> = {},
+  partialOptions: Partial<pileOptions<T>> = {},
 ): PileElement<T> => {
-  const mergedOptions: pileOptions<T> = {
+  const options: pileOptions<T> = {
     ...createDefaultOptions(),
-    ...options,
+    ...partialOptions,
   };
-  const { type, cardElements, draggable, rules, groupDrag } = mergedOptions;
+  const { type, cardElements, draggable, rules, groupDrag } = options;
 
   let cascadePercent = [0, 0.001];
   let cascadeDuration = 0;
@@ -314,6 +315,8 @@ export const pileElement = <T extends Card>(
     vector2[1] = destinationBox.y - sourceBox.y + destinationCascade[1];
 
     await slideCard(cardElement, vector2, 600);
+
+    cardElement.container.draggable = destination.options.draggable;
     destination.container.appendChild(cardElement.container);
 
     // eslint-disable-next-line prefer-const
@@ -419,6 +422,9 @@ export const pileElement = <T extends Card>(
     },
     get cards() {
       return pile.cards;
+    },
+    get options() {
+      return options;
     },
     cardElements,
     container,
