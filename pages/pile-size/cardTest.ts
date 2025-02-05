@@ -22,6 +22,8 @@ if (app) {
   const hand1 = player1.getPile("Hand");
   hand1.options.type = "cascade";
   document.getElementById("p1Hand")?.appendChild(hand1.container);
+  console.log(player1.getPile("Hand").cardElements);
+  console.log(player1.getPile("Hand").cards);
 
   const hand2 = player2.getPile("Hand");
   hand2.options.type = "cascade";
@@ -37,17 +39,17 @@ if (app) {
 
   hand2.cascadeOffset = [0.3, 0];
 
-  for (let i = 0; i < 15; i++) {
-    await draw.moveCardToPile(hand1);
-    await delay(50);
-  }
+  window.addEventListener("DOMContentLoaded", async () => {
+    for (let i = 0; i < 15; i++) {
+      await draw.moveCardToPile(hand1);
+      await delay(50);
+    }
 
-  for (let i = 0; i < 15; i++) {
-    await draw.moveCardToPile(hand2);
-    await delay(50);
-  }
-
-  window.addEventListener("DOMContentLoaded", () => {});
+    for (let i = 0; i < 15; i++) {
+      await draw.moveCardToPile(hand2);
+      await delay(50);
+    }
+  });
 }
 
 function delay(ms: number) {
