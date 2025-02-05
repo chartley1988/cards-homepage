@@ -5,11 +5,17 @@ import "../../styles/pile.css";
 import Deck from "../deck/deck";
 import { slideCard } from "../animate/animate";
 
+interface DragData {
+  indexs: string[];
+  sourcePileContainerId: string;
+}
+
 export type pileOptions<T extends Card> = {
   cardElements: CardElement<T>[];
   type: "stack" | "cascade";
   draggable: boolean;
   rules: () => boolean;
+  groupDrag: boolean;
 };
 
 export const createDefaultOptions = <T extends Card>(): pileOptions<T> => ({
@@ -17,6 +23,7 @@ export const createDefaultOptions = <T extends Card>(): pileOptions<T> => ({
   type: "stack",
   draggable: true,
   rules: () => true,
+  groupDrag: true,
 });
 
 export type PileElement<T extends Card> = {
@@ -60,7 +67,7 @@ export const pileElement = <T extends Card>(
     ...createDefaultOptions(),
     ...options,
   };
-  const { type, cardElements, draggable, rules } = mergedOptions;
+  const { type, cardElements, draggable, rules, groupDrag } = mergedOptions;
 
   let cascadePercent = [0, 0.001];
   let cascadeDuration = 0;
@@ -79,43 +86,124 @@ export const pileElement = <T extends Card>(
   };
   const drag = (e: DragEvent) => {
     if (!(e.target instanceof HTMLElement)) return;
+
+    // Find the main card container.
     const cardElement = findCardContainer(e.target);
     if (cardElement === null) return;
-    cardElement.container.classList.add("card-dragging");
+
+    // Prepare your drag data.
     const data = {
-      index: cardElement.container.style.zIndex,
+      indexs: [cardElement.container.style.zIndex],
       sourcePileContainerId: container.id,
     };
+
+    if (groupDrag) {
+      // Create a custom drag image that visually represents the group.
+      const dragImage = document.createElement("div");
+      dragImage.id = "card-dragImage";
+      dragImage.classList.add("drag-image");
+
+      // Get the parent element that holds the card and its siblings.
+      const pileElement = cardElement.container.parentElement;
+      if (!pileElement) return;
+
+      // Card dragged index
+      const originalZIndex = parseInt(cardElement.container.style.zIndex);
+
+      // Iterate over all children in the pile.
+      Array.from(pileElement.children).forEach((card) => {
+        if (!(card instanceof HTMLElement)) {
+          return;
+        }
+
+        // Get the card's z-index as a number.
+        const cardZIndex = parseInt(card.style.zIndex);
+
+        // Only add the class if the card's z-index is higher than the original.
+        // Clone each card element and append to dragImage.
+        if (cardZIndex >= originalZIndex) {
+          card.classList.add("card-dragging");
+          const clone = card.cloneNode(true);
+          dragImage.appendChild(clone);
+          if (cardZIndex !== originalZIndex) {
+            data.indexs.push(card.style.zIndex);
+          }
+        }
+      });
+
+      // It might be necessary to add the drag image element off-screen before using it.
+      dragImage.style.position = "absolute";
+      dragImage.style.top = "-9999px";
+      document.body.appendChild(dragImage);
+
+      e.dataTransfer?.setDragImage(dragImage, 0, 0);
+    }
     e.dataTransfer?.setData("application/json", JSON.stringify(data));
   };
   const dragend = (e: DragEvent) => {
+    // clears the image being used by drag
+    const dragImage = document.getElementById("card-dragImage");
+    if (dragImage) {
+      dragImage.remove();
+    }
+    // if the drop target isnt an element then abort
     if (!(e.target instanceof HTMLElement)) return;
     const cardElement = findCardContainer(e.target);
+
     if (cardElement === null || cardElement === undefined) return;
-    cardElement.container.classList.remove("card-dragging");
+    const parent = cardElement.container.parentElement;
+    // clears dragging class from all selected elements
+    if (parent) {
+      Array.from(parent.children).forEach((child) => {
+        child.classList.remove("card-dragging");
+      });
+    }
   };
+
   const drop = (e: DragEvent) => {
-    e.preventDefault();
+    // if drop target isnt element, get out
     if (!(e.target instanceof HTMLElement)) return;
     const jsonData = e.dataTransfer?.getData("application/json");
+    // if the data isnt there, the draggable probably shouldn't have been draggable
     if (!jsonData) throw "no json data... source probably isnt draggable";
-    const { index, sourcePileContainerId } = JSON.parse(jsonData);
-    if (!index || !sourcePileContainerId) {
+    const { indexs, sourcePileContainerId } = JSON.parse(jsonData) as DragData;
+    // something went wrong with the data
+    if (indexs.length === 0 || !sourcePileContainerId) {
       throw "no card index during drop";
     }
+    // figure out which piles the cards came from / are going to
     const sourcePile = findPileElement(sourcePileContainerId);
     const thisPile = findPileElement(container.id);
+
+    // dont animate when cards set back down
     if (sourcePile.container.id === container.id) {
       return "cant drop in own container";
     }
-    sourcePile.cardElements[parseInt(index)].container.classList.remove(
-      "card-dragging",
-    );
-    sourcePile.moveCardToPile(
+
+    // grabs all the card elements from the index data
+    const cardElements = indexs.map((index) => {
+      return sourcePile.cardElements[parseInt(index)];
+    });
+
+    // removes all the card-dragging classes
+    cardElements.forEach((element) => {
+      element.container.classList.remove("card-dragging");
+    });
+
+    // try passing the first card
+    const attemptPrimaryMove = sourcePile.moveCardToPile(
       thisPile,
-      sourcePile.cardElements[parseInt(index)],
+      sourcePile.cardElements[parseInt(indexs[0])],
       rules(),
     );
+
+    // if the first card is successful, pass the rest
+    if (attemptPrimaryMove === true) {
+      cardElements.splice(0, 1);
+      cardElements.forEach((element) => {
+        sourcePile.moveCardToPile(thisPile, element, true);
+      });
+    }
   };
 
   const container = document.createElement("div");
@@ -131,19 +219,16 @@ export const pileElement = <T extends Card>(
   //! Seems to not work on cards that have been passed
   const cascade = (duration = cascadeDuration) => {
     reset();
-    const promise = new Promise((resolve) => {
-      const arrayFinished = []; // Array of .finished promises returned by animate
-      for (let i = 0; i < cardElements.length; i++) {
-        const vector2 = [];
-        const cardElement = cardElements[i].container;
-        vector2[0] = cascadePercent[0] * cardElement.offsetWidth * i;
-        vector2[1] = cascadePercent[1] * cardElement.offsetHeight * i;
-        const slide = slideCard(cardElements[i], vector2, duration);
-        arrayFinished.push(slide);
-      }
-      resolve(Promise.all(arrayFinished).then(() => {}));
-    });
-    return promise;
+    const arrayFinished = []; // Array of .finished promises returned by animate
+    for (let i = 0; i < cardElements.length; i++) {
+      const vector2 = [];
+      const cardElement = cardElements[i].container;
+      vector2[0] = cascadePercent[0] * cardElement.offsetWidth * i;
+      vector2[1] = cascadePercent[1] * cardElement.offsetHeight * i;
+      const slide = slideCard(cardElements[i], vector2, duration);
+      arrayFinished.push(slide);
+    }
+    return Promise.all(arrayFinished);
   };
 
   // sets a new value to the percent of cascade, and a one time use duration
@@ -237,19 +322,17 @@ export const pileElement = <T extends Card>(
     cardElement.transform.translate = translate;
     cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
 
-    cardElement.container.style.zIndex = String(
-      destination.cardElements.length,
-    );
-
     // add the new card element to destination
     const index = cardElements.findIndex((element) => {
       return JSON.stringify(element) === JSON.stringify(cardElement);
     });
-    if (index === -1) return Promise.reject(false);
+    if (index === -1)
+      return Promise.reject("couldnt find cardElement in source cardElements");
     if (index !== cardElements.length - 1) {
       //      for (let i = index; i < cardElements.length-1; i++)
       cardElements.splice(cardElements.indexOf(cardElement), 1);
-      cascade(400);
+      //! I dont know why cascade was below... but it was now breaking shit?
+      //cascade();
     } else {
       cardElements.splice(cardElements.indexOf(cardElement), 1);
     }
