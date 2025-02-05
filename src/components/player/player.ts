@@ -1,6 +1,6 @@
 import Card from "../card/card";
 import Deck from "../deck/deck";
-import { PileElement } from "../pile/pileElement";
+import { PileElement } from "../../types/pile.types";
 
 export default class Player<T extends Card> {
   private _deck: Deck<T>;
@@ -24,7 +24,7 @@ export default class Player<T extends Card> {
   }
 
   get piles() {
-    return this._piles;
+    return this._piles as PileElement<T>[];
   }
 
   get deck() {

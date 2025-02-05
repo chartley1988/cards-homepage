@@ -11,4 +11,9 @@ export default [
 	{ languageOptions: { globals: globals.browser } },
 	pluginJs.configs.recommended,
 	...tseslint.configs.recommended,
+	{
+		rules: {
+			"prefer-const": "warn", // or "warn" if you want warnings instead of errors
+		},
+	},
 ];

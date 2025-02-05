@@ -44,6 +44,7 @@ export default class Pile<T extends Card> {
       return true;
     }
   };
+
   shuffle = () => {
     const copy = [...this._cards];
     const shuffledPile = [];
@@ -52,11 +53,5 @@ export default class Pile<T extends Card> {
       shuffledPile.push(copy.splice(randomNum, 1)[0]);
     }
     this._cards = shuffledPile;
-  };
-
-  //! Should this be a method? I think this was Solitaire Necessary
-  isLastCard = (card: T) => {
-    if (this._getCardIndex(card) === this._cards.length - 1) return true;
-    else return false;
   };
 }

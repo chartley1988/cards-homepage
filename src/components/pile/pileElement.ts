@@ -1,112 +1,76 @@
 import Pile from "./pile";
-import Card from "../card/card";
-import { CardElement } from "../card/cardElement";
-import "../../styles/pile.css";
+import { CardElementType } from "../../types/card.types";
 
-export type PileElement<T extends Card> = {
-  type: "stack" | "cascade";
-  pile: Pile<T>;
-  cards: T[];
-  cardElements: CardElement<T>[];
-  container: HTMLDivElement;
-  cascadePercent: number[];
-  cascadeDuration: number;
-  cascade: () => Promise<unknown>;
-  slideCard: (
-    cardElement: CardElement<T>,
-    vector2: number[],
-    duration: number,
-  ) => void;
-  getTopCardElement: () => CardElement<T>;
-  spinCard: (
-    cardElement: CardElement<T>,
-    duration: number,
-  ) => Promise<Animation> | Promise<unknown>;
-  zoomCard: (
-    cardElement: CardElement<T>,
-    factor: number,
-    duration: number,
-  ) => Promise<Animation>;
-  slideDeck: (vector2: number[], duration: number) => void;
-  moveCardToPile: (
-    destinationPile: PileElement<T>,
-    cardElement?: CardElement<T>,
-    gameRules?: boolean,
-    animationCallback?: (
-      destination: PileElement<T>,
-      cardThatWasPassed: CardElement<T>,
-    ) => Promise<boolean>,
-  ) => boolean;
-  cascadeValueSetter: (percent: number[], duration: number) => void;
-  reset: () => void;
-  animateMoveCardToNewDeck: (
-    destination: PileElement<T>,
-    cardThatWasPassed: CardElement<T>,
-  ) => Promise<boolean>;
-  topCard: CardElement<T>;
-  findCardContainer: (element: HTMLElement) => null | CardElement<T>;
+import Card from "../card/card";
+import "../../styles/pile.css";
+import type { Layout, PileElement } from "../../types/pile.types";
+
+// These are recipes for cascade()
+const layout: Layout = {
+  stack: {
+    offset: [-0.003, -0.003],
+  },
+  cascade: {
+    offset: [0.18, 0],
+  },
 };
 
 // Adds a base the size of the card to be the basis of deck layouts.\
 export const pileElement = <T extends Card>(
   pile: Pile<T>,
-  cardElements: CardElement<T>[] = [],
+  cardElements: CardElementType<T>[] = [],
   type: "stack" | "cascade" = "stack",
 ): PileElement<T> => {
-  let cascadePercent = [0, 0.001];
+  let cascadeOffset = layout[type].offset;
   let cascadeDuration = 0;
-  if (type === "stack") {
-    cascadePercent = [-0.003, -0.003];
-    cascadeDuration = 0;
-  } else if (type === "cascade") {
-    cascadePercent = [0.18, 0];
-    cascadeDuration = 0;
-  }
+
   const cards = pile.cards;
 
   const container = document.createElement("div");
   container.classList.add("deck-base");
 
+  //?  Chartley: Should some of these animations be here?
+  //?  Perhaps zoomCard, spinCard, and slideCard should
+  //?  live in base card class with flip(). Deck based
+  //?  animations should stay here, such as cascade.
+
   const slideCard = async (
-    cardElement: CardElement<T>,
-    vector2: number[],
+    cardElement: CardElementType<T>,
+    vector2: [number, number],
     duration: number,
-  ) => {
+  ): Promise<Animation | undefined> => {
     if (cardElement.transform.active) return;
-    if (vector2.length !== 2) {
-      console.error("Error: vector2 must be an array of 2 values, x and y.");
-    }
-    //! This should be a func
-    // eslint-disable-next-line prefer-const
-    let { translate, scale, rotate } = cardElement.transform;
-    translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
-    cardElement.transform.translate = translate;
-    //! This should be a func
 
-    const transform = `${translate} ${scale} ${rotate}`;
+    const transform = `
+      translate(${vector2[0]}px, ${vector2[1]}px) 
+      ${cardElement.transform.scale} 
+      ${cardElement.transform.rotate}
+    `;
 
-    const keys = {
-      transform: transform,
-    };
+    const anim = cardElement.container.animate(
+      {
+        transform: transform,
+      },
+      {
+        duration: duration,
+        easing: "ease-out",
+        delay: 0,
+        direction: "normal" as PlaybackDirection,
+      },
+    );
 
-    const options = {
-      duration: duration,
-      easing: "ease-out",
-      delay: 0,
-      direction: "normal" as PlaybackDirection,
-    };
-
-    const anim = cardElement.container.animate(keys, options);
-    cardElement.container.dispatchEvent(new Event("animationstart"));
     await anim.finished.then(() => {
       cardElement.container.style.transform = transform;
-      cardElement.container.dispatchEvent(new Event("animationend"));
     });
+
+    return anim.finished;
   };
 
-  const spinCard = async (cardElement: CardElement<T>, duration: number) => {
-    if (cardElement === undefined) return new Promise(() => undefined);
-    if (cardElement.transform.active) return new Promise(() => undefined);
+  const spinCard = async (
+    cardElement: CardElementType<T>,
+    duration: number,
+  ): Promise<Animation | undefined> => {
+    if (cardElement === undefined || cardElement.transform.active) return;
 
     cardElement.transform.rotate =
       cardElement.transform.rotate === `rotate(0deg)`
@@ -116,22 +80,21 @@ export const pileElement = <T extends Card>(
     const { translate, scale, rotate } = cardElement.transform;
     const transform = `${translate} ${scale} ${rotate}`;
 
-    const keys = {
-      transform: transform,
-    };
+    const anim = cardElement.container.animate(
+      {
+        transform: transform,
+      },
 
-    const options = {
-      duration: duration,
-      easing: "linear",
-      delay: 0,
-      direction: "normal" as PlaybackDirection,
-    };
+      {
+        duration: duration,
+        easing: "linear",
+        delay: 0,
+        direction: "normal" as PlaybackDirection,
+      },
+    );
 
-    const anim = cardElement.container.animate(keys, options);
-    cardElement.container.dispatchEvent(new Event("animationstart"));
     await anim.finished.then(() => {
       cardElement.container.style.transform = transform;
-      cardElement.container.dispatchEvent(new Event("animationend"));
     });
 
     return anim;
@@ -139,11 +102,10 @@ export const pileElement = <T extends Card>(
 
   //! I haven't tested this
   const zoomCard = async (
-    cardElement: CardElement<T>,
+    cardElement: CardElementType<T>,
     factor: number,
     duration: number,
   ) => {
-    // eslint-disable-next-line prefer-const
     let { translate, scale, rotate } = cardElement.transform;
 
     scale = `scale(${factor})`;
@@ -194,29 +156,31 @@ export const pileElement = <T extends Card>(
     });
   };
 
-  //! Seems to not work on cards that have been passed
   const cascade = (duration = cascadeDuration) => {
     reset();
-    const promise = new Promise((resolve) => {
-      const arrayFinished = []; // Array of .finished promises returned by animate
-      for (let i = 0; i < cardElements.length; i++) {
-        const vector2 = [];
-        const cardElement = cardElements[i].container;
-        vector2[0] = cascadePercent[0] * cardElement.offsetWidth * i;
-        vector2[1] = cascadePercent[1] * cardElement.offsetHeight * i;
-        const slide = slideCard(cardElements[i], vector2, duration);
-        arrayFinished.push(slide);
-      }
-      resolve(Promise.all(arrayFinished).then(() => {}));
+    const animations = cardElements.map((cardElement, i) => {
+      const vector2: [number, number] = [
+        cascadeOffset[0] * cardElement.container.offsetWidth * i,
+        cascadeOffset[1] * cardElement.container.offsetHeight * i,
+      ];
+
+      return slideCard(cardElement, vector2, duration);
     });
-    return promise;
+
+    return Promise.all(animations);
   };
 
   // sets a new value to the percent of cascade, and a one time use duration
   // then performs the cascade and resets duration to 0
-  const cascadeValueSetter = (percent: number[], duration: number) => {
-    cascadePercent[0] = percent[0];
-    cascadePercent[1] = percent[1];
+
+  //? So far, we've had this function trigger cascade() at the end.
+  //? Seems kinda impure. It's probably a redundant function anyway
+  //? when we can just update the .cascadeOffset property anyway.
+  //? Perhaps we should make a setCascadeType function where you
+  //? could choose from the prset "cascade" or "stack" options.
+
+  const cascadeValueSetter = (percent: [number, number], duration: number) => {
+    cascadeOffset = percent;
     cascadeDuration = duration;
     cascade();
     cascadeDuration = 0;
@@ -226,7 +190,7 @@ export const pileElement = <T extends Card>(
    * Card Elements have animations, and must remain part of the original Pile until the animation is complete. The card objects are moved instantly, this function checks for top card object, and returns matching cardElement.
    * @returns The cardElement that is on the top of the pile
    */
-  const getTopCardElement = (): CardElement<T> => {
+  const getTopCardElementType = (): CardElementType<T> => {
     const topCard = cards[cards.length - 1];
     return cardElements.filter((element) => element.card === topCard)[0];
   };
@@ -234,9 +198,9 @@ export const pileElement = <T extends Card>(
   // slimmed down move card to deck
   const moveCardToPile = (
     destinationPile: PileElement<T>,
-    cardElement = getTopCardElement(),
+    cardElement = getTopCardElementType(),
     gameRules = true, // ability to pass in rules for passing the card from one deckbase to another
-    animationCallback = animateMoveCardToNewDeck, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
+    animationCallback = animateMoveCardToNewPile, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) => {
     if (cardElements.indexOf(cardElement) === -1) return false;
 
@@ -271,9 +235,9 @@ export const pileElement = <T extends Card>(
   // Only to do with animations.
   // I had to now reference where things used to be in objects, because the card
   // has been moved in the Objects, but not visually on the screen
-  async function animateMoveCardToNewDeck(
+  async function animateMoveCardToNewPile(
     destination: PileElement<T>,
-    cardElement: CardElement<T>,
+    cardElement: CardElementType<T>,
   ) {
     cardElement.container.style.zIndex = String(
       destination.cards.length + 1000,
@@ -282,17 +246,18 @@ export const pileElement = <T extends Card>(
     const destinationBox = destination.container.getBoundingClientRect();
 
     const destinationCascade = [
-      destination.cascadePercent[0] *
+      destination.cascadeOffset[0] *
         cardElement.container.offsetWidth *
         (destination.cards.length - 1),
-      destination.cascadePercent[1] *
+      destination.cascadeOffset[1] *
         cardElement.container.offsetHeight *
         (destination.cards.length - 1),
     ];
 
-    const vector2 = [];
-    vector2[0] = destinationBox.x - sourceBox.x + destinationCascade[0];
-    vector2[1] = destinationBox.y - sourceBox.y + destinationCascade[1];
+    const vector2: [number, number] = [
+      destinationBox.x - sourceBox.x + destinationCascade[0],
+      destinationBox.y - sourceBox.y + destinationCascade[1],
+    ];
 
     await slideCard(cardElement, vector2, 600);
     destination.container.appendChild(cardElement.container);
@@ -326,41 +291,8 @@ export const pileElement = <T extends Card>(
     adjustZIndex(cardElements);
 
     return Promise.resolve(true);
-
-    //! I dont think this ever worked?
-    /*
-    function resizeContainer(deckBase) {
-      const cardHeight = parseFloat(deckBase.deck.cards[0].card.offsetHeight);
-      const cardWidth = parseFloat(deckBase.deck.cards[0].card.offsetWidth);
-      const deckLength = deckBase.deck.cards.length;
-      const newHeight =
-        cardHeight * deckLength * Math.abs(deckBase.cascadePercent[1]) +
-        cardHeight * (1 - Math.abs(deckBase.cascadePercent[1]));
-      const newWidth =
-        cardWidth * deckLength * Math.abs(deckBase.cascadePercent[0]) +
-        cardWidth * (1 - Math.abs(deckBase.cascadePercent[0]));
-      deckBase.container.style.height = `${newHeight}px`;
-      deckBase.container.style.width = `${newWidth}px`;
-
-      const deltaX = newWidth - cardWidth;
-      const deltaY = newHeight - cardWidth;
-
-      const container = deckBase.container;
-
-      if (deckBase.cascadePercent[0] < 0) {
-        // If x is a negative percent
-      } else {
-        // If x is a positive percent
-      }
-      if (deckBase.cascadePercent[1] < 0) {
-        // If y is a negative percent
-      } else {
-        // If y is a positive percent
-      }
-    }
-      */
-    ///////////////////////////////////////////////////
   }
+
   // resets the container of the DeckBase
   const reset = () => {
     while (container.firstElementChild) {
@@ -373,7 +305,7 @@ export const pileElement = <T extends Card>(
     }
   };
 
-  function adjustZIndex(cardElements: CardElement<T>[]) {
+  function adjustZIndex(cardElements: CardElementType<T>[]) {
     for (let index = 0; index < cardElements.length; index++) {
       const card = cardElements[index];
       card.container.style.zIndex = String(index);
@@ -399,9 +331,9 @@ export const pileElement = <T extends Card>(
     },
     cardElements,
     container,
-    cascadePercent,
+    cascadeOffset,
     cascadeDuration,
-    getTopCardElement,
+    getTopCardElementType,
     slideCard,
     spinCard,
     zoomCard,
@@ -410,10 +342,6 @@ export const pileElement = <T extends Card>(
     cascade,
     cascadeValueSetter,
     reset,
-    animateMoveCardToNewDeck,
     findCardContainer,
-    get topCard() {
-      return cardElements[cardElements.length - 1];
-    },
   };
 };

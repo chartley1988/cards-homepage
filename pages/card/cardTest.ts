@@ -6,9 +6,9 @@ import "../../src/components/navMenu/navMenu";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
 import Player from "../../src/components/player/player";
 import Card from "../../src/components/card/card";
-import { PileElement } from "../../src/components/pile/pileElement";
-import { CardElement } from "../../src/components/card/cardElement";
+import { CardElementType } from "../../src/types/card.types";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
+import { PileElement } from "../../src/types/pile.types";
 
 const app = document.getElementById("app");
 if (app) {
@@ -33,9 +33,12 @@ if (app) {
   let currentPlayer = player1;
 
   draw.cascade();
-  hand1.cascadeValueSetter([0.18, 0], 0);
-  hand2.cascadeValueSetter([0.4, 0], 0);
-  player1.getPile("hand").cascadeValueSetter([0.0, 0.4], 0);
+  player1.getPile("hand").cascadeOffset = [0.4, 0];
+
+  [hand1, hand2].forEach((hand) => {
+    hand.cascadeOffset = [0.3, 0];
+    hand.cascade();
+  });
 
   window.addEventListener("DOMContentLoaded", () => {
     deal(5, draw, [hand1, hand2]);
@@ -83,7 +86,7 @@ if (app) {
   const rules = (
     sourcePile: PileElement<PlayingCard>,
     destinationPile: PileElement<PlayingCard>,
-    card: CardElement<PlayingCard>,
+    card: CardElementType<PlayingCard>,
   ): boolean => {
     if (!card.faceUp) return false;
     if (card.card.value < 6) console.log(card.card.value);
