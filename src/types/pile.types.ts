@@ -21,9 +21,10 @@ export type PileElementType<T extends Card> = {
       destination: PileElementType<T>,
       cardThatWasPassed: CardElementType<T>,
     ) => Promise<boolean>,
-  ) => boolean;
+  ) => Promise<boolean> | false;
   reset: () => void;
   findCardContainer: (element: HTMLElement) => null | CardElementType<T>;
+  shuffle: () => void;
   options: pileOptionsType<T>;
 };
 
@@ -34,9 +35,13 @@ export interface DragData {
 
 export type pileOptionsType<T extends Card> = {
   cardElements: CardElementType<T>[];
-  type: "stack" | "cascade";
+  type: "stack" | "cascade" | "visibleStack";
   draggable: boolean;
-  rules: () => boolean;
+  rules: (
+    sourcePile: PileElementType<T>,
+    destinationPile: PileElementType<T>,
+    cardElement: CardElementType<T>,
+  ) => boolean;
   groupDrag: boolean;
 };
 
@@ -50,4 +55,5 @@ export type Layout = {
   stack: LayoutSection;
   cascade: LayoutSection;
   [key: string]: LayoutSection;
+  visibleStack: LayoutSection;
 };

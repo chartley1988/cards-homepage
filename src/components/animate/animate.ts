@@ -64,12 +64,11 @@ export const spinCard = async <T extends Card>(
 
   const anim = cardElement.container.animate(keys, options);
   cardElement.container.dispatchEvent(new Event("animationstart"));
-  await anim.finished.then(() => {
+  return await anim.finished.then(() => {
     cardElement.container.style.transform = transform;
     cardElement.container.dispatchEvent(new Event("animationend"));
+    return Promise.resolve(true);
   });
-
-  return anim;
 };
 
 //! I haven't tested this
@@ -133,22 +132,35 @@ export const slideDeck = async <T extends Card>(
   });
 };
 
-export const cascade = <T extends Card>(
-  pileElement: PileElementType<T>,
-  duration = pileElement.cascadeDuration,
-) => {
-  pileElement.reset();
-  const promise = new Promise((resolve) => {
-    const arrayFinished = []; // Array of .finished promises returned by animate
-    for (let i = 0; i < pileElement.cardElements.length; i++) {
-      const vector2 = [];
-      const cardElement = pileElement.cardElements[i].container;
-      vector2[0] = pileElement.cascadeOffset[0] * cardElement.offsetWidth * i;
-      vector2[1] = pileElement.cascadeOffset[1] * cardElement.offsetHeight * i;
-      const slide = slideCard(pileElement.cardElements[i], vector2, duration);
-      arrayFinished.push(slide);
+/**
+ *
+ * @param numberOfCards The number of cards to deal out
+ * @param from The pile the cards are coming from
+ * @param to The pile(s?) the cards are going to
+ * @param delayTime The delay between dealing cards
+ */
+export async function deal<T extends Card>(
+  numberOfCards: number,
+  from: PileElementType<T>,
+  to: PileElementType<T>[] | PileElementType<T>,
+  delayTime: number = 200,
+) {
+  const piles = Array.isArray(to) ? to : [to];
+  const promises: Promise<boolean>[] = [];
+
+  for (let i = 0; i < numberOfCards * piles.length; i++) {
+    const currentPile = piles[i % piles.length];
+
+    // ✅ Store each move promise
+    const movePromise = from.moveCardToPile(currentPile);
+    if (movePromise === false) return;
+    promises.push(movePromise);
+
+    if (i < numberOfCards * piles.length - 1) {
+      await new Promise((resolve) => setTimeout(resolve, delayTime));
     }
-    resolve(Promise.all(arrayFinished).then(() => {}));
-  });
-  return promise;
-};
+  }
+
+  // ✅ Ensure all cards finish moving before returning
+  await Promise.all(promises);
+}
