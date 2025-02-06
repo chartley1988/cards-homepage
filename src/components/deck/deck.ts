@@ -1,12 +1,9 @@
 import Card from "../card/card";
 import { CardElement } from "../card/cardElement";
 import Pile from "../pile/pile";
-import {
-  createDefaultOptions,
-  PileElement,
-  pileElement,
-  pileOptions,
-} from "../pile/pileElement";
+import { createDefaultOptions, pileElement } from "../pile/pileElement";
+import { PileElementType, pileOptionsType } from "../../types/pile.types";
+import { CardElementType } from "../../types/card.types";
 
 /**
  * A deck is all of the cards to be used in your game.
@@ -22,12 +19,13 @@ import {
 export default class Deck<T extends Card> {
   private _cards: T[];
   private _piles: Pile<T>[];
-  pileElements: PileElement<T>[];
+  pileElements: PileElementType<T>[];
   private _graveyard: Pile<T>;
-  private _cardBuilder: (card: T) => CardElement<T>;
+  private _cardBuilder: (card: T) => CardElementType<T>;
   constructor(
     cards: T[],
-    cardBuilder: (card: T) => CardElement<T> = (card: T) => CardElement(card),
+    cardBuilder: (card: T) => CardElementType<T> = (card: T) =>
+      CardElement(card),
   ) {
     this._cards = cards;
     this._piles = [];
@@ -67,9 +65,9 @@ export default class Deck<T extends Card> {
   createPileElement = (
     name: string,
     cards: T[] = [],
-    options: Partial<pileOptions<T>> = {},
+    options: Partial<pileOptionsType<T>> = {},
   ) => {
-    const mergedOptions: pileOptions<T> = {
+    const mergedOptions: pileOptionsType<T> = {
       ...createDefaultOptions(),
       ...{ cardElements: cards.map((card) => this._cardBuilder(card)) },
       ...options,

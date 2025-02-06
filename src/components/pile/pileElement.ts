@@ -1,7 +1,7 @@
 import Pile from "./pile";
 import { CardElementType } from "../../types/card.types";
 import { DragData } from "../../types/pile.types";
-import { pileOptions } from "../../types/pile.types";
+import { pileOptionsType } from "../../types/pile.types";
 
 import Card from "../card/card";
 import "../../styles/pile.css";
@@ -19,7 +19,7 @@ const layout: Layout = {
   },
 };
 
-export const createDefaultOptions = <T extends Card>(): pileOptions<T> => ({
+export const createDefaultOptions = <T extends Card>(): pileOptionsType<T> => ({
   cardElements: [],
   type: "stack",
   draggable: true,
@@ -31,9 +31,9 @@ export const createDefaultOptions = <T extends Card>(): pileOptions<T> => ({
 export const pileElement = <T extends Card>(
   pile: Pile<T>,
   deck: Deck<T>,
-  partialOptions: Partial<pileOptions<T>> = {},
+  partialOptions: Partial<pileOptionsType<T>> = {},
 ): PileElementType<T> => {
-  const options: pileOptions<T> = {
+  const options: pileOptionsType<T> = {
     ...createDefaultOptions(),
     ...partialOptions,
   };

@@ -22,7 +22,7 @@ export type PileElementType<T extends Card> = {
   ) => boolean;
   reset: () => void;
   findCardContainer: (element: HTMLElement) => null | CardElementType<T>;
-  options: pileOptions<T>;
+  options: pileOptionsType<T>;
 };
 
 export interface DragData {
@@ -30,7 +30,7 @@ export interface DragData {
   sourcePileContainerId: string;
 }
 
-export type pileOptions<T extends Card> = {
+export type pileOptionsType<T extends Card> = {
   cardElements: CardElementType<T>[];
   type: "stack" | "cascade";
   draggable: boolean;

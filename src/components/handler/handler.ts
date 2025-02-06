@@ -10,7 +10,7 @@ export default class Handler<T extends Card> {
     players: {
       name: string;
       deck: Deck<T>;
-      piles: string[];
+      piles: [];
       cardInitializer?: string;
     }[],
   ) {

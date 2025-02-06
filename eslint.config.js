@@ -4,18 +4,18 @@ import tseslint from "typescript-eslint";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-	{
-		ignores: ["src/legacy/**", "docs/**", "dist/**"],
-	},
-	{
-		files: ["**/*.{js,mjs,cjs,ts}"],
-	},
-	{ languageOptions: { globals: globals.browser } },
-	pluginJs.configs.recommended,
-	...tseslint.configs.recommended,
-	{
-		rules: {
-			"prefer-const": "warn", // or "warn" if you want warnings instead of errors
-		},
-	},
+  {
+    ignores: ["src/legacy/**", "docs/**", "dist/**"],
+  },
+  {
+    files: ["**/*.{js,mjs,cjs,ts}"],
+  },
+  { languageOptions: { globals: globals.browser } },
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    rules: {
+      "prefer-const": "warn", // or "warn" if you want warnings instead of errors
+    },
+  },
 ];
