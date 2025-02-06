@@ -20,13 +20,9 @@ if (app) {
   );
 
   const hand1 = player1.getPile("Hand");
-  hand1.options.type = "cascade";
   document.getElementById("p1Hand")?.appendChild(hand1.container);
-  console.log(player1.getPile("Hand").cardElements);
-  console.log(player1.getPile("Hand").cards);
 
   const hand2 = player2.getPile("Hand");
-  hand2.options.type = "cascade";
   document.getElementById("p2Hand")?.appendChild(hand2.container);
 
   const draw = main.getPile("Draw");
@@ -37,7 +33,12 @@ if (app) {
 
   draw.cascade();
 
-  hand2.cascadeOffset = [0.3, 0];
+  hand1.createCascadeLayout("flop", [1.1, 0]);
+  hand1.createCascadeLayout("tight", [0, -0.01]);
+  hand1.applyCascadeLayout("flop");
+  hand2.applyCascadeLayout("tight");
+  hand1.cascade();
+  hand2.cascade();
 
   window.addEventListener("DOMContentLoaded", async () => {
     for (let i = 0; i < 15; i++) {

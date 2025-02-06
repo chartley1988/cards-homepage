@@ -5,7 +5,7 @@ import { pileOptionsType } from "../../types/pile.types";
 
 import Card from "../card/card";
 import "../../styles/pile.css";
-import type { Layout, PileElementType } from "../../types/pile.types";
+import type { Layout, Offset, PileElementType } from "../../types/pile.types";
 import Deck from "../deck/deck";
 import { slideCard } from "../animate/animate";
 
@@ -37,11 +37,8 @@ export const pileElement = <T extends Card>(
     ...createDefaultOptions(),
     ...partialOptions,
   };
-  const { type, cardElements, draggable, rules, groupDrag } = options;
-  const cascadeOffset = [layout[type].offset[0], layout[type].offset[1]] as [
-    number,
-    number,
-  ];
+  const { cardElements, draggable, rules, groupDrag } = options;
+  const cascadeOffset = [0, 0] as [number, number];
   const cascadeDuration = 0;
   const cards = pile.cards;
 
@@ -62,6 +59,29 @@ export const pileElement = <T extends Card>(
 
     return Promise.all(animations);
   };
+
+  function applyCascadeLayout(layoutName: string) {
+    console.log(cascadeOffset);
+    if (Object.keys(layout).includes(layoutName)) {
+      console.log(layout);
+      cascadeOffset[0] = layout[layoutName].offset[0];
+      cascadeOffset[1] = layout[layoutName].offset[1];
+    } else {
+      throw new Error(`No cascade layout with that name found: ${layout}`);
+    }
+  }
+
+  function createCascadeLayout(layoutName: string, offset: Offset) {
+    if (Object.keys(layout).includes(layoutName)) {
+      throw new Error("A layout with that name already exists");
+    } else {
+      Object.defineProperty(layout, layoutName, {
+        value: { offset },
+        enumerable: true, // So it shows up in Object.keys() for your existence check
+      });
+    }
+    console.log(layout);
+  }
 
   // sets a new value to the percent of cascade, and a one time use duration
   // then performs the cascade and resets duration to 0
@@ -194,6 +214,7 @@ export const pileElement = <T extends Card>(
       card.container.style.zIndex = String(index);
     }
   };
+
   const findCardContainer = (element: HTMLElement) => {
     if (element.classList.contains("card-container"))
       return cardElements[parseInt(element.style.zIndex)];
@@ -211,6 +232,7 @@ export const pileElement = <T extends Card>(
   const allowDrop = (e: DragEvent) => {
     e.preventDefault();
   };
+
   const drag = (e: DragEvent) => {
     if (!(e.target instanceof HTMLElement)) return;
 
@@ -267,6 +289,7 @@ export const pileElement = <T extends Card>(
     }
     e.dataTransfer?.setData("application/json", JSON.stringify(data));
   };
+
   const dragend = (e: DragEvent) => {
     // clears the image being used by drag
     const dragImage = document.getElementById("card-dragImage");
@@ -356,6 +379,8 @@ export const pileElement = <T extends Card>(
     getTopCardElement,
     moveCardToPile,
     cascade,
+    applyCascadeLayout,
+    createCascadeLayout,
     reset,
     findCardContainer,
   };

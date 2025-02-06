@@ -10,6 +10,8 @@ export type PileElementType<T extends Card> = {
   cascadeOffset: [number, number];
   cascadeDuration: number;
   cascade: () => Promise<unknown>;
+  applyCascadeLayout: (layoutName: string) => void | Error;
+  createCascadeLayout: (layoutName: string, offset: Offset) => void;
   getTopCardElement: () => CardElementType<T>;
   moveCardToPile: (
     destinationPile: PileElementType<T>,
@@ -38,7 +40,7 @@ export type pileOptionsType<T extends Card> = {
   groupDrag: boolean;
 };
 
-type Offset = [number, number];
+export type Offset = [number, number];
 
 type LayoutSection = {
   offset: Offset;
@@ -47,4 +49,5 @@ type LayoutSection = {
 export type Layout = {
   stack: LayoutSection;
   cascade: LayoutSection;
+  [key: string]: LayoutSection;
 };
