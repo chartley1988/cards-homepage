@@ -44,7 +44,6 @@ if (app) {
 
   let currentPlayer = player1;
   draw.cascade();
-  player1.getPile("hand").cascadeOffset = [0, 0.3];
 
   window.addEventListener("DOMContentLoaded", () => {
     deal(5, draw, [hand1, hand2]);

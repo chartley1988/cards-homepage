@@ -23,6 +23,7 @@ export default class PlayingCard extends Card {
     | "K"
     | "joker";
   value: number;
+  color: "red" | "black" | "joker";
 
   constructor(
     number:
@@ -82,18 +83,23 @@ export default class PlayingCard extends Card {
     switch (suit) {
       case "spade":
         this.symbol = "♠";
+        this.color = "black";
         break;
       case "diamond":
         this.symbol = "♦";
+        this.color = "red";
         break;
       case "club":
         this.symbol = "♣";
+        this.color = "black";
         break;
       case "heart":
         this.symbol = "♥";
+        this.color = "red";
         break;
       default:
         this.symbol = "joker";
+        this.color = "joker";
     }
   }
   updateValue = (newValue: number) => {

@@ -64,12 +64,11 @@ export const spinCard = async <T extends Card>(
 
   const anim = cardElement.container.animate(keys, options);
   cardElement.container.dispatchEvent(new Event("animationstart"));
-  await anim.finished.then(() => {
+  return await anim.finished.then(() => {
     cardElement.container.style.transform = transform;
     cardElement.container.dispatchEvent(new Event("animationend"));
+    return Promise.resolve(true);
   });
-
-  return anim;
 };
 
 //! I haven't tested this
@@ -146,19 +145,22 @@ export async function deal<T extends Card>(
   to: PileElementType<T>[] | PileElementType<T>,
   delayTime: number = 200,
 ) {
-  // If `to` is a single pile, convert it to an array for simplicity
   const piles = Array.isArray(to) ? to : [to];
+  const promises: Promise<boolean>[] = [];
 
   for (let i = 0; i < numberOfCards * piles.length; i++) {
-    // Alternate between piles using the modulo operator
     const currentPile = piles[i % piles.length];
 
-    // Move card to the current pile
-    from.moveCardToPile(currentPile);
+    // ✅ Store each move promise
+    const movePromise = from.moveCardToPile(currentPile);
+    if (movePromise === false) return;
+    promises.push(movePromise);
 
-    // Wait for 0.5 seconds before the next card
     if (i < numberOfCards * piles.length - 1) {
       await new Promise((resolve) => setTimeout(resolve, delayTime));
     }
   }
+
+  // ✅ Ensure all cards finish moving before returning
+  await Promise.all(promises);
 }

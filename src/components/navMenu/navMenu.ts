@@ -26,6 +26,10 @@ const navMenuData: NavItem[] = [
     text: "Pile Size",
     slug: "/pile-size/",
   },
+  {
+    text: "Daves Playground",
+    slug: "/davesPlayground/",
+  },
 ];
 
 const navMenu = (data: NavItem[]): void => {

@@ -6,15 +6,36 @@
   height: calc(var(--card-size) * 3.5);
   border-radius: calc(0.15 * var(--card-size));
 }
-.flex-container-column {
+#freeCell {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 5rem;
+  gap: 75px;
 }
+.middle {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+.bottom {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}
+.top {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+.freeSpotsContainer,
+.aceSpotContainer {
+  display: flex;
+  gap: 15px;
+}
+
 .flex-container-row {
   display: flex;
   flex-direction: row;
-  gap: 5rem;
   justify-content: space-evenly;
 }
 
