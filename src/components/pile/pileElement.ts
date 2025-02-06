@@ -15,7 +15,7 @@ const layout: Layout = {
     offset: [-0.003, -0.003],
   },
   cascade: {
-    offset: [0.18, 0],
+    offset: [0.4, 0],
   },
 };
 
@@ -47,27 +47,25 @@ export const pileElement = <T extends Card>(
   container.id = Math.random().toString(36).slice(2, 11);
 
   const cascade = (duration = cascadeDuration) => {
+    console.log(cardElements);
     reset();
-    const animations = cardElements.map((cardElement, i) => {
-      const vector2: [number, number] = [
-        cascadeOffset[0] * cardElement.container.offsetWidth * i,
-        cascadeOffset[1] * cardElement.container.offsetHeight * i,
-      ];
-
-      return slideCard(cardElement, vector2, duration);
+    const promise = new Promise((resolve) => {
+      const arrayFinished = []; // Array of .finished promises returned by animate
+      for (let i = 0; i < cardElements.length; i++) {
+        const vector2 = [];
+        const cardElement = cardElements[i].container;
+        vector2[0] = cascadeOffset[0] * cardElement.offsetWidth * i;
+        vector2[1] = cascadeOffset[1] * cardElement.offsetHeight * i;
+        const slide = slideCard(cardElements[i], vector2, duration);
+        arrayFinished.push(slide);
+      }
+      resolve(Promise.all(arrayFinished).then(() => {}));
     });
-
-    return Promise.all(animations);
+    return promise;
   };
 
   // sets a new value to the percent of cascade, and a one time use duration
   // then performs the cascade and resets duration to 0
-
-  //? So far, we've had this function trigger cascade() at the end.
-  //? Seems kinda impure. It's probably a redundant function anyway
-  //? when we can just update the .cascadeOffset property anyway.
-  //? Perhaps we should make a setCascadeType function where you
-  //? could choose from the prset "cascade" or "stack" options.
 
   /**
    * Card Elements have animations, and must remain part of the original Pile until the animation is complete. The card objects are moved instantly, this function checks for top card object, and returns matching cardElement.
@@ -78,11 +76,18 @@ export const pileElement = <T extends Card>(
     return cardElements.filter((element) => element.card === topCard)[0];
   };
 
-  // slimmed down move card to deck
+  /**
+   *
+   * @param destinationPile PileElement that the card is moving to
+   * @param cardElement The card being moved. Defaults to the top card of source pile
+   * @param gameRules ability to pass specific rules for this card moving. Defaults to the piles rules which defaults: () => true
+   * @param animationCallback Allows you to change the default animation, null for no animation
+   * @returns
+   */
   const moveCardToPile = (
     destinationPile: PileElementType<T>,
     cardElement = getTopCardElement(),
-    gameRules = true, // ability to pass in rules for passing the card from one deckbase to another
+    gameRules = rules(), // ability to pass in rules for passing the card from one deckbase to another
     animationCallback = animateMoveCardToNewPile, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) => {
     if (cardElements.indexOf(cardElement) === -1) return false;
@@ -128,6 +133,7 @@ export const pileElement = <T extends Card>(
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
 
+    // The calculation for how far the card needs to be determined by the cascade vectors of the destination pile and the number of cards.
     const destinationCascade = [
       destination.cascadeOffset[0] *
         cardElement.container.offsetWidth *
@@ -143,9 +149,13 @@ export const pileElement = <T extends Card>(
     ];
 
     await slideCard(cardElement, vector2, 600);
+    // wait for the card to move, adjust the draggable setting to that of the new pile
     cardElement.container.draggable = destination.options.draggable;
+    // append the card to the container once the animation is finished, and it is in the correct position
     destination.container.appendChild(cardElement.container);
 
+    // We must adjust the transform on the card to be that of the destinations cascade now.
+    // When the card is appeneded to the new pile, and keeps the old transform, it will move that far away again.
     const { scale, rotate } = cardElement.transform;
     const translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
     cardElement.transform.translate = translate;
@@ -155,10 +165,13 @@ export const pileElement = <T extends Card>(
     const index = cardElements.findIndex((element) => {
       return JSON.stringify(element) === JSON.stringify(cardElement);
     });
+    // Should never be -1, but if the index wasn't found abort
     if (index === -1) return Promise.reject(false);
-    if (index !== cardElements.length - 1) {
-      //      for (let i = index; i < cardElements.length-1; i++)
+    // If the card wasn't the top card, cascade the hand back together.
+    // If group Drag is on, it will cause unneccesary shifting, as the whole pile it leaving anyways
+    if (index !== cardElements.length - 1 && groupDrag === false) {
       cardElements.splice(cardElements.indexOf(cardElement), 1);
+      cascade(400);
     } else {
       cardElements.splice(cardElements.indexOf(cardElement), 1);
     }

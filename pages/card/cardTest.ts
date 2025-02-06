@@ -15,7 +15,10 @@ if (app) {
   const deck = StandardDeckOfCards();
 
   const player1 = new Player("dave", deck, [
-    { name: "hand", options: { draggable: true, groupDrag: false } },
+    {
+      name: "hand",
+      options: { draggable: true, groupDrag: false, type: "cascade" },
+    },
   ]);
   const main = new Player(
     "main",
@@ -23,7 +26,9 @@ if (app) {
     [{ name: "draw" }, { name: "discard" }],
     "draw",
   );
-  const player2 = new Player("hups", deck, [{ name: "hand" }]);
+  const player2 = new Player("hups", deck, [
+    { name: "hand", options: { type: "cascade" } },
+  ]);
 
   const hand1 = player1.getPile("hand");
   document.getElementById("p1Hand")?.appendChild(hand1.container);
@@ -38,19 +43,12 @@ if (app) {
   document.getElementById("mainDiscard")?.appendChild(discard.container);
 
   let currentPlayer = player1;
-
   draw.cascade();
-  player1.getPile("hand").cascadeOffset = [0.4, 0];
-
-  [hand1, hand2].forEach((hand) => {
-    hand.cascadeOffset = [0.3, 0];
-    hand.cascade();
-  });
+  player1.getPile("hand").cascadeOffset = [0, 0.3];
 
   window.addEventListener("DOMContentLoaded", () => {
     deal(5, draw, [hand1, hand2]);
   });
-  hand1.cascade();
 
   draw.container.addEventListener("dblclick", () => {
     main.getPile("draw").moveCardToPile(currentPlayer.getPile("hand"));
