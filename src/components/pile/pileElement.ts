@@ -48,7 +48,10 @@ export const pileElement = <T extends Card>(
     ...partialOptions,
   };
   const { type, cardElements, draggable, rules, groupDrag } = options;
-  const cascadeOffset = layout[type].offset;
+  const cascadeOffset = [layout[type].offset[0], layout[type].offset[1]] as [
+    number,
+    number,
+  ];
   const cascadeDuration = 0;
 
   const container = document.createElement("div");
