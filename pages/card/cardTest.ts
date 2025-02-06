@@ -43,6 +43,7 @@ if (app) {
   document.getElementById("mainDiscard")?.appendChild(discard.container);
 
   let currentPlayer = player1;
+  player1.getPile("hand").cascadeOffset = [0, 0.3];
   draw.cascade();
 
   window.addEventListener("DOMContentLoaded", () => {
