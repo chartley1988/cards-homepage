@@ -133,22 +133,32 @@ export const slideDeck = async <T extends Card>(
   });
 };
 
-export const cascade = <T extends Card>(
-  pileElement: PileElementType<T>,
-  duration = pileElement.cascadeDuration,
-) => {
-  pileElement.reset();
-  const promise = new Promise((resolve) => {
-    const arrayFinished = []; // Array of .finished promises returned by animate
-    for (let i = 0; i < pileElement.cardElements.length; i++) {
-      const vector2 = [];
-      const cardElement = pileElement.cardElements[i].container;
-      vector2[0] = pileElement.cascadeOffset[0] * cardElement.offsetWidth * i;
-      vector2[1] = pileElement.cascadeOffset[1] * cardElement.offsetHeight * i;
-      const slide = slideCard(pileElement.cardElements[i], vector2, duration);
-      arrayFinished.push(slide);
+/**
+ *
+ * @param numberOfCards The number of cards to deal out
+ * @param from The pile the cards are coming from
+ * @param to The pile(s?) the cards are going to
+ * @param delayTime The delay between dealing cards
+ */
+export async function deal<T extends Card>(
+  numberOfCards: number,
+  from: PileElementType<T>,
+  to: PileElementType<T>[] | PileElementType<T>,
+  delayTime: number = 200,
+) {
+  // If `to` is a single pile, convert it to an array for simplicity
+  const piles = Array.isArray(to) ? to : [to];
+
+  for (let i = 0; i < numberOfCards * piles.length; i++) {
+    // Alternate between piles using the modulo operator
+    const currentPile = piles[i % piles.length];
+
+    // Move card to the current pile
+    from.moveCardToPile(currentPile);
+
+    // Wait for 0.5 seconds before the next card
+    if (i < numberOfCards * piles.length - 1) {
+      await new Promise((resolve) => setTimeout(resolve, delayTime));
     }
-    resolve(Promise.all(arrayFinished).then(() => {}));
-  });
-  return promise;
-};
+  }
+}

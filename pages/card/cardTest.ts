@@ -5,10 +5,9 @@ import "./styles.css";
 import "../../src/components/navMenu/navMenu";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
 import Player from "../../src/components/player/player";
-import Card from "../../src/components/card/card";
 import { CardElementType } from "../../src/types/card.types";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
-import { slideDeck } from "../../src/components/animate/animate";
+import { deal, slideDeck } from "../../src/components/animate/animate";
 import { PileElementType } from "../../src/types/pile.types";
 
 const app = document.getElementById("app");
@@ -16,7 +15,7 @@ if (app) {
   const deck = StandardDeckOfCards();
 
   const player1 = new Player("dave", deck, [
-    { name: "hand", options: { draggable: false } },
+    { name: "hand", options: { draggable: true, groupDrag: false } },
   ]);
   const main = new Player(
     "main",
@@ -100,29 +99,4 @@ if (app) {
     if (card.card.value < 6) console.log(card.card.value);
     return true;
   };
-}
-
-async function deal<T extends Card>(
-  number: number,
-  from: PileElementType<T>,
-  to: PileElementType<T>[] | PileElementType<T>,
-) {
-  // If `to` is a single pile, convert it to an array for simplicity
-  const piles = Array.isArray(to) ? to : [to];
-
-  for (let i = 0; i < number * piles.length; i++) {
-    // Alternate between piles using the modulo operator
-    const currentPile = piles[i % piles.length];
-
-    // Move card to the current pile
-    from.moveCardToPile(currentPile);
-
-    // Wait for 0.5 seconds before the next card
-    if (i < number * piles.length - 1) {
-      await delay(500); // 500 milliseconds = 0.5 seconds
-    }
-  }
-}
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
