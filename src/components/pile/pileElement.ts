@@ -10,7 +10,7 @@ import Deck from "../deck/deck";
 import { slideCard } from "../animate/animate";
 
 // These are recipes for cascade()
-const layout: Layout = {
+const layouts: Layout = {
   stack: {
     offset: [-0.003, -0.003],
   },
@@ -24,7 +24,7 @@ const layout: Layout = {
 
 export const createDefaultOptions = <T extends Card>(): pileOptionsType<T> => ({
   cardElements: [],
-  type: "stack",
+  layout: "stack",
   draggable: true,
   rules: (
     sourcePile: PileElementType<T>,
@@ -47,10 +47,10 @@ export const pileElement = <T extends Card>(
     ...createDefaultOptions(),
     ...partialOptions,
   };
-  const { cardElements, draggable, rules, groupDrag } = options;
+  const { cardElements, draggable, rules, groupDrag, layout } = options;
   const cascadeOffset = [0, 0] as [number, number];
   const cascadeDuration = 0;
-
+  applyCascadeLayout(layout);
   const container = document.createElement("div");
   container.classList.add("deck-base");
   container.id = Math.random().toString(36).slice(2, 11);
@@ -73,20 +73,20 @@ export const pileElement = <T extends Card>(
   };
 
   function applyCascadeLayout(layoutName: string) {
-    const newOffset = layout[layoutName].offset.slice();
-    if (Object.keys(layout).includes(layoutName)) {
+    const newOffset = layouts[layoutName].offset.slice();
+    if (Object.keys(layouts).includes(layoutName)) {
       cascadeOffset[0] = newOffset[0];
       cascadeOffset[1] = newOffset[1];
     } else {
-      throw new Error(`No cascade layout with that name found: ${layout}`);
+      throw new Error(`No cascade layout with that name found: ${layouts}`);
     }
   }
 
   function createCascadeLayout(layoutName: string, offset: Offset) {
-    if (Object.keys(layout).includes(layoutName)) {
+    if (Object.keys(layouts).includes(layoutName)) {
       throw new Error("A layout with that name already exists");
     } else {
-      Object.defineProperty(layout, layoutName, {
+      Object.defineProperty(layouts, layoutName, {
         value: { offset },
         enumerable: true, // So it shows up in Object.keys() for your existence check
       });
@@ -366,11 +366,6 @@ export const pileElement = <T extends Card>(
     const attemptPrimaryMove = sourcePile.moveCardToPile(
       destinationPile,
       sourcePile.cardElements[parseInt(indexs[0])],
-      rules(
-        sourcePile,
-        destinationPile,
-        sourcePile.cardElements[parseInt(indexs[0])],
-      ),
     );
 
     // if the first card is successful, pass the rest
@@ -406,9 +401,11 @@ export const pileElement = <T extends Card>(
     get cards() {
       return pile.cards;
     },
+    get cascadeOffset() {
+      return cascadeOffset;
+    },
     cardElements,
     container,
-    cascadeOffset,
     cascadeDuration,
     options,
     getTopCardElement,

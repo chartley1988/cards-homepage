@@ -35,7 +35,7 @@ export interface DragData {
 
 export type pileOptionsType<T extends Card> = {
   cardElements: CardElementType<T>[];
-  type: "stack" | "cascade" | "visibleStack";
+  layout: "stack" | "cascade" | "visibleStack";
   draggable: boolean;
   rules: (
     sourcePile: PileElementType<T>,

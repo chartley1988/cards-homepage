@@ -9,7 +9,7 @@ export const slideCard = async <T extends Card>(
 ) => {
   if (cardElement.transform.active) return;
   if (vector2.length !== 2) {
-    console.error("Error: vector2 must be an array of 2 values, x and y.");
+    throw "Error: vector2 must be an array of 2 values, x and y.";
   }
   const { scale, rotate } = cardElement.transform;
   const newTranslate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
@@ -109,7 +109,7 @@ export const slideDeck = async <T extends Card>(
   duration: number,
 ) => {
   if (vector2.length !== 2) {
-    console.error("Error: vector2 must be an array of 2 values, x and y.");
+    throw "Error: vector2 must be an array of 2 values, x and y.";
   }
 
   const translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;

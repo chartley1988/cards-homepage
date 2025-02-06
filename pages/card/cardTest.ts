@@ -17,7 +17,7 @@ if (app) {
   const player1 = new Player("dave", deck, [
     {
       name: "hand",
-      options: { draggable: true, groupDrag: false, type: "cascade" },
+      options: { draggable: true, groupDrag: false, layout: "cascade" },
     },
   ]);
   const main = new Player(
@@ -27,7 +27,7 @@ if (app) {
     "draw",
   );
   const player2 = new Player("hups", deck, [
-    { name: "hand", options: { type: "cascade" } },
+    { name: "hand", options: { layout: "cascade" } },
   ]);
 
   const hand1 = player1.getPile("hand");
@@ -43,7 +43,11 @@ if (app) {
   document.getElementById("mainDiscard")?.appendChild(discard.container);
 
   let currentPlayer = player1;
-  player1.getPile("hand").cascadeOffset = [0, 0.3];
+  player1.getPile("hand").applyCascadeLayout("visibleStack");
+  player1.getPile("hand").createCascadeLayout("flop", [0.5, 0.5]);
+  player2.getPile("hand").applyCascadeLayout("visibleStack");
+  //player1.getPile("hand").cascadeOffset = [0.3, 0];
+
   draw.cascade();
 
   window.addEventListener("DOMContentLoaded", () => {
@@ -94,7 +98,7 @@ if (app) {
     card: CardElementType<PlayingCard>,
   ): boolean => {
     if (!card.faceUp) return false;
-    if (card.card.value < 6) console.log(card.card.value);
-    return true;
+    if (card.card.value < 6) return true;
+    else return true;
   };
 }

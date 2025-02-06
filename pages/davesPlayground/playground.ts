@@ -52,35 +52,35 @@ if (app) {
     { name: "deck", options: {} },
     {
       name: "tableau1",
-      options: { rules: tableauRules, type: "visibleStack" },
+      options: { rules: tableauRules, layout: "visibleStack" },
     },
     {
       name: "tableau2",
-      options: { rules: tableauRules, type: "visibleStack" },
+      options: { rules: tableauRules, layout: "visibleStack" },
     },
     {
       name: "tableau3",
-      options: { rules: tableauRules, type: "visibleStack" },
+      options: { rules: tableauRules, layout: "visibleStack" },
     },
     {
       name: "tableau4",
-      options: { rules: tableauRules, type: "visibleStack" },
+      options: { rules: tableauRules, layout: "visibleStack" },
     },
     {
       name: "tableau5",
-      options: { rules: tableauRules, type: "visibleStack" },
+      options: { rules: tableauRules, layout: "visibleStack" },
     },
     {
       name: "tableau6",
-      options: { rules: tableauRules, type: "visibleStack" },
+      options: { rules: tableauRules, layout: "visibleStack" },
     },
     {
       name: "tableau7",
-      options: { rules: tableauRules, type: "visibleStack" },
+      options: { rules: tableauRules, layout: "visibleStack" },
     },
     {
       name: "tableau8",
-      options: { rules: tableauRules, type: "visibleStack" },
+      options: { rules: tableauRules, layout: "visibleStack" },
     },
     { name: "freeSpot1", options: { rules: freeSpotRules } },
     { name: "freeSpot2", options: { rules: freeSpotRules } },
