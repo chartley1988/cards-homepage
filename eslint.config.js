@@ -16,6 +16,7 @@ export default [
   {
     rules: {
       "prefer-const": "warn", // or "warn" if you want warnings instead of errors
+      "no-console": "error",
     },
   },
 ];

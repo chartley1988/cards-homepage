@@ -73,11 +73,10 @@ export const pileElement = <T extends Card>(
   };
 
   function applyCascadeLayout(layoutName: string) {
-    console.log(cascadeOffset);
+    const newOffset = layout[layoutName].offset.slice();
     if (Object.keys(layout).includes(layoutName)) {
-      console.log(layout);
-      cascadeOffset[0] = layout[layoutName].offset[0];
-      cascadeOffset[1] = layout[layoutName].offset[1];
+      cascadeOffset[0] = newOffset[0];
+      cascadeOffset[1] = newOffset[1];
     } else {
       throw new Error(`No cascade layout with that name found: ${layout}`);
     }
@@ -92,7 +91,6 @@ export const pileElement = <T extends Card>(
         enumerable: true, // So it shows up in Object.keys() for your existence check
       });
     }
-    console.log(layout);
   }
 
   // sets a new value to the percent of cascade, and a one time use duration
