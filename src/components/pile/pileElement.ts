@@ -92,10 +92,6 @@ export const pileElement = <T extends Card>(
    * Card Elements have animations, and must remain part of the original Pile until the animation is complete. The card objects are moved instantly, this function checks for top card object, and returns matching cardElement.
    * @returns The cardElement that is on the top of the pile
    */
-  const getTopCardElement = (): CardElementType<T> => {
-    const topCard = pile.cards[pile.cards.length - 1];
-    return cardElements.filter((element) => element.card === topCard)[0];
-  };
 
   /**
    *
@@ -108,7 +104,7 @@ export const pileElement = <T extends Card>(
   function moveCardToPile(
     this: PileElementType<T>,
     destinationPile: PileElementType<T>,
-    cardElement = getTopCardElement(),
+    cardElement = cardElements[cardElements.length - 1],
     gameRules = options.rules, // ability to pass in rules for passing the card from one deckbase to another
     animationCallback = animateMoveCardToNewPile, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) {
@@ -160,38 +156,16 @@ export const pileElement = <T extends Card>(
     cardElement.container.style.zIndex = String(
       destination.cards.length + 1000,
     );
+
+    destination.container.appendChild(cardElement.container);
+    destination.cardElements.push(cardElement);
+    console.log(
+      cardElement ===
+        destination.cardElements[destination.cardElements.length - 1],
+    );
+
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
-
-    // The calculation for how far the card needs to be determined by the cascade vectors of the destination pile and the number of cards.
-    const destinationCascade = [
-      destination.cascadeOffset[0] *
-        cardElement.container.offsetWidth *
-        (destination.cards.length - 1),
-      destination.cascadeOffset[1] *
-        cardElement.container.offsetHeight *
-        (destination.cards.length - 1),
-    ];
-
-    const vector2: [number, number] = [
-      destinationBox.x - sourceBox.x + destinationCascade[0],
-      destinationBox.y - sourceBox.y + destinationCascade[1],
-    ];
-    const returnPromise = await slideCard(cardElement, vector2, 600).then(() =>
-      Promise.resolve(true),
-    );
-    // wait for the card to move, adjust the draggable setting to that of the new pile
-    cardElement.container.draggable = destination.options.draggable;
-    // append the card to the container once the animation is finished, and it is in the correct position
-    destination.container.appendChild(cardElement.container);
-
-    // We must adjust the transform on the card to be that of the destinations cascade now.
-    // When the card is appeneded to the new pile, and keeps the old transform, it will move that far away again.
-    const { scale, rotate } = cardElement.transform;
-    const translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
-    cardElement.transform.translate = translate;
-    cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
-
     // add the new card element to destination
     const index = cardElements.findIndex((element) => {
       return JSON.stringify(element) === JSON.stringify(cardElement);
@@ -202,15 +176,51 @@ export const pileElement = <T extends Card>(
     // If group Drag is on, it will cause unneccesary shifting, as the whole pile it leaving anyways
     if (index !== cardElements.length - 1 && options.groupDrag === false) {
       cardElements.splice(cardElements.indexOf(cardElement), 1);
-      cascade(400);
+      cascade(300);
     } else {
       cardElements.splice(cardElements.indexOf(cardElement), 1);
     }
-    destination.cardElements.push(cardElement);
-    adjustZIndex(destination.cardElements);
+    // The calculation for how far the card needs to be determined by the cascade vectors of the destination pile and the number of cards.
+    const destinationCascade = [
+      destination.cascadeOffset[0] *
+        cardElement.container.offsetWidth *
+        (destination.cards.length - 1),
+      destination.cascadeOffset[1] *
+        cardElement.container.offsetHeight *
+        (destination.cards.length - 1),
+    ];
+    // When the card is appeneded to the new pile, and keeps the old transform, it will move that far away again.
+    const sourceCascade = [
+      cascadeOffset[0] * cardElement.container.offsetWidth * index,
+      cascadeOffset[1] * cardElement.container.offsetHeight * index,
+    ];
 
-    // adjust the ZIndex of this piles cardElements
-    adjustZIndex(cardElements);
+    const { scale, rotate } = cardElement.transform;
+    const translate = `translate(${sourceBox.x - destinationBox.x + sourceCascade[0]}px, ${sourceBox.y - destinationBox.y + sourceCascade[1]}px)`;
+    cardElement.transform.translate = translate;
+    cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
+
+    const vector2: [number, number] = [
+      destinationCascade[0],
+      destinationCascade[1],
+    ];
+    cardElement.container.draggable = false;
+
+    const returnPromise = await slideCard(cardElement, vector2, 9000).then(
+      () => {
+        cardElement.container.draggable = destination.options.draggable;
+        adjustZIndex(destination.cardElements);
+        // adjust the ZIndex of this piles cardElements
+        adjustZIndex(cardElements);
+        return Promise.resolve(true);
+      },
+    );
+    // wait for the card to move, adjust the draggable setting to that of the new pile
+    cardElement.container.draggable = destination.options.draggable;
+
+    // We must adjust the transform on the card to be that of the destinations cascade now.
+    cardElement.transform.translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
+    cardElement.container.style.transform = `${`translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`} ${scale} ${rotate}`;
 
     return returnPromise;
   }
@@ -255,6 +265,11 @@ export const pileElement = <T extends Card>(
   };
 
   const drag = (e: DragEvent) => {
+    if (cardElements[cardElements.length - 1].transform.active === true) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
     if (!(e.target instanceof HTMLElement)) return;
 
     // Find the main card container.
@@ -403,11 +418,13 @@ export const pileElement = <T extends Card>(
     get cascadeOffset() {
       return cascadeOffset;
     },
+    get topCardElement() {
+      return cardElements[cardElements.length - 1];
+    },
     cardElements,
     container,
     cascadeDuration,
     options,
-    getTopCardElement,
     moveCardToPile,
     cascade,
     applyCascadeLayout,

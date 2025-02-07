@@ -10,10 +10,10 @@ export type PileElementType<T extends Card> = {
   container: HTMLDivElement;
   cascadeOffset: [number, number];
   cascadeDuration: number;
+  topCardElement: CardElementType<T>;
   cascade: () => Promise<unknown>;
   applyCascadeLayout: (layoutName: string) => void | Error;
   createCascadeLayout: (layoutName: string, offset: Offset) => void;
-  getTopCardElement: () => CardElementType<T>;
   moveCardToPile: (
     destinationPile: PileElementType<T>,
     cardElement?: CardElementType<T>,
