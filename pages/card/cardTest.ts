@@ -7,7 +7,7 @@ import StandardDeckOfCards from "../../src/components/card/playingCard/standardD
 import Player from "../../src/components/player/player";
 import { CardElementType } from "../../src/types/card.types";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
-import { deal, slideDeck } from "../../src/components/animate/animate";
+import { deal } from "../../src/components/animate/animate";
 import { PileElementType } from "../../src/types/pile.types";
 
 const app = document.getElementById("app");
@@ -60,12 +60,13 @@ if (app) {
   });
 
   main.getPile("draw").container.addEventListener("click", () => {
-    if (!main.getPile("draw").getTopCardElement().faceUp)
-      main.getPile("draw").getTopCardElement().flip();
+    if (!main.getPile("draw").topCardElement.faceUp)
+      main.getPile("draw").topCardElement.flip();
   });
 
   hand1.container.addEventListener("dblclick", () => {
-    slideDeck(hand1, [-100, -300], 1000);
+    hand1.applyCascadeLayout("cascade");
+    hand1.cascade(1000);
   });
   hand1.container.addEventListener("click", (e) => {
     if (e.target instanceof HTMLElement) {

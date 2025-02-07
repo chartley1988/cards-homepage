@@ -11,13 +11,14 @@ export type PileElementType<T extends Card> = {
   cascadeOffset: [number, number];
   cascadeDuration: number;
   topCardElement: CardElementType<T>;
-  cascade: () => Promise<unknown>;
+  cascade: (number?: number) => Promise<unknown>;
   applyCascadeLayout: (layoutName: string) => void | Error;
   createCascadeLayout: (layoutName: string, offset: Offset) => void;
   moveCardToPile: (
     destinationPile: PileElementType<T>,
     cardElement?: CardElementType<T>,
     gameRules?: Rules,
+    groupOffset?: number,
     animationCallback?: (
       destination: PileElementType<T>,
       cardThatWasPassed: CardElementType<T>,

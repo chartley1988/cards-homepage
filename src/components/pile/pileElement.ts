@@ -106,6 +106,7 @@ export const pileElement = <T extends Card>(
     destinationPile: PileElementType<T>,
     cardElement = cardElements[cardElements.length - 1],
     gameRules = options.rules, // ability to pass in rules for passing the card from one deckbase to another
+    groupOffset: number = 0,
     animationCallback = animateMoveCardToNewPile, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) {
     if (cardElements.indexOf(cardElement) === -1) return false;
@@ -141,8 +142,8 @@ export const pileElement = <T extends Card>(
     }
 
     // the card got passed, and this is the animation we want to show.
-    return animationCallback(destinationPile, cardElement).then(() =>
-      Promise.resolve(true),
+    return animationCallback(destinationPile, cardElement, groupOffset).then(
+      () => Promise.resolve(true),
     );
   }
 
@@ -152,6 +153,7 @@ export const pileElement = <T extends Card>(
   async function animateMoveCardToNewPile(
     destination: PileElementType<T>,
     cardElement: CardElementType<T>,
+    groupOffset: number = 0,
   ) {
     cardElement.container.style.zIndex = String(
       destination.cards.length + 1000,
@@ -159,10 +161,6 @@ export const pileElement = <T extends Card>(
 
     destination.container.appendChild(cardElement.container);
     destination.cardElements.push(cardElement);
-    console.log(
-      cardElement ===
-        destination.cardElements[destination.cardElements.length - 1],
-    );
 
     const sourceBox = container.getBoundingClientRect();
     const destinationBox = destination.container.getBoundingClientRect();
@@ -191,8 +189,12 @@ export const pileElement = <T extends Card>(
     ];
     // When the card is appeneded to the new pile, and keeps the old transform, it will move that far away again.
     const sourceCascade = [
-      cascadeOffset[0] * cardElement.container.offsetWidth * index,
-      cascadeOffset[1] * cardElement.container.offsetHeight * index,
+      cascadeOffset[0] *
+        cardElement.container.offsetWidth *
+        (index + groupOffset),
+      cascadeOffset[1] *
+        cardElement.container.offsetHeight *
+        (index + groupOffset),
     ];
 
     const { scale, rotate } = cardElement.transform;
@@ -206,7 +208,7 @@ export const pileElement = <T extends Card>(
     ];
     cardElement.container.draggable = false;
 
-    const returnPromise = await slideCard(cardElement, vector2, 9000).then(
+    const returnPromise = await slideCard(cardElement, vector2, 600).then(
       () => {
         cardElement.container.draggable = destination.options.draggable;
         adjustZIndex(destination.cardElements);
@@ -385,8 +387,13 @@ export const pileElement = <T extends Card>(
     // if the first card is successful, pass the rest
     if (attemptPrimaryMove !== false) {
       cardElements.splice(0, 1);
-      cardElements.forEach((element) => {
-        sourcePile.moveCardToPile(destinationPile, element);
+      cardElements.forEach((element, index) => {
+        sourcePile.moveCardToPile(
+          destinationPile,
+          element,
+          sourcePile.options.rules,
+          index + 1,
+        );
       });
     }
   };
