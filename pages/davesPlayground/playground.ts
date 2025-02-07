@@ -14,73 +14,90 @@ import Handler from "../../src/components/handler/handler";
 import PlayingCardElement from "../../src/components/card/playingCard/playingCardElement";
 import Player from "../../src/components/player/player";
 import { deal } from "../../src/components/animate/animate";
-import { PileElementType } from "../../src/types/pile.types";
+import { Layout, PileElementType } from "../../src/types/pile.types";
 import { CardElementType } from "../../src/types/card.types";
+import { Rules } from "../../src/components/rules/rules";
 
 const app = document.getElementById("app");
 if (app) {
   const gameDeck = StandardDeckOfCards();
 
-  const tableauRules = (
-    sourcePile: PileElementType<PlayingCard>,
-    destinationPile: PileElementType<PlayingCard>,
-    cardElement: CardElementType<PlayingCard>,
-  ) => {
-    const card = cardElement.card;
-    const destCard = destinationPile.getTopCardElement().card;
-    if (card.color === "red") {
-      if (destCard.color !== "black") {
+  class FreeCellRules extends Rules {
+    constructor(passRules?, receiveRules?) {
+      super(passRules, receiveRules);
+    }
+  }
+  const something = { word: "heeyyy" };
+  const getSomething = () => something.word;
+  const s = {} as PileElementType<PlayingCard>;
+  const d = {} as PileElementType<PlayingCard>;
+  const c = {} as CardElementType<PlayingCard>;
+
+  const tableauReceiveRuleArray = [
+    // card must be alternating colors
+    (source = s, dest = d, card = c) => {
+      if (card.card.color === dest.getTopCardElement().card.color) return false;
+      else return true;
+    },
+    // card must be one less than the destination pile
+    (source = s, dest = d, card = c) => {
+      if (card.card.value + 1 !== dest.getTopCardElement().card.value)
         return false;
-      }
-    }
-    if (card.color === "black") {
-      if (destCard.color !== "red") {
-        return false;
-      }
-    }
-    if (
-      card.value + 1 !== destCard.value &&
-      card.value - 1 !== destCard.value
-    ) {
-      return false;
-    }
-    return true;
-  };
-  const freeSpotRules = () => true;
-  const aceSpotRules = () => true;
+      else return true;
+    },
+    (word, another, three, four = getSomething(), five) => {
+      return true;
+    },
+  ];
+  const tableauPassRuleArray = [
+    (source, dest, card) => {
+      if (card) return true;
+    },
+    () => {
+      return true;
+    },
+  ];
+
+  const tableauRules = new FreeCellRules(
+    tableauPassRuleArray,
+    tableauReceiveRuleArray,
+  );
+  const freeSpotRules = new FreeCellRules();
+  const aceSpotRules = new FreeCellRules();
+
   const piles = [
     { name: "deck", options: {} },
     {
       name: "tableau1",
-      options: { rules: tableauRules, layout: "visibleStack" },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau2",
-      options: { rules: tableauRules, layout: "visibleStack" },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau3",
-      options: { rules: tableauRules, layout: "visibleStack" },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau4",
-      options: { rules: tableauRules, layout: "visibleStack" },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau5",
-      options: { rules: tableauRules, layout: "visibleStack" },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau6",
-      options: { rules: tableauRules, layout: "visibleStack" },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau7",
-      options: { rules: tableauRules, layout: "visibleStack" },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau8",
-      options: { rules: tableauRules, layout: "visibleStack" },
+      options: { layout: "visibleStack" },
     },
     { name: "freeSpot1", options: { rules: freeSpotRules } },
     { name: "freeSpot2", options: { rules: freeSpotRules } },
@@ -139,6 +156,17 @@ if (app) {
       ?.appendChild(pileMap[pile.name].container);
   });
 
+  const tableaus = [
+    tableau1,
+    tableau2,
+    tableau3,
+    tableau4,
+    tableau5,
+    tableau6,
+    tableau7,
+    tableau8,
+  ];
+
   window.addEventListener("DOMContentLoaded", async () => {
     await deal(
       6,
@@ -170,6 +198,7 @@ if (app) {
       tableau8,
     ].forEach((pile) => {
       pile.cardElements.forEach((element) => element.flip());
+      pile.options.rules = tableauRules;
     });
   });
 

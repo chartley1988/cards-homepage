@@ -8,6 +8,7 @@ import "../../styles/pile.css";
 import type { Layout, Offset, PileElementType } from "../../types/pile.types";
 import Deck from "../deck/deck";
 import { slideCard } from "../animate/animate";
+import { Rules } from "../rules/rules";
 
 // These are recipes for cascade()
 const layouts: Layout = {
@@ -26,14 +27,7 @@ export const createDefaultOptions = <T extends Card>(): pileOptionsType<T> => ({
   cardElements: [],
   layout: "stack",
   draggable: true,
-  rules: (
-    sourcePile: PileElementType<T>,
-    destinationPile: PileElementType<T>,
-    cardElement: CardElementType<T>,
-  ) => {
-    if (sourcePile && cardElement && destinationPile) return true;
-    else return false;
-  },
+  rules: new Rules(),
   groupDrag: true,
 });
 
@@ -47,29 +41,27 @@ export const pileElement = <T extends Card>(
     ...createDefaultOptions(),
     ...partialOptions,
   };
-  const { cardElements, draggable, rules, groupDrag, layout } = options;
   const cascadeOffset = [0, 0] as [number, number];
   const cascadeDuration = 0;
-  applyCascadeLayout(layout);
+  applyCascadeLayout(options.layout);
   const container = document.createElement("div");
   container.classList.add("deck-base");
   container.id = Math.random().toString(36).slice(2, 11);
 
+  const { cardElements } = options;
+
   const cascade = (duration = cascadeDuration) => {
     reset();
-    const promise = new Promise((resolve) => {
-      const arrayFinished = []; // Array of .finished promises returned by animate
-      for (let i = 0; i < cardElements.length; i++) {
-        const vector2 = [];
-        const cardElement = cardElements[i].container;
-        vector2[0] = cascadeOffset[0] * cardElement.offsetWidth * i;
-        vector2[1] = cascadeOffset[1] * cardElement.offsetHeight * i;
-        const slide = slideCard(cardElements[i], vector2, duration);
-        arrayFinished.push(slide);
-      }
-      resolve(Promise.all(arrayFinished).then(() => {}));
-    });
-    return promise;
+    const arrayFinished = [];
+    for (let i = 0; i < cardElements.length; i++) {
+      const vector2 = [];
+      const cardElement = cardElements[i].container;
+      vector2[0] = cascadeOffset[0] * cardElement.offsetWidth * i;
+      vector2[1] = cascadeOffset[1] * cardElement.offsetHeight * i;
+      const slide = slideCard(cardElements[i], vector2, duration);
+      arrayFinished.push(slide);
+    }
+    return Promise.all(arrayFinished);
   };
 
   function applyCascadeLayout(layoutName: string) {
@@ -117,17 +109,24 @@ export const pileElement = <T extends Card>(
     this: PileElementType<T>,
     destinationPile: PileElementType<T>,
     cardElement = getTopCardElement(),
-    gameRules = rules(this, destinationPile, cardElement), // ability to pass in rules for passing the card from one deckbase to another
+    gameRules = options.rules, // ability to pass in rules for passing the card from one deckbase to another
     animationCallback = animateMoveCardToNewPile, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) {
     if (cardElements.indexOf(cardElement) === -1) return false;
 
     // will return either the card that got passed, or false if the rules aren't "true"
-    const cardPassed = pile.passCard(
-      destinationPile.pile,
-      cardElement.card,
-      gameRules,
-    );
+
+    if (gameRules.canPass(this, destinationPile, cardElement) === false)
+      return false;
+    if (
+      destinationPile.options.rules.canReceive(
+        this,
+        destinationPile,
+        cardElement,
+      ) === false
+    )
+      return false;
+    const cardPassed = pile.passCard(destinationPile.pile, cardElement.card);
 
     // if the attempt to pass the card is a fail, return immediately
     if (cardPassed === false) {
@@ -201,7 +200,7 @@ export const pileElement = <T extends Card>(
     if (index === -1) return Promise.reject(false);
     // If the card wasn't the top card, cascade the hand back together.
     // If group Drag is on, it will cause unneccesary shifting, as the whole pile it leaving anyways
-    if (index !== cardElements.length - 1 && groupDrag === false) {
+    if (index !== cardElements.length - 1 && options.groupDrag === false) {
       cardElements.splice(cardElements.indexOf(cardElement), 1);
       cascade(400);
     } else {
@@ -225,7 +224,7 @@ export const pileElement = <T extends Card>(
     for (let i = 0; i < cardElements.length; i++) {
       const card = cardElements[i];
       cardElements[i].container.style.zIndex = String(i);
-      cardElements[i].container.draggable = draggable;
+      cardElements[i].container.draggable = options.draggable;
       container.appendChild(card.container);
     }
   };
@@ -268,7 +267,7 @@ export const pileElement = <T extends Card>(
       sourcePileContainerId: container.id,
     };
 
-    if (groupDrag) {
+    if (options.groupDrag) {
       // Create a custom drag image that visually represents the group.
       const dragImage = document.createElement("div");
       dragImage.id = "card-dragImage";
@@ -372,13 +371,13 @@ export const pileElement = <T extends Card>(
     if (attemptPrimaryMove !== false) {
       cardElements.splice(0, 1);
       cardElements.forEach((element) => {
-        sourcePile.moveCardToPile(destinationPile, element, true);
+        sourcePile.moveCardToPile(destinationPile, element);
       });
     }
   };
 
   container.id = Math.random().toString(36).slice(2, 11);
-  if (draggable) {
+  if (options.draggable) {
     container.ondragstart = drag;
     container.ondragend = dragend;
     container.ondrop = drop;

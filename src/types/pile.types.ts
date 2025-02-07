@@ -1,6 +1,7 @@
 import { CardElementType } from "./card.types";
 import Pile from "../components/pile/pile";
 import Card from "../components/card/card";
+import { Rules } from "../components/rules/rules";
 
 export type PileElementType<T extends Card> = {
   pile: Pile<T>;
@@ -16,7 +17,7 @@ export type PileElementType<T extends Card> = {
   moveCardToPile: (
     destinationPile: PileElementType<T>,
     cardElement?: CardElementType<T>,
-    gameRules?: boolean,
+    gameRules?: Rules,
     animationCallback?: (
       destination: PileElementType<T>,
       cardThatWasPassed: CardElementType<T>,
@@ -37,11 +38,7 @@ export type pileOptionsType<T extends Card> = {
   cardElements: CardElementType<T>[];
   layout: "stack" | "cascade" | "visibleStack";
   draggable: boolean;
-  rules: (
-    sourcePile: PileElementType<T>,
-    destinationPile: PileElementType<T>,
-    cardElement: CardElementType<T>,
-  ) => boolean;
+  rules: Rules;
   groupDrag: boolean;
 };
 
