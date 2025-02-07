@@ -38,9 +38,14 @@ export interface DragData {
 export type pileOptionsType<T extends Card> = {
   cardElements: CardElementType<T>[];
   layout: "stack" | "cascade" | "visibleStack";
-  draggable: boolean;
   rules: Rules;
+  draggable: boolean;
   groupDrag: boolean;
+  dragRules: (
+    pile: PileElementType<T> | undefined,
+    card: CardElementType<T> | undefined,
+    ...args: unknown[]
+  ) => boolean;
 };
 
 export type Offset = [number, number];

@@ -32,20 +32,18 @@ if (app) {
   const s = {} as PileElementType<PlayingCard>;
   const d = {} as PileElementType<PlayingCard>;
   const c = {} as CardElementType<PlayingCard>;
-
   const tableauReceiveRuleArray = [
     // card must be alternating colors
     (source = s, dest = d, card = c) => {
-      if (card.card.color === dest.getTopCardElement().card.color) return false;
+      if (card.card.color === dest.topCardElement.card.color) return false;
       else return true;
     },
     // card must be one less than the destination pile
     (source = s, dest = d, card = c) => {
-      if (card.card.value + 1 !== dest.getTopCardElement().card.value)
-        return false;
+      if (card.card.value + 1 !== dest.topCardElement.card.value) return false;
       else return true;
     },
-    (word, another, three, four = getSomething(), five) => {
+    () => {
       return true;
     },
   ];
@@ -64,40 +62,70 @@ if (app) {
   );
   const freeSpotRules = new FreeCellRules();
   const aceSpotRules = new FreeCellRules();
+  const freeSpaces = 2;
+
+  const dragRules = (
+    pile: PileElementType<PlayingCard>,
+    card: CardElementType<PlayingCard>,
+  ) => {
+    // always drag top card
+    if (pile.topCardElement === card) return true;
+    const cardIndex = pile.cardElements.findIndex((element) => {
+      return JSON.stringify(element) === JSON.stringify(card);
+    });
+    const cardsOnTop = pile.cardElements.slice(cardIndex);
+    // to move a pile, must be in sequence
+    if (
+      cardsOnTop.every((cardElement, index, arr) => {
+        if (index === 0) return true; // First card has nothing to compare with
+
+        const prevCard = arr[index - 1].card;
+        const currentCard = cardElement.card;
+
+        return (
+          prevCard.color !== currentCard.color &&
+          prevCard.value === currentCard.value + 1
+        );
+      }) === false
+    )
+      return false;
+    if (cardsOnTop.length > freeSpaces) return false;
+    return true;
+  };
 
   const piles = [
     { name: "deck", options: {} },
     {
       name: "tableau1",
-      options: { layout: "visibleStack" },
+      options: { layout: "visibleStack", dragRules: dragRules },
     },
     {
       name: "tableau2",
-      options: { layout: "visibleStack" },
+      options: { layout: "visibleStack", dragRules: dragRules },
     },
     {
       name: "tableau3",
-      options: { layout: "visibleStack" },
+      options: { layout: "visibleStack", dragRules: dragRules },
     },
     {
       name: "tableau4",
-      options: { layout: "visibleStack" },
+      options: { layout: "visibleStack", dragRules: dragRules },
     },
     {
       name: "tableau5",
-      options: { layout: "visibleStack" },
+      options: { layout: "visibleStack", dragRules: dragRules },
     },
     {
       name: "tableau6",
-      options: { layout: "visibleStack" },
+      options: { layout: "visibleStack", dragRules: dragRules },
     },
     {
       name: "tableau7",
-      options: { layout: "visibleStack" },
+      options: { layout: "visibleStack", dragRules: dragRules },
     },
     {
       name: "tableau8",
-      options: { layout: "visibleStack" },
+      options: { layout: "visibleStack", dragRules: dragRules },
     },
     { name: "freeSpot1", options: { rules: freeSpotRules } },
     { name: "freeSpot2", options: { rules: freeSpotRules } },
@@ -202,5 +230,5 @@ if (app) {
     });
   });
 
-  // TODO: Renable linting on this file, and fix errors
+  // TODO: Re-enable linting on this file, and fix errors
 }

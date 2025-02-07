@@ -26,9 +26,17 @@ const layouts: Layout = {
 export const createDefaultOptions = <T extends Card>(): pileOptionsType<T> => ({
   cardElements: [],
   layout: "stack",
-  draggable: true,
   rules: new Rules(),
+  draggable: true,
   groupDrag: true,
+  dragRules: (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _pile: PileElementType<T> = {} as PileElementType<T>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _cardElement: CardElementType<T> = {} as CardElementType<T>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ..._args: unknown[]
+  ) => true,
 });
 
 // Adds a base the size of the card to be the basis of deck layouts.\
@@ -41,6 +49,7 @@ export const pileElement = <T extends Card>(
     ...createDefaultOptions(),
     ...partialOptions,
   };
+
   const cascadeOffset = [0, 0] as [number, number];
   const cascadeDuration = 0;
   applyCascadeLayout(options.layout);
@@ -266,7 +275,7 @@ export const pileElement = <T extends Card>(
     e.preventDefault();
   };
 
-  const drag = (e: DragEvent) => {
+  function drag(e: DragEvent) {
     if (cardElements[cardElements.length - 1].transform.active === true) {
       e.preventDefault();
       e.stopPropagation();
@@ -277,7 +286,13 @@ export const pileElement = <T extends Card>(
     // Find the main card container.
     const cardElement = findCardContainer(e.target);
     if (cardElement === null) return;
-
+    if (
+      options.dragRules(findPileElement(container.id), cardElement) === false
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
     // Prepare your drag data.
     const data = {
       indexs: [cardElement.container.style.zIndex],
@@ -326,7 +341,7 @@ export const pileElement = <T extends Card>(
       e.dataTransfer?.setDragImage(dragImage, 0, 0);
     }
     e.dataTransfer?.setData("application/json", JSON.stringify(data));
-  };
+  }
 
   const dragend = (e: DragEvent) => {
     // clears the image being used by drag
