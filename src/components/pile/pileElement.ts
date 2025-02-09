@@ -18,7 +18,7 @@ const layouts: Layout = {
     offset: [0.4, 0],
   },
   visibleStack: {
-    offset: [0, 0.4],
+    offset: [0, 0.25],
   },
 };
 

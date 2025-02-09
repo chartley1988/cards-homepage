@@ -9,6 +9,9 @@ import PlayingCard from "../../src/components/card/playingCard/playingCardClass"
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
 import PlayingCardElement from "../../src/components/card/playingCard/playingCardElement";
 import { spinCard } from "../../src/components/animate/animate";
+import { setTheme, redOak } from "../../src/components/table/themes";
+
+setTheme(redOak);
 
 function instanceCard() {
   const front = document.createElement("div");

@@ -16,9 +16,13 @@ import Player from "../../src/components/player/player";
 import { deal } from "../../src/components/animate/animate";
 import { PileElementType } from "../../src/types/pile.types";
 import { CardElementType } from "../../src/types/card.types";
+import { Table } from "../../src/components/table/table";
+import { setTheme, redFelt } from "../../src/components/table/themes";
 
 const app = document.getElementById("app");
 if (app) {
+  setTheme(redFelt);
+
   const gameDeck = StandardDeckOfCards();
 
   const tableauRules = (

@@ -5,9 +5,13 @@ import "./styles.css";
 import "../../src/components/navMenu/navMenu";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
 import Player from "../../src/components/player/player";
+import { setTheme, tanTiles } from "../../src/components/table/themes";
 
 const app = document.getElementById("app");
+
 if (app) {
+  setTheme(tanTiles);
+
   const deck = StandardDeckOfCards();
 
   const player1 = new Player("Player 1", deck, [{ name: "Hand" }]);
@@ -33,7 +37,7 @@ if (app) {
 
   draw.cascade();
 
-  hand1.createCascadeLayout("flop", [1.1, 0]);
+  hand1.createCascadeLayout("flop", [0.2, 0]);
   hand1.createCascadeLayout("tight", [0, -0.01]);
   hand1.applyCascadeLayout("flop");
   hand2.applyCascadeLayout("tight");
@@ -42,12 +46,12 @@ if (app) {
 
   window.addEventListener("DOMContentLoaded", async () => {
     for (let i = 0; i < 15; i++) {
-      await draw.moveCardToPile(hand1);
-      await delay(50);
+      draw.moveCardToPile(hand1);
+      await delay(5);
     }
 
     for (let i = 0; i < 15; i++) {
-      await draw.moveCardToPile(hand2);
+      draw.moveCardToPile(hand2);
       await delay(50);
     }
   });

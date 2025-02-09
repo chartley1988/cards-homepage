@@ -9,9 +9,12 @@ import { CardElementType } from "../../src/types/card.types";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import { deal, slideDeck } from "../../src/components/animate/animate";
 import { PileElementType } from "../../src/types/pile.types";
+import { greenFelt, setTheme } from "../../src/components/table/themes";
 
 const app = document.getElementById("app");
 if (app) {
+  setTheme(greenFelt);
+
   const deck = StandardDeckOfCards();
 
   const player1 = new Player("dave", deck, [
