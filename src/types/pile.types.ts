@@ -1,6 +1,7 @@
 import { CardElementType } from "./card.types";
 import Pile from "../components/pile/pile";
 import Card from "../components/card/card";
+import { Rules } from "../components/rules/rules";
 
 export type PileElementType<T extends Card> = {
   pile: Pile<T>;
@@ -9,14 +10,15 @@ export type PileElementType<T extends Card> = {
   container: HTMLDivElement;
   cascadeOffset: [number, number];
   cascadeDuration: number;
-  cascade: () => Promise<unknown>;
+  topCardElement: CardElementType<T>;
+  cascade: (number?: number) => Promise<unknown>;
   applyCascadeLayout: (layoutName: string) => void | Error;
   createCascadeLayout: (layoutName: string, offset: Offset) => void;
-  getTopCardElement: () => CardElementType<T>;
   moveCardToPile: (
     destinationPile: PileElementType<T>,
     cardElement?: CardElementType<T>,
-    gameRules?: boolean,
+    gameRules?: Rules,
+    groupOffset?: number,
     animationCallback?: (
       destination: PileElementType<T>,
       cardThatWasPassed: CardElementType<T>,
@@ -36,13 +38,14 @@ export interface DragData {
 export type pileOptionsType<T extends Card> = {
   cardElements: CardElementType<T>[];
   layout: "stack" | "cascade" | "visibleStack";
+  rules: Rules;
   draggable: boolean;
-  rules: (
-    sourcePile: PileElementType<T>,
-    destinationPile: PileElementType<T>,
-    cardElement: CardElementType<T>,
-  ) => boolean;
   groupDrag: boolean;
+  dragRules: (
+    pile: PileElementType<T> | undefined,
+    card: CardElementType<T> | undefined,
+    ...args: unknown[]
+  ) => boolean;
 };
 
 export type Offset = [number, number];
