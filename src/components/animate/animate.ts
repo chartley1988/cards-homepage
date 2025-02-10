@@ -164,3 +164,53 @@ export async function deal<T extends Card>(
   // ✅ Ensure all cards finish moving before returning
   await Promise.all(promises);
 }
+
+export async function denyMove<T extends Card>(
+  cardElement: CardElementType<T>,
+) {
+  if (cardElement === undefined) return new Promise(() => undefined);
+  if (cardElement.transform.active) return new Promise(() => undefined);
+  const backgroundOverlay = document.createElement("div");
+  backgroundOverlay.classList.add("card-background-overlay");
+
+  // Append it inside the card container
+  cardElement.container.appendChild(backgroundOverlay);
+
+  // Get the computed z-index of the card container
+  const computedZIndex = window.getComputedStyle(cardElement.container).zIndex;
+
+  // If the z-index is not 'auto', set the overlay to be one level below
+  if (!isNaN(parseInt(computedZIndex)) && computedZIndex !== "auto") {
+    backgroundOverlay.style.zIndex = JSON.stringify(parseInt(computedZIndex));
+  } else {
+    backgroundOverlay.style.zIndex = "1"; // Default if no valid z-index is found
+  }
+  backgroundOverlay.style.opacity = "0.2";
+
+  const keys = {
+    transform: [
+      "scale(1)",
+      "scale(1.1)",
+      "scale(1.1) translateX(-5px)",
+      "scale(1.1) translateX(5px)",
+      "scale(1.1) translateX(-5px)",
+      "scale(1)",
+    ],
+  };
+
+  const options = {
+    duration: 600,
+    easing: "ease-in-out",
+    delay: 0,
+    direction: "normal" as PlaybackDirection,
+    composite: "add" as CompositeOperation,
+  };
+  cardElement.container.style.backgroundColor = "red";
+  const anim = cardElement.container.animate(keys, options);
+  cardElement.container.dispatchEvent(new Event("animationstart"));
+  return await anim.finished.then(() => {
+    cardElement.container.dispatchEvent(new Event("animationend"));
+    cardElement.container.removeChild(backgroundOverlay);
+    return Promise.resolve(true);
+  });
+}

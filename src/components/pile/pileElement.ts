@@ -2,12 +2,11 @@ import Pile from "./pile";
 import { CardElementType } from "../../types/card.types";
 import { DragData } from "../../types/pile.types";
 import { pileOptionsType } from "../../types/pile.types";
-
 import Card from "../card/card";
 import "../../styles/pile.css";
 import type { Layout, Offset, PileElementType } from "../../types/pile.types";
 import Deck from "../deck/deck";
-import { slideCard } from "../animate/animate";
+import { denyMove, slideCard } from "../animate/animate";
 import { Rules } from "../rules/rules";
 
 // These are recipes for cascade()
@@ -94,14 +93,6 @@ export const pileElement = <T extends Card>(
     }
   }
 
-  // sets a new value to the percent of cascade, and a one time use duration
-  // then performs the cascade and resets duration to 0
-
-  /**
-   * Card Elements have animations, and must remain part of the original Pile until the animation is complete. The card objects are moved instantly, this function checks for top card object, and returns matching cardElement.
-   * @returns The cardElement that is on the top of the pile
-   */
-
   /**
    *
    * @param destinationPile PileElement that the card is moving to
@@ -122,16 +113,18 @@ export const pileElement = <T extends Card>(
 
     // will return either the card that got passed, or false if the rules aren't "true"
 
-    if (gameRules.canPass(this, destinationPile, cardElement) === false)
+    if (gameRules.canPass(this, destinationPile, cardElement) === false) {
       return false;
+    }
     if (
       destinationPile.options.rules.canReceive(
         this,
         destinationPile,
         cardElement,
       ) === false
-    )
+    ) {
       return false;
+    }
     const cardPassed = pile.passCard(destinationPile.pile, cardElement.card);
 
     // if the attempt to pass the card is a fail, return immediately
@@ -289,6 +282,7 @@ export const pileElement = <T extends Card>(
     if (
       options.dragRules(findPileElement(container.id), cardElement) === false
     ) {
+      denyMove(cardElement);
       e.preventDefault();
       e.stopPropagation();
       return;
@@ -399,9 +393,14 @@ export const pileElement = <T extends Card>(
       destinationPile,
       sourcePile.cardElements[parseInt(indexs[0])],
     );
+    if (attemptPrimaryMove === false) {
+      cardElements.forEach((element) => {
+        denyMove(element);
+      });
+    }
 
     // if the first card is successful, pass the rest
-    if (attemptPrimaryMove !== false) {
+    else {
       cardElements.splice(0, 1);
       cardElements.forEach((element, index) => {
         sourcePile.moveCardToPile(

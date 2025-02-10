@@ -54,7 +54,11 @@ if (app) {
     tableauReceiveRuleArray,
   );
 
-  function aceSpotReceiveRules() {}
+  const aceSpotReceiveRules = [
+    () => {
+      return false;
+    },
+  ];
 
   const freeSpotRules = new FreeCellRules();
   const aceSpotRules = new FreeCellRules([() => false], aceSpotReceiveRules);
@@ -129,19 +133,19 @@ if (app) {
     { name: "freeSpot4", options: { rules: freeSpotRules } },
     {
       name: "aceSpot1",
-      options: { rules: aceSpotRules, draggable: false, groupDrag: false },
+      options: { rules: aceSpotRules, groupDrag: false },
     },
     {
       name: "aceSpot2",
-      options: { rules: aceSpotRules, draggable: false, groupDrag: false },
+      options: { rules: aceSpotRules, groupDrag: false },
     },
     {
       name: "aceSpot3",
-      options: { rules: aceSpotRules, draggable: false, groupDrag: false },
+      options: { rules: aceSpotRules, groupDrag: false },
     },
     {
       name: "aceSpot4",
-      options: { rules: aceSpotRules, draggable: false, groupDrag: false },
+      options: { rules: aceSpotRules, groupDrag: false },
     },
   ];
 
