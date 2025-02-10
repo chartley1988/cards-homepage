@@ -336,6 +336,7 @@ export const pileElement = <T extends Card>(
       // It might be necessary to add the drag image element off-screen before using it.
       dragImage.style.position = "absolute";
       dragImage.style.top = "-9999px";
+      dragImage.style.zIndex = "1";
       document.body.appendChild(dragImage);
 
       e.dataTransfer?.setDragImage(dragImage, 0, 0);
