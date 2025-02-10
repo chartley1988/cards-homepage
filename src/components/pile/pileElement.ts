@@ -138,13 +138,11 @@ export const pileElement = <T extends Card>(
       );
       cascade();
       destinationPile.cascade();
-      return Promise.resolve(true);
+      return false;
     }
 
     // the card got passed, and this is the animation we want to show.
-    return animationCallback(destinationPile, cardElement, groupOffset).then(
-      () => Promise.resolve(true),
-    );
+    return animationCallback(destinationPile, cardElement, groupOffset);
   }
 
   // Only to do with animations.
@@ -209,12 +207,12 @@ export const pileElement = <T extends Card>(
     cardElement.container.draggable = false;
 
     const returnPromise = await slideCard(cardElement, vector2, 600).then(
-      () => {
+      (animation) => {
         cardElement.container.draggable = destination.options.draggable;
         adjustZIndex(destination.cardElements);
         // adjust the ZIndex of this piles cardElements
         adjustZIndex(cardElements);
-        return Promise.resolve(true);
+        return animation;
       },
     );
     // wait for the card to move, adjust the draggable setting to that of the new pile
@@ -223,7 +221,6 @@ export const pileElement = <T extends Card>(
     // We must adjust the transform on the card to be that of the destinations cascade now.
     cardElement.transform.translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
     cardElement.container.style.transform = `${`translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`} ${scale} ${rotate}`;
-
     return returnPromise;
   }
 

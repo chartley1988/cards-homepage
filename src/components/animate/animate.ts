@@ -30,9 +30,10 @@ export const slideCard = async <T extends Card>(
 
   const anim = cardElement.container.animate(keys, options);
   cardElement.container.dispatchEvent(new Event("animationstart"));
-  await anim.finished.then(() => {
+  return await anim.finished.then((animation) => {
     cardElement.container.style.transform = transform;
     cardElement.container.dispatchEvent(new Event("animationend"));
+    return animation;
   });
 };
 
@@ -151,18 +152,24 @@ export async function deal<T extends Card>(
   for (let i = 0; i < numberOfCards * piles.length; i++) {
     const currentPile = piles[i % piles.length];
 
-    // ✅ Store each move promise
-    const movePromise = from.moveCardToPile(currentPile);
-    if (movePromise === false) return;
-    promises.push(movePromise);
+    // Let animations run in parallel.
+    const animationPromise = from.moveCardToPile(currentPile);
+    if (!animationPromise) return Promise.all(promises); // Handle early exit
+
+    // Await the finished property inside the Promise array.
+    promises.push(
+      animationPromise.then(
+        (animation) =>
+          animation?.finished?.then(() => true) ?? Promise.resolve(true),
+      ),
+    );
 
     if (i < numberOfCards * piles.length - 1) {
       await new Promise((resolve) => setTimeout(resolve, delayTime));
     }
   }
-
-  // ✅ Ensure all cards finish moving before returning
-  await Promise.all(promises);
+  // Now we wait for all animations to complete
+  return Promise.all(promises);
 }
 
 export async function denyMove<T extends Card>(

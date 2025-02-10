@@ -12,7 +12,6 @@ import { PileElementType } from "../../src/types/pile.types";
 import { CardElementType } from "../../src/types/card.types";
 import { setTheme, redFelt } from "../../src/components/table/themes";
 import { Rules } from "../../src/components/rules/rules";
-import { CardElement } from "../../src/components/card/cardElement";
 
 const app = document.getElementById("app");
 if (app) {
@@ -44,9 +43,10 @@ if (app) {
   const s = {} as PileElementType<PlayingCard>;
   const d = {} as PileElementType<PlayingCard>;
   const c = {} as CardElementType<PlayingCard>;
+
   const tableauReceiveRuleArray = [
     // card must be alternating colors
-    (source = s, dest = d, card = c) => {
+    (source, dest = d, card = c) => {
       if (dest.cardElements.length === 0) return true;
       if (card.card.color === dest.topCardElement.card.color) return false;
       else return true;
@@ -257,7 +257,7 @@ if (app) {
   });
 
   window.addEventListener("DOMContentLoaded", async () => {
-    await deal(
+    const dealy = await deal(
       7,
       deck,
       [
@@ -286,6 +286,7 @@ if (app) {
       tableau8,
     ].forEach((pile) => {
       pile.cardElements.forEach((element) => element.flip());
+
       pile.options.rules = tableauRules;
       pile.container.addEventListener("dblclick", (e) => {
         if (!(e.target instanceof HTMLElement)) return;

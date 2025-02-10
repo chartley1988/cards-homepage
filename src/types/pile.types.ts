@@ -22,8 +22,8 @@ export type PileElementType<T extends Card> = {
     animationCallback?: (
       destination: PileElementType<T>,
       cardThatWasPassed: CardElementType<T>,
-    ) => Promise<boolean>,
-  ) => Promise<boolean> | false;
+    ) => Promise<Animation | undefined>,
+  ) => Promise<Animation | undefined> | false;
   reset: () => void;
   findCardContainer: (element: HTMLElement) => null | CardElementType<T>;
   shuffle: () => void;
