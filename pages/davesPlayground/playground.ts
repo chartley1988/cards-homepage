@@ -248,6 +248,18 @@ if (app) {
     aceSpot3,
     aceSpot4,
   } = pileMap;
+  const tableaus = [
+    tableau1,
+    tableau2,
+    tableau3,
+    tableau4,
+    tableau5,
+    tableau6,
+    tableau7,
+    tableau8,
+  ];
+  const freeSpots = [freeSpot1, freeSpot2, freeSpot3, freeSpot4];
+  const aceSpots = [aceSpot1, aceSpot2, aceSpot3, aceSpot4];
   deck.shuffle();
 
   piles.forEach((pile) => {
@@ -257,82 +269,110 @@ if (app) {
   });
 
   window.addEventListener("DOMContentLoaded", async () => {
-    const dealy = await deal(
-      7,
-      deck,
-      [
-        tableau1,
-        tableau2,
-        tableau3,
-        tableau4,
-        tableau5,
-        tableau6,
-        tableau7,
-        tableau8,
-      ],
-      100,
-    );
+    const dealy = await deal(7, deck, tableaus, 100);
 
     document.getElementById("deck")?.removeChild(deck.container);
     // Flip all cards after dealing is done
-    [
-      tableau1,
-      tableau2,
-      tableau3,
-      tableau4,
-      tableau5,
-      tableau6,
-      tableau7,
-      tableau8,
-    ].forEach((pile) => {
-      pile.cardElements.forEach((element) => element.flip());
 
+    // TODO: Re-enable linting on this file, and fix errors
+    function checkForAvailableFreeSpot() {
+      return freeSpots.find((element) => {
+        return element.cardElements.length === 0;
+      });
+    }
+    function moveToAceSpot(
+      source: PileElementType<PlayingCard>,
+      cardElement: CardElementType<PlayingCard>,
+    ) {
+      if (cardElement.card.value === 1) {
+        const firstFreeSpot = aceSpots.filter((element) => {
+          return element.cardElements.length === 0;
+        })[0];
+        source.moveCardToPile(firstFreeSpot, cardElement);
+        return true;
+      } else {
+        const allowedMove = aceSpots.filter((element) => {
+          if (element.cardElements.length === 0) return false;
+          return (
+            element.topCardElement.card.suit === cardElement.card.suit &&
+            element.topCardElement.card.value === cardElement.card.value - 1
+          );
+        });
+        if (allowedMove.length === 0) return false;
+        else {
+          source.moveCardToPile(allowedMove[0], cardElement);
+          return true;
+        }
+      }
+    }
+    function moveToTableau(
+      source: PileElementType<PlayingCard>,
+      cardElement: CardElementType<PlayingCard>,
+    ) {
+      const legalMove = tableaus.find((pile) => {
+        if (pile.cardElements.length === 0) return false;
+        return (
+          pile.topCardElement.card.color !== cardElement.card.color &&
+          pile.topCardElement.card.value === cardElement.card.value + 1
+        );
+      });
+      if (legalMove) {
+        source.moveCardToPile(legalMove, cardElement);
+        return true;
+      }
+
+      const blankTableau = tableaus.find((pile) => {
+        return pile.cardElements.length === 0;
+      });
+      if (blankTableau) {
+        source.moveCardToPile(blankTableau, cardElement);
+        return true;
+      } else return false;
+    }
+
+    tableaus.forEach((pile) => {
+      pile.cardElements.forEach((element) => element.flip());
       pile.options.rules = tableauRules;
       pile.container.addEventListener("dblclick", (e) => {
         if (!(e.target instanceof HTMLElement)) return;
         const cardElement = pile.findCardContainer(e.target);
         if (cardElement === null) return;
-        if (moveToAceSpot(pile, cardElement) === true) return;
-        const availableFreeSpots = checkForAvailableFreeSpot();
-        if (availableFreeSpots.length === 0) {
+        if (pile.topCardElement !== cardElement) {
           denyMove(cardElement);
           return false;
         }
-        pile.moveCardToPile(availableFreeSpots[0], cardElement);
+        if (moveToAceSpot(pile, cardElement) === true) return;
+        if (moveToTableau(pile, cardElement) === true) return;
+        const availableFreeSpots = checkForAvailableFreeSpot();
+        if (!availableFreeSpots) {
+          denyMove(cardElement);
+          return false;
+        }
+        pile.moveCardToPile(availableFreeSpots, cardElement);
+      });
+    });
+
+    freeSpots.forEach((pile) => {
+      pile.container.addEventListener("dblclick", (e) => {
+        if (!(e.target instanceof HTMLElement)) return;
+        const cardElement = pile.findCardContainer(e.target);
+        if (cardElement === null) return;
+        if (moveToAceSpot(pile, cardElement) === true) return;
+        if (moveToTableau(pile, cardElement) === true) return;
+        else {
+          denyMove(cardElement);
+          return false;
+        }
+      });
+    });
+    aceSpots.forEach((pile) => {
+      pile.container.addEventListener("dblclick", (e) => {
+        if (!(e.target instanceof HTMLElement)) return;
+        const cardElement = pile.findCardContainer(e.target);
+        if (cardElement === null) return;
+        denyMove(cardElement);
+        return false;
       });
     });
   });
-
-  // TODO: Re-enable linting on this file, and fix errors
-  function checkForAvailableFreeSpot() {
-    return [freeSpot1, freeSpot2, freeSpot3, freeSpot4].filter((element) => {
-      return element.cardElements.length === 0;
-    });
-  }
-  function moveToAceSpot(
-    source: PileElementType<PlayingCard>,
-    cardElement: CardElementType<PlayingCard>,
-  ) {
-    const aceSpots = [aceSpot1, aceSpot2, aceSpot3, aceSpot4];
-    if (cardElement.card.value === 1) {
-      const firstFreeSpot = aceSpots.filter((element) => {
-        return element.cardElements.length === 0;
-      })[0];
-      source.moveCardToPile(firstFreeSpot, cardElement);
-      return true;
-    } else {
-      const allowedMove = aceSpots.filter((element) => {
-        if (element.cardElements.length === 0) return false;
-        return (
-          element.topCardElement.card.suit === cardElement.card.suit &&
-          element.topCardElement.card.value === cardElement.card.value - 1
-        );
-      });
-      if (allowedMove.length === 0) return false;
-      else {
-        source.moveCardToPile(allowedMove[0], cardElement);
-        return true;
-      }
-    }
-  }
 }
