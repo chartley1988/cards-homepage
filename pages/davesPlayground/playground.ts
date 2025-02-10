@@ -12,10 +12,26 @@ import { PileElementType } from "../../src/types/pile.types";
 import { CardElementType } from "../../src/types/card.types";
 import { setTheme, redFelt } from "../../src/components/table/themes";
 import { Rules } from "../../src/components/rules/rules";
+import { CardElement } from "../../src/components/card/cardElement";
 
 const app = document.getElementById("app");
 if (app) {
   setTheme(redFelt);
+
+  const gameInfo = {
+    freeSpaces: 4,
+    getFreeSpaces: () => {
+      return gameInfo.freeSpaces;
+    },
+    addFreeSpace: () => {
+      gameInfo.freeSpaces += 1;
+      return true;
+    },
+    minusFreeSpace: () => {
+      gameInfo.freeSpaces -= 1;
+      return true;
+    },
+  };
 
   const gameDeck = StandardDeckOfCards();
 
@@ -31,21 +47,86 @@ if (app) {
   const tableauReceiveRuleArray = [
     // card must be alternating colors
     (source = s, dest = d, card = c) => {
+      if (dest.cardElements.length === 0) return true;
       if (card.card.color === dest.topCardElement.card.color) return false;
       else return true;
     },
     // card must be one less than the destination pile
     (source = s, dest = d, card = c) => {
+      if (dest.cardElements.length === 0) return true;
       if (card.card.value + 1 !== dest.topCardElement.card.value) return false;
       else return true;
     },
   ];
   const tableauPassRuleArray = [
-    (source, dest, card) => {
+    // can only pass if top card, or sequence is correct
+    (source = s, dest = d, card = c) => {
+      if (source.topCardElement === card) return true;
+      const cardIndex = source.cardElements.findIndex((element) => {
+        return JSON.stringify(element) === JSON.stringify(card);
+      });
+      const cardsOnTop = source.cardElements.slice(cardIndex);
+      // to move a pile, must be in sequence
+      if (
+        cardsOnTop.every((cardElement, index, arr) => {
+          if (index === 0) return true; // First card has nothing to compare with
+
+          const prevCard = arr[index - 1].card;
+          const currentCard = cardElement.card;
+
+          return (
+            prevCard.color !== currentCard.color &&
+            prevCard.value === currentCard.value + 1
+          );
+        }) === false
+      )
+        return false;
+      else return true;
+    },
+    // cant pass a group if not enough free spaces
+    (source = s, dest = d, card = c, freeSpaces = gameInfo.getFreeSpaces()) => {
+      if (source.topCardElement === card) return true;
+      const cardIndex = source.cardElements.findIndex((element) => {
+        return JSON.stringify(element) === JSON.stringify(card);
+      });
+      const cardDepth = source.cardElements.length - 1 - cardIndex;
+      if (cardDepth > freeSpaces) return false;
+      else return true;
+    },
+    (source = s, dest = d, card = c) => {
       if (card) return true;
     },
-    () => {
-      return true;
+    (source = s, dest = d, card = c) => {
+      if (card) return true;
+    },
+  ];
+
+  const freeSpotReceiveRules = [
+    // if theres a card in the spot its illegal
+    (source = s, dest = d, card = c) => {
+      if (dest.cardElements.length > 0) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    // if your not passing the top card, its illegal
+    (source = s, dest = d, card = c) => {
+      if (source.topCardElement !== card) {
+        return false;
+      } else return true;
+    },
+  ];
+
+  const aceSpotReceiveRules = [
+    (source = s, dest = d, card = c) => {
+      if (dest.cardElements.length > 0) {
+        const topCard = dest.topCardElement.card;
+        return (
+          topCard.suit === card.card.suit &&
+          card.card.value - 1 === topCard.value
+        );
+      } else return card.card.value === 1;
     },
   ];
 
@@ -53,84 +134,75 @@ if (app) {
     tableauPassRuleArray,
     tableauReceiveRuleArray,
   );
-
-  const aceSpotReceiveRules = [
-    () => {
-      return false;
-    },
-  ];
-
-  const freeSpotRules = new FreeCellRules();
+  const freeSpotRules = new FreeCellRules([() => true], freeSpotReceiveRules);
   const aceSpotRules = new FreeCellRules([() => false], aceSpotReceiveRules);
-  const freeSpaces = 2;
-
-  const dragRules = (
-    pile: PileElementType<PlayingCard>,
-    card: CardElementType<PlayingCard>,
-  ) => {
-    // always drag top card
-    if (pile.topCardElement === card) return true;
-    const cardIndex = pile.cardElements.findIndex((element) => {
-      return JSON.stringify(element) === JSON.stringify(card);
-    });
-    const cardsOnTop = pile.cardElements.slice(cardIndex);
-    // to move a pile, must be in sequence
-    if (
-      cardsOnTop.every((cardElement, index, arr) => {
-        if (index === 0) return true; // First card has nothing to compare with
-
-        const prevCard = arr[index - 1].card;
-        const currentCard = cardElement.card;
-
-        return (
-          prevCard.color !== currentCard.color &&
-          prevCard.value === currentCard.value + 1
-        );
-      }) === false
-    )
-      return false;
-    if (cardsOnTop.length > freeSpaces) return false;
-    return true;
-  };
 
   const piles = [
-    { name: "deck", options: {} },
+    { name: "deck" },
     {
       name: "tableau1",
-      options: { layout: "visibleStack", dragRules: dragRules },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau2",
-      options: { layout: "visibleStack", dragRules: dragRules },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau3",
-      options: { layout: "visibleStack", dragRules: dragRules },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau4",
-      options: { layout: "visibleStack", dragRules: dragRules },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau5",
-      options: { layout: "visibleStack", dragRules: dragRules },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau6",
-      options: { layout: "visibleStack", dragRules: dragRules },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau7",
-      options: { layout: "visibleStack", dragRules: dragRules },
+      options: { layout: "visibleStack" },
     },
     {
       name: "tableau8",
-      options: { layout: "visibleStack", dragRules: dragRules },
+      options: { layout: "visibleStack" },
     },
-    { name: "freeSpot1", options: { rules: freeSpotRules } },
-    { name: "freeSpot2", options: { rules: freeSpotRules } },
-    { name: "freeSpot3", options: { rules: freeSpotRules } },
-    { name: "freeSpot4", options: { rules: freeSpotRules } },
+    {
+      name: "freeSpot1",
+      options: {
+        rules: freeSpotRules,
+        receiveCardCallback: gameInfo.minusFreeSpace,
+        passCardCallback: gameInfo.addFreeSpace,
+      },
+    },
+    {
+      name: "freeSpot2",
+      options: {
+        rules: freeSpotRules,
+        receiveCardCallback: gameInfo.minusFreeSpace,
+        passCardCallback: gameInfo.addFreeSpace,
+      },
+    },
+    {
+      name: "freeSpot3",
+      options: {
+        rules: freeSpotRules,
+        receiveCardCallback: gameInfo.minusFreeSpace,
+        passCardCallback: gameInfo.addFreeSpace,
+      },
+    },
+    {
+      name: "freeSpot4",
+      options: {
+        rules: freeSpotRules,
+        receiveCardCallback: gameInfo.minusFreeSpace,
+        passCardCallback: gameInfo.addFreeSpace,
+      },
+    },
     {
       name: "aceSpot1",
       options: { rules: aceSpotRules, groupDrag: false },
@@ -184,17 +256,6 @@ if (app) {
       ?.appendChild(pileMap[pile.name].container);
   });
 
-  const tableaus = [
-    tableau1,
-    tableau2,
-    tableau3,
-    tableau4,
-    tableau5,
-    tableau6,
-    tableau7,
-    tableau8,
-  ];
-
   window.addEventListener("DOMContentLoaded", async () => {
     await deal(
       6,
@@ -213,7 +274,7 @@ if (app) {
     );
 
     await deal(1, deck, [tableau1, tableau2, tableau3, tableau4], 10);
-
+    document.getElementById("deck")?.removeChild(deck.container);
     // Flip all cards after dealing is done
     [
       tableau1,

@@ -28,14 +28,8 @@ export const createDefaultOptions = <T extends Card>(): pileOptionsType<T> => ({
   rules: new Rules(),
   draggable: true,
   groupDrag: true,
-  dragRules: (
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _pile: PileElementType<T> = {} as PileElementType<T>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _cardElement: CardElementType<T> = {} as CardElementType<T>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ..._args: unknown[]
-  ) => true,
+  receiveCardCallback: () => true,
+  passCardCallback: () => true,
 });
 
 // Adds a base the size of the card to be the basis of deck layouts.\
@@ -131,6 +125,10 @@ export const pileElement = <T extends Card>(
     if (cardPassed === false) {
       return false;
     }
+
+    // hit the callbacks for both passing and recieving cards
+    options.passCardCallback();
+    destinationPile.options.receiveCardCallback();
 
     // if the animation callback is set to null, don't animate anything and return
     //! untested
@@ -280,7 +278,11 @@ export const pileElement = <T extends Card>(
     const cardElement = findCardContainer(e.target);
     if (cardElement === null) return;
     if (
-      options.dragRules(findPileElement(container.id), cardElement) === false
+      options.rules.canPass(
+        findPileElement(container.id),
+        undefined,
+        cardElement,
+      ) === false
     ) {
       denyMove(cardElement);
       e.preventDefault();

@@ -41,11 +41,8 @@ export type pileOptionsType<T extends Card> = {
   rules: Rules;
   draggable: boolean;
   groupDrag: boolean;
-  dragRules: (
-    pile: PileElementType<T> | undefined,
-    card: CardElementType<T> | undefined,
-    ...args: unknown[]
-  ) => boolean;
+  receiveCardCallback: (...args: unknown[]) => true;
+  passCardCallback: (...args: unknown[]) => true;
 };
 
 export type Offset = [number, number];
