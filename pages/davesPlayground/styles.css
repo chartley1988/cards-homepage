@@ -15,7 +15,8 @@
 .middle {
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: center;
+  gap: 2rem;
 }
 .bottom {
   display: flex;
@@ -24,6 +25,7 @@
 }
 .top {
   display: flex;
+  padding-top: 1.5rem;
   flex-direction: row;
   justify-content: space-evenly;
 }
