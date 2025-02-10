@@ -7,7 +7,7 @@ import "../../src/components/navMenu/navMenu";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
 import Player from "../../src/components/player/player";
-import { deal } from "../../src/components/animate/animate";
+import { deal, denyMove } from "../../src/components/animate/animate";
 import { PileElementType } from "../../src/types/pile.types";
 import { CardElementType } from "../../src/types/card.types";
 import { setTheme, redFelt } from "../../src/components/table/themes";
@@ -258,7 +258,7 @@ if (app) {
 
   window.addEventListener("DOMContentLoaded", async () => {
     await deal(
-      6,
+      7,
       deck,
       [
         tableau1,
@@ -270,10 +270,9 @@ if (app) {
         tableau7,
         tableau8,
       ],
-      10,
+      100,
     );
 
-    await deal(1, deck, [tableau1, tableau2, tableau3, tableau4], 10);
     document.getElementById("deck")?.removeChild(deck.container);
     // Flip all cards after dealing is done
     [
@@ -288,8 +287,51 @@ if (app) {
     ].forEach((pile) => {
       pile.cardElements.forEach((element) => element.flip());
       pile.options.rules = tableauRules;
+      pile.container.addEventListener("dblclick", (e) => {
+        if (!(e.target instanceof HTMLElement)) return;
+        const cardElement = pile.findCardContainer(e.target);
+        if (cardElement === null) return;
+        if (moveToAceSpot(pile, cardElement) === true) return;
+        const availableFreeSpots = checkForAvailableFreeSpot();
+        if (availableFreeSpots.length === 0) {
+          denyMove(cardElement);
+          return false;
+        }
+        pile.moveCardToPile(availableFreeSpots[0], cardElement);
+      });
     });
   });
 
   // TODO: Re-enable linting on this file, and fix errors
+  function checkForAvailableFreeSpot() {
+    return [freeSpot1, freeSpot2, freeSpot3, freeSpot4].filter((element) => {
+      return element.cardElements.length === 0;
+    });
+  }
+  function moveToAceSpot(
+    source: PileElementType<PlayingCard>,
+    cardElement: CardElementType<PlayingCard>,
+  ) {
+    const aceSpots = [aceSpot1, aceSpot2, aceSpot3, aceSpot4];
+    if (cardElement.card.value === 1) {
+      const firstFreeSpot = aceSpots.filter((element) => {
+        return element.cardElements.length === 0;
+      })[0];
+      source.moveCardToPile(firstFreeSpot, cardElement);
+      return true;
+    } else {
+      const allowedMove = aceSpots.filter((element) => {
+        if (element.cardElements.length === 0) return false;
+        return (
+          element.topCardElement.card.suit === cardElement.card.suit &&
+          element.topCardElement.card.value === cardElement.card.value - 1
+        );
+      });
+      if (allowedMove.length === 0) return false;
+      else {
+        source.moveCardToPile(allowedMove[0], cardElement);
+        return true;
+      }
+    }
+  }
 }
