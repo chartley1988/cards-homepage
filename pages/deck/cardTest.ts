@@ -70,7 +70,7 @@ if (app) {
     p1DrawPileElement.moveCardToPile(player1HandPile);
   });
   p1DrawPileElement.container.addEventListener("click", () => {
-    p1DrawPileElement.getTopCardElement().flip();
+    p1DrawPileElement.topCardElement.flip();
   });
 
   const p1Hand = document.getElementById("p1Hand");
@@ -81,6 +81,6 @@ if (app) {
   });
 
   player1HandPile.container.addEventListener("mouseenter", () => {
-    spinCard(player1HandPile.getTopCardElement(), 1000);
+    spinCard(player1HandPile.topCardElement, 1000);
   });
 }

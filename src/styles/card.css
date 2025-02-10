@@ -1,6 +1,15 @@
 :root {
   --card-flip-speed: 0.3s;
-  --card-size: 50px;
+  --card-size: 75px;
+}
+
+@font-face {
+  font-family: "Crete Round";
+  src:
+    url("./fonts/creteround-regular-webfont.woff2") format("woff2"),
+    url("./fonts/creteround-regular-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
 }
 
 .card-parent * {
@@ -32,7 +41,7 @@
 }
 
 .card-parent * {
-  font-size: calc((var(--card-size) * 3.5) / 13);
+  font-size: calc((var(--card-size) * 3.5) / 10);
 }
 
 .card-front,

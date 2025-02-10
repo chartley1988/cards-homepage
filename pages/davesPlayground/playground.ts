@@ -1,20 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { CardElement } from "../../src/components/card/cardElement";
-import { pileElement } from "../../src/components/pile/pileElement";
 import "../../src/styles/style.css";
 import "../../src/styles/card.css";
 import "../../src/styles/theme.css";
 import "./styles.css";
 import "../../src/components/navMenu/navMenu";
-import addDeckBase from "../../src/legacy/scripts/cardFoundations/deckBase";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import Card from "../../src/components/card/card";
-import Handler from "../../src/components/handler/handler";
-import PlayingCardElement from "../../src/components/card/playingCard/playingCardElement";
 import Player from "../../src/components/player/player";
 import { deal } from "../../src/components/animate/animate";
-import { Layout, PileElementType } from "../../src/types/pile.types";
+import { PileElementType } from "../../src/types/pile.types";
 import { CardElementType } from "../../src/types/card.types";
 import { setTheme, redFelt } from "../../src/components/table/themes";
 import { Rules } from "../../src/components/rules/rules";
@@ -30,8 +24,7 @@ if (app) {
       super(passRules, receiveRules);
     }
   }
-  const something = { word: "heeyyy" };
-  const getSomething = () => something.word;
+
   const s = {} as PileElementType<PlayingCard>;
   const d = {} as PileElementType<PlayingCard>;
   const c = {} as CardElementType<PlayingCard>;
@@ -45,9 +38,6 @@ if (app) {
     (source = s, dest = d, card = c) => {
       if (card.card.value + 1 !== dest.topCardElement.card.value) return false;
       else return true;
-    },
-    () => {
-      return true;
     },
   ];
   const tableauPassRuleArray = [
@@ -63,8 +53,11 @@ if (app) {
     tableauPassRuleArray,
     tableauReceiveRuleArray,
   );
+
+  function aceSpotReceiveRules() {}
+
   const freeSpotRules = new FreeCellRules();
-  const aceSpotRules = new FreeCellRules();
+  const aceSpotRules = new FreeCellRules([() => false], aceSpotReceiveRules);
   const freeSpaces = 2;
 
   const dragRules = (
