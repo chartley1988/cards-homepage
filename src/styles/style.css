@@ -1,3 +1,9 @@
+@font-face {
+  font-family: "Playfair Display";
+  src: url("fonts/PlayfairDisplay-VariableFont_wght.ttf") format("woff2");
+  font-display: swap; /* or optional, block, fallback */
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -34,7 +40,8 @@ body {
 }
 
 h1 {
-  font-size: 3.2em;
+  font-family: "Playfair Display";
+  font-size: clamp(4rem, 5vw + 2rem, 10rem);
   line-height: 1.1;
 }
 
