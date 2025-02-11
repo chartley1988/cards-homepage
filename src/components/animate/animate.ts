@@ -133,6 +133,7 @@ export const slideDeck = async <T extends Card>(
 
 /**
  *
+ * This is an ASYNC function. You likely want to AWAIT this before performing more operations
  * @param numberOfCards The number of cards to deal out
  * @param from The pile the cards are coming from
  * @param to The pile(s?) the cards are going to
@@ -215,9 +216,9 @@ export async function denyMove<T extends Card>(
   cardElement.container.style.backgroundColor = "red";
   const anim = cardElement.container.animate(keys, options);
   cardElement.container.dispatchEvent(new Event("animationstart"));
-  return await anim.finished.then(() => {
+  return anim.finished.then((promise) => {
     cardElement.container.dispatchEvent(new Event("animationend"));
     cardElement.container.removeChild(backgroundOverlay);
-    return Promise.resolve(true);
+    return promise;
   });
 }

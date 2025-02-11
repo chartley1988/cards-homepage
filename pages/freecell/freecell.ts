@@ -59,6 +59,10 @@ if (app) {
 
   // rules for a tableau to be able to pass a card. Once again, SourcePile is the first arg, DestinationPile is the second, CardElement is the third.
   const tableauPassRuleArray = [
+    // stops grabbing cards while dealing
+    (source = s, dest = d, card = c) => {
+      return card.card.faceUp;
+    },
     // Can only pass if top card or sequence is correct
     (source = s, dest = d, card = c) => {
       if (source.topCardElement === card) return true;
@@ -157,7 +161,15 @@ if (app) {
   // running loops to make elements, as all tableaus are the same, all free spots, and all ace spots.
   for (let i = 1; i < 9; i++) {
     tableaus.push(
-      gameDeck.createPileElement(`tableau${i}`, [], { layout: "visibleStack" }),
+      gameDeck.createPileElement(`tableau${i}`, [], {
+        layout: "visibleStack",
+        // stops cards from being grabbed whlie dealing
+        rules: new Rules([
+          (source = s, dest = d, card = c) => {
+            return card.card.faceUp;
+          },
+        ]),
+      }),
     );
   }
   for (let i = 1; i < 5; i++) {
