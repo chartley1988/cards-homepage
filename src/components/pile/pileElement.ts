@@ -321,8 +321,13 @@ export const pileElement = <T extends Card>(
    * @returns the cardElement<T> that was clicked on
    */
   const findCardContainer = (element: HTMLElement) => {
-    if (element.classList.contains("card-container"))
-      return cardElements[parseInt(element.style.zIndex)];
+    if (element.classList.contains("card-container")) {
+      const returnElement = cardElements.find(
+        (cardElement) => cardElement.container === element,
+      );
+      if (!returnElement) return null;
+      else return returnElement;
+    }
     if (element.classList.contains("deck-base")) return null;
     else if (element.parentElement)
       return findCardContainer(element.parentElement);
