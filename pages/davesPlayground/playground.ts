@@ -12,11 +12,14 @@ import { PileElementType } from "../../src/types/pile.types";
 import { CardElementType } from "../../src/types/card.types";
 import { setTheme, redFelt } from "../../src/components/table/themes";
 import { Rules } from "../../src/components/rules/rules";
+import { pileElement } from "../../src/components/pile/pileElement";
 
 const app = document.getElementById("app");
 if (app) {
+  // setting the background of the game
   setTheme(redFelt);
 
+  // Game specific log
   const gameInfo = {
     freeSpaces: 4,
     getFreeSpaces: () => {
@@ -32,32 +35,39 @@ if (app) {
     },
   };
 
+  // Initialize a deck of playing cards
   const gameDeck = StandardDeckOfCards();
 
+  // creating a class for freeCell Rules that extends Rules
   class FreeCellRules extends Rules {
     constructor(passRules?, receiveRules?) {
       super(passRules, receiveRules);
     }
   }
 
+  // Type casting my blank objects to ensure I have access to methods and props in my rules. The actual objects will be inserted during a pass.
   const s = {} as PileElementType<PlayingCard>;
   const d = {} as PileElementType<PlayingCard>;
   const c = {} as CardElementType<PlayingCard>;
 
+  // the first 3 args to a rule are always SourcePile, DestinationPile, and Card being passed. Any additional args must be placed after
   const tableauReceiveRuleArray = [
     // card must be alternating colors
     (source, dest = d, card = c) => {
+      // always must be willing to receive if no cards in the pile, this shortcut must be here for every rule
       if (dest.cardElements.length === 0) return true;
       if (card.card.color === dest.topCardElement.card.color) return false;
       else return true;
     },
-    // card must be one less than the destination pile
+    // card must be one less in value than the destination pile
     (source = s, dest = d, card = c) => {
       if (dest.cardElements.length === 0) return true;
       if (card.card.value + 1 !== dest.topCardElement.card.value) return false;
       else return true;
     },
   ];
+
+  // rules for a tableau to be able to pass a card. Once again, SourcePile is the first arg, DestinationPile is the second, CardElement is the third.
   const tableauPassRuleArray = [
     // can only pass if top card, or sequence is correct
     (source = s, dest = d, card = c) => {
@@ -101,6 +111,7 @@ if (app) {
     },
   ];
 
+  // rules for free spots are pretty much just receive any top card if the pile is empty
   const freeSpotReceiveRules = [
     // if theres a card in the spot its illegal
     (source = s, dest = d, card = c) => {
@@ -118,6 +129,7 @@ if (app) {
     },
   ];
 
+  // ace spot receive rules, must be an ace, or one higher in the same suit as the previous card
   const aceSpotReceiveRules = [
     (source = s, dest = d, card = c) => {
       if (dest.cardElements.length > 0) {
@@ -130,156 +142,77 @@ if (app) {
     },
   ];
 
+  // initializing all the rules for the 3 separate spots
+  // rules for both passing and receiving
   const tableauRules = new FreeCellRules(
     tableauPassRuleArray,
     tableauReceiveRuleArray,
   );
+  // always able to pass a card, rules for receiving
   const freeSpotRules = new FreeCellRules([() => true], freeSpotReceiveRules);
+  // never pass a card, rules for receiving
   const aceSpotRules = new FreeCellRules([() => false], aceSpotReceiveRules);
 
-  const piles = [
-    { name: "deck" },
-    {
-      name: "tableau1",
-      options: { layout: "visibleStack" },
-    },
-    {
-      name: "tableau2",
-      options: { layout: "visibleStack" },
-    },
-    {
-      name: "tableau3",
-      options: { layout: "visibleStack" },
-    },
-    {
-      name: "tableau4",
-      options: { layout: "visibleStack" },
-    },
-    {
-      name: "tableau5",
-      options: { layout: "visibleStack" },
-    },
-    {
-      name: "tableau6",
-      options: { layout: "visibleStack" },
-    },
-    {
-      name: "tableau7",
-      options: { layout: "visibleStack" },
-    },
-    {
-      name: "tableau8",
-      options: { layout: "visibleStack" },
-    },
-    {
-      name: "freeSpot1",
-      options: {
+  // creating the pile Elements to display the cards
+  const deck = gameDeck.createPileElement("deck", gameDeck.cards);
+  // Type casting my blank arrays to ensure I have access to methods and props
+  const tableaus: PileElementType<PlayingCard>[] = [];
+  const freeSpots: PileElementType<PlayingCard>[] = [];
+  const aceSpots: PileElementType<PlayingCard>[] = [];
+  // running loops to make elements, as all tableaus are the same, all free spots, and all ace spots.
+  for (let i = 1; i < 9; i++) {
+    tableaus.push(
+      gameDeck.createPileElement(`tableau${i}`, [], { layout: "visibleStack" }),
+    );
+  }
+  for (let i = 1; i < 5; i++) {
+    freeSpots.push(
+      gameDeck.createPileElement(`freeSpot${i}`, [], {
         rules: freeSpotRules,
         receiveCardCallback: gameInfo.minusFreeSpace,
         passCardCallback: gameInfo.addFreeSpace,
-      },
-    },
-    {
-      name: "freeSpot2",
-      options: {
-        rules: freeSpotRules,
-        receiveCardCallback: gameInfo.minusFreeSpace,
-        passCardCallback: gameInfo.addFreeSpace,
-      },
-    },
-    {
-      name: "freeSpot3",
-      options: {
-        rules: freeSpotRules,
-        receiveCardCallback: gameInfo.minusFreeSpace,
-        passCardCallback: gameInfo.addFreeSpace,
-      },
-    },
-    {
-      name: "freeSpot4",
-      options: {
-        rules: freeSpotRules,
-        receiveCardCallback: gameInfo.minusFreeSpace,
-        passCardCallback: gameInfo.addFreeSpace,
-      },
-    },
-    {
-      name: "aceSpot1",
-      options: { rules: aceSpotRules, groupDrag: false },
-    },
-    {
-      name: "aceSpot2",
-      options: { rules: aceSpotRules, groupDrag: false },
-    },
-    {
-      name: "aceSpot3",
-      options: { rules: aceSpotRules, groupDrag: false },
-    },
-    {
-      name: "aceSpot4",
-      options: { rules: aceSpotRules, groupDrag: false },
-    },
-  ];
+      }),
+    );
+    aceSpots.push(
+      gameDeck.createPileElement(`aceSpot${i}`, [], {
+        rules: aceSpotRules,
+        groupDrag: false,
+      }),
+    );
+  }
 
-  const game = new Player("freeCell", gameDeck, piles, "deck");
-
-  // Destructure game.getPile for each pile dynamically
-  const pileMap = Object.fromEntries(
-    piles.map(({ name }) => [name, game.getPile(name)]),
-  );
-
-  // Now you have:
-  const {
-    deck,
-    tableau1,
-    tableau2,
-    tableau3,
-    tableau4,
-    tableau5,
-    tableau6,
-    tableau7,
-    tableau8,
-    freeSpot1,
-    freeSpot2,
-    freeSpot3,
-    freeSpot4,
-    aceSpot1,
-    aceSpot2,
-    aceSpot3,
-    aceSpot4,
-  } = pileMap;
-  const tableaus = [
-    tableau1,
-    tableau2,
-    tableau3,
-    tableau4,
-    tableau5,
-    tableau6,
-    tableau7,
-    tableau8,
-  ];
-  const freeSpots = [freeSpot1, freeSpot2, freeSpot3, freeSpot4];
-  const aceSpots = [aceSpot1, aceSpot2, aceSpot3, aceSpot4];
-  deck.shuffle();
-
-  piles.forEach((pile) => {
-    document
-      .getElementById(pile.name)
-      ?.appendChild(pileMap[pile.name].container);
+  // In my index.html I created a layout with id's matching the names I used for my pileElements.
+  // I am getting those elements, and putting the correct pileElement in the spot
+  [...tableaus, ...freeSpots, ...aceSpots, deck].forEach((element) => {
+    document.getElementById(element.pile.name)?.appendChild(element.container);
   });
 
+  // Once the DomContent is loaded we can run some async operations
   window.addEventListener("DOMContentLoaded", async () => {
-    const dealy = await deal(7, deck, tableaus, 100);
-
+    // shuffle the deck, deal the cards, then remove the dealers pile container.
+    deck.shuffle();
+    await deal(7, deck, tableaus, 100);
     document.getElementById("deck")?.removeChild(deck.container);
-    // Flip all cards after dealing is done
+    // each of the tableaus will now have the cards dealt, and you must flip the cards
+    tableaus.forEach((pile) => {
+      pile.cardElements.forEach((element) => element.flip());
+      // we didn't initialize tableaus with rules, as we wanted to pass shuffled cards to them
+      // now we must put the rules into play
+      pile.options.rules = tableauRules;
+    });
 
-    // TODO: Re-enable linting on this file, and fix errors
+    //! These helper functions and listeners are only for adding extra double click functionality to the game
+    //! Drag and drop functionality will work without these
+
+    // helper function to look for and return the first empty free spot
     function checkForAvailableFreeSpot() {
       return freeSpots.find((element) => {
         return element.cardElements.length === 0;
       });
     }
+
+    // helper function to move a card to the ace spot if conditions are correct.
+    // returns true if it found an acceptable spot, and false if it is unable to move to aces
     function moveToAceSpot(
       source: PileElementType<PlayingCard>,
       cardElement: CardElementType<PlayingCard>,
@@ -305,6 +238,10 @@ if (app) {
         }
       }
     }
+
+    // helper function to move a card to tableaus if conditions are correct.
+    // returns true if it found an acceptable spot, and false if it is unable to move to tableaus
+    // will prioritize a legal move over putting it on a blank tableau
     function moveToTableau(
       source: PileElementType<PlayingCard>,
       cardElement: CardElementType<PlayingCard>,
@@ -320,7 +257,6 @@ if (app) {
         source.moveCardToPile(legalMove, cardElement);
         return true;
       }
-
       const blankTableau = tableaus.find((pile) => {
         return pile.cardElements.length === 0;
       });
@@ -330,28 +266,36 @@ if (app) {
       } else return false;
     }
 
+    // now we add the listeners to each pile
     tableaus.forEach((pile) => {
-      pile.cardElements.forEach((element) => element.flip());
-      pile.options.rules = tableauRules;
       pile.container.addEventListener("dblclick", (e) => {
+        // a check to ensure the target is an element
         if (!(e.target instanceof HTMLElement)) return;
+        // a function that recursively finds the card container from anywhere clicked on a card
         const cardElement = pile.findCardContainer(e.target);
+        // safety check that the pile had a card
         if (cardElement === null) return;
+        // only allow double clicks on the top card of a tableau
         if (pile.topCardElement !== cardElement) {
           denyMove(cardElement);
           return false;
         }
+        // prioritize a move to an ace spot
         if (moveToAceSpot(pile, cardElement) === true) return;
+        // next priority is a tableau move
         if (moveToTableau(pile, cardElement) === true) return;
+        // last option is to move it to a free spot
         const availableFreeSpots = checkForAvailableFreeSpot();
-        if (!availableFreeSpots) {
-          denyMove(cardElement);
-          return false;
-        }
-        pile.moveCardToPile(availableFreeSpots, cardElement);
+        if (availableFreeSpots) {
+          pile.moveCardToPile(availableFreeSpots, cardElement);
+          return true;
+          // if no available moves, deny the move
+        } else denyMove(cardElement);
+        return false;
       });
     });
 
+    // please see above breakdown for details
     freeSpots.forEach((pile) => {
       pile.container.addEventListener("dblclick", (e) => {
         if (!(e.target instanceof HTMLElement)) return;
@@ -365,6 +309,7 @@ if (app) {
         }
       });
     });
+    // please see above breakdown for details
     aceSpots.forEach((pile) => {
       pile.container.addEventListener("dblclick", (e) => {
         if (!(e.target instanceof HTMLElement)) return;
@@ -376,3 +321,5 @@ if (app) {
     });
   });
 }
+
+// TODO: Re-enable linting on this file, and fix errors

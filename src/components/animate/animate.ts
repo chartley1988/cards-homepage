@@ -154,7 +154,9 @@ export async function deal<T extends Card>(
 
     // Let animations run in parallel.
     const animationPromise = from.moveCardToPile(currentPile);
-    if (!animationPromise) return Promise.all(promises); // Handle early exit
+    if (!animationPromise) {
+      return Promise.all(promises);
+    } // Handle early exit
 
     // Await the finished property inside the Promise array.
     promises.push(
