@@ -401,10 +401,16 @@ export const pileElement = <T extends Card>(
       // It is necessary to add the drag image element off-screen before using it.
       dragImage.style.position = "absolute";
       dragImage.style.top = "-9999px";
+      dragImage.style.pointerEvents = "none"; // Prevent interference
       dragImage.style.zIndex = "1";
       document.body.appendChild(dragImage);
 
-      e.dataTransfer?.setDragImage(dragImage, 0, 0);
+      // calculating where the click occurred on the original card
+      const rect = cardElement.container.getBoundingClientRect(); // Get element position
+      const offsetX = e.clientX - rect.left; // X offset from where user clicked
+      const offsetY = e.clientY - rect.top; // Y offset from where user clicked
+
+      e.dataTransfer?.setDragImage(dragImage, offsetX, offsetY);
     }
     e.dataTransfer?.setData("application/json", JSON.stringify(data));
   }
