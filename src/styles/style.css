@@ -43,6 +43,14 @@ h1 {
   font-family: "Playfair Display";
   font-size: clamp(4rem, 5vw + 2rem, 10rem);
   line-height: 1.1;
+
+  /* Outline */
+  color: white;
+  text-shadow:
+    -3px -3px 0 #000,
+    3px -3px 0 #000,
+    -3px 3px 0 #000,
+    3px 3px 0 #000;
 }
 
 #app {
