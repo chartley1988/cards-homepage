@@ -154,6 +154,8 @@ if (app) {
   const aceSpotRules = new FreeCellRules([() => false], aceSpotReceiveRules);
 
   // creating the pile Elements to display the cards
+
+  // deck get made as a pile with all of the cards initialized in it
   const deck = gameDeck.createPileElement("deck", gameDeck.cards);
   // Type casting my blank arrays to ensure I have access to methods and props
   const tableaus: PileElementType<PlayingCard>[] = [];
@@ -188,9 +190,10 @@ if (app) {
   });
 
   // Once the DomContent is loaded we can run some async operations
+  // shuffle the deck before dom content loaded
+  deck.shuffle();
   window.addEventListener("DOMContentLoaded", async () => {
-    // shuffle the deck, deal the cards, then remove the dealers pile container.
-    deck.shuffle();
+    // deal the cards, then remove the dealers pile container.
     await deal(7, deck, tableaus, 100);
     document.getElementById("deck")?.removeChild(deck.container);
     // each of the tableaus will now have the cards dealt, and you must flip the cards

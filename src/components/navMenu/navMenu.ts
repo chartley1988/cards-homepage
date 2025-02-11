@@ -27,8 +27,12 @@ const navMenuData: NavItem[] = [
     slug: "/pile-size/",
   },
   {
-    text: "Daves Playground",
-    slug: "/davesPlayground/",
+    text: "FreeCell",
+    slug: "/freecell/",
+  },
+  {
+    text: "Demo",
+    slug: "/demo/",
   },
 ];
 
