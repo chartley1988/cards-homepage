@@ -358,7 +358,7 @@ export const pileElement = <T extends Card>(
     if (
       options.rules.canPass(
         findPileElement(container.id),
-        undefined,
+        {} as PileElementType<T>,
         cardElement,
       ) === false
     ) {

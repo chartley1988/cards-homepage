@@ -18,7 +18,7 @@ export type PileElementType<T extends Card> = {
   moveCardToPile: (
     destinationPile: PileElementType<T>,
     cardElement?: CardElementType<T>,
-    gameRules?: Rules,
+    gameRules?: Rules<T>,
     groupOffset?: number,
     animationCallback?: (
       destination: PileElementType<T>,
@@ -39,7 +39,7 @@ export interface DragData {
 export type pileOptionsType<T extends Card> = {
   cardElements: CardElementType<T>[];
   layout: "stack" | "cascade" | "visibleStack";
-  rules: Rules;
+  rules: Rules<T>;
   draggable: boolean;
   groupDrag: boolean;
   receiveCardCallback: (...args: unknown[]) => boolean;
