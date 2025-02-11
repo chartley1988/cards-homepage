@@ -52,6 +52,23 @@ export const pileElement = <T extends Card>(
 
   const { cardElements } = options;
 
+  const updateShadows = () => {
+    for (let i = 0; i < cardElements.length; i++) {
+      const cardElement = cardElements[i].container;
+      if (
+        Math.abs(cascadeOffset[0]) > 0.04 ||
+        Math.abs(cascadeOffset[1]) > 0.04
+      ) {
+        cardElement.classList.add("card-shadow");
+      } else if (i === cardElements.length - 1) {
+        cardElement.classList.add("card-shadow");
+      } else {
+        cardElement.classList.remove("card-shadow");
+      }
+    }
+    cardElements[0]?.container.classList.add("card-shadow");
+  };
+
   const cascade = (duration = cascadeDuration) => {
     reset();
     const arrayFinished = [];
@@ -60,6 +77,7 @@ export const pileElement = <T extends Card>(
       const cardElement = cardElements[i].container;
       vector2[0] = cascadeOffset[0] * cardElement.offsetWidth * i;
       vector2[1] = cascadeOffset[1] * cardElement.offsetHeight * i;
+
       const slide = slideCard(cardElements[i], vector2, duration);
       arrayFinished.push(slide);
     }
@@ -142,6 +160,8 @@ export const pileElement = <T extends Card>(
     }
 
     // the card got passed, and this is the animation we want to show.
+    this.updateShadows();
+    destinationPile.updateShadows();
     return animationCallback(destinationPile, cardElement, groupOffset);
   }
 
@@ -447,6 +467,7 @@ export const pileElement = <T extends Card>(
     cascadeDuration,
     options,
     moveCardToPile,
+    updateShadows,
     cascade,
     applyCascadeLayout,
     createCascadeLayout,

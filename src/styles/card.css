@@ -19,7 +19,6 @@
   justify-content: center;
   align-items: center;
   margin: auto;
-  overflow: hidden;
   box-sizing: border-box;
   border-radius: calc(0.15 * var(--card-size));
 }
@@ -93,4 +92,10 @@
   clip-path: inset(0 round calc(0.15 * var(--card-size)));
   opacity: 0; /* Hidden by default */
   transition: opacity 0.3s;
+}
+
+.card-shadow {
+  box-shadow:
+    rgba(0, 0, 0, 0.25) 0px 14px 28px,
+    rgba(0, 0, 0, 0.22) 0px 10px 10px;
 }

@@ -11,6 +11,7 @@ export type PileElementType<T extends Card> = {
   cascadeOffset: [number, number];
   cascadeDuration: number;
   topCardElement: CardElementType<T>;
+  updateShadows: () => void;
   cascade: (number?: number) => Promise<unknown>;
   applyCascadeLayout: (layoutName: string) => void | Error;
   createCascadeLayout: (layoutName: string, offset: Offset) => void;
