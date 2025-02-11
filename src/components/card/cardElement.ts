@@ -112,6 +112,9 @@ export const CardElement = <T extends Card>(
     get location() {
       return location;
     },
+    get parent() {
+      return parent;
+    },
     get front() {
       return front;
     },

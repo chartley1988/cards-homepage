@@ -53,20 +53,30 @@ export const pileElement = <T extends Card>(
   const { cardElements } = options;
 
   const updateShadows = () => {
+    if (cardElements.length <= 0) return;
     for (let i = 0; i < cardElements.length; i++) {
-      const cardElement = cardElements[i].container;
+      const front = cardElements[i].front;
+      const back = cardElements[i].back;
       if (
         Math.abs(cascadeOffset[0]) > 0.04 ||
-        Math.abs(cascadeOffset[1]) > 0.04
+        Math.abs(cascadeOffset[1]) > 0.04 ||
+        i === cardElements.length - 1
       ) {
-        cardElement.classList.add("card-shadow");
-      } else if (i === cardElements.length - 1) {
-        cardElement.classList.add("card-shadow");
+        if (front) {
+          front.classList.add("card-shadow");
+        }
+        back.classList.add("card-shadow");
       } else {
-        cardElement.classList.remove("card-shadow");
+        if (front) {
+          front.classList.remove("card-shadow");
+        }
+        back.classList.remove("card-shadow");
       }
     }
-    cardElements[0]?.container.classList.add("card-shadow");
+    if (cardElements[0].front) {
+      cardElements[0].front.classList.add("card-shadow");
+    }
+    cardElements[0].back.classList.add("card-shadow");
   };
 
   const cascade = (duration = cascadeDuration) => {
