@@ -274,21 +274,17 @@ export const pileElement = <T extends Card>(
     cardElement.container.draggable = false;
 
     // animate the card moving from the current transform (appearing on source pile) to its rightful spot in destination cascade
-    const returnPromise = await slideCard(cardElement, vector2, 600).then(
-      (animation) => {
-        // wait for the card to move, adjust the draggable setting to that of the new pile
-        cardElement.container.draggable = destination.options.draggable;
-        // adjust the ZIndex of both piles cardElements
-        adjustZIndex(destination.cardElements);
-        adjustZIndex(cardElements);
-        // We must adjust the transform on the card to be that of the destinations cascade now.
-        cardElement.transform.translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
-        cardElement.container.style.transform = `${`translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`} ${scale} ${rotate}`;
-        return animation;
-      },
-    );
-
-    return returnPromise;
+    return slideCard(cardElement, vector2, 600).then((animation) => {
+      // wait for the card to move, adjust the draggable setting to that of the new pile
+      cardElement.container.draggable = destination.options.draggable;
+      // adjust the ZIndex of both piles cardElements
+      adjustZIndex(destination.cardElements);
+      adjustZIndex(cardElements);
+      // We must adjust the transform on the card to be that of the destinations cascade now.
+      cardElement.transform.translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
+      cardElement.container.style.transform = `${`translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`} ${scale} ${rotate}`;
+      return animation;
+    });
   }
 
   // resets the container of the DeckBase
