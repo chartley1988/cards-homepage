@@ -58,7 +58,7 @@ export const CardElement = <T extends Card>(
     });
   })();
 
-  const flip = (delay = 0) => {
+  const flip = (delay: number = 0) => {
     if (flipEnabled === false) return;
     else {
       flipEnabled = false;
