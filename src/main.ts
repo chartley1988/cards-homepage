@@ -2,7 +2,6 @@ import "./components/navMenu/navMenu";
 import "./styles/style.css";
 import "./styles/theme.css";
 import "./styles/card.css";
-import "./styles/home.css";
 import { setTheme, redFelt } from "./components/table/themes";
 import StandardDeckOfCards from "./components/card/playingCard/standardDeckOfCards";
 import { deal } from "./components/animate/animate";
@@ -32,7 +31,7 @@ if (app) {
     const fan = titleCards.container;
     fan.style.position = "absolute";
     fan.style.bottom = "-50%";
-    fan.style.right = "-50%";
+    fan.style.right = "-35%";
 
     titleContainer.appendChild(h1);
     h1.appendChild(fan);
