@@ -11,6 +11,10 @@ import { PileElementType } from "../../src/types/pile.types";
 import { CardElementType } from "../../src/types/card.types";
 import { setTheme, redFelt } from "../../src/components/table/themes";
 import { Rules } from "../../src/components/rules/rules";
+import {
+  quickPassRules,
+  quickReceiveRules,
+} from "../../src/components/rules/quickRules";
 const app = document.getElementById("app");
 if (app) {
   // setting the background of the game
@@ -40,55 +44,15 @@ if (app) {
   const d = {} as PileElementType<PlayingCard>;
   const c = {} as CardElementType<PlayingCard>;
 
-  // the first 3 args to a rule are always SourcePile, DestinationPile, and Card being passed. Any additional args must be placed after
+  // importing some useful rules
   const tableauReceiveRuleArray = [
-    // card must be alternating colors
-    (source, dest = d, card = c) => {
-      // always must be willing to receive if no cards in the pile, this shortcut must be here for every rule
-      if (dest.cardElements.length === 0) return true;
-      if (card.card.color === dest.topCardElement.card.color) return false;
-      else return true;
-    },
-    // card must be one less in value than the destination pile
-    (source = s, dest = d, card = c) => {
-      if (dest.cardElements.length === 0) return true;
-      if (card.card.value + 1 !== dest.topCardElement.card.value) return false;
-      else return true;
-    },
+    quickReceiveRules.emptyAndRedBlackAlternating,
+    quickReceiveRules.emptyAndOneLessThanTopCard,
   ];
 
   // rules for a tableau to be able to pass a card. Once again, SourcePile is the first arg, DestinationPile is the second, CardElement is the third.
   const tableauPassRuleArray = [
-    // stops grabbing cards while dealing
-    (source = s, dest = d, card = c) => {
-      return card.card.faceUp;
-    },
-    // Can only pass if top card or sequence is correct
-    (source = s, dest = d, card = c) => {
-      if (source.topCardElement === card) return true;
-
-      const cardIndex = source.cardElements.findIndex(
-        (element) => JSON.stringify(element) === JSON.stringify(card),
-      );
-
-      if (cardIndex === -1) return false;
-
-      const cardsOnTop = source.cardElements.slice(cardIndex);
-
-      // To move a pile, must be in sequence
-      return cardsOnTop.every((cardElement, index, arr) => {
-        if (index === 0) return true; // First card has nothing to compare with
-
-        const prevCard = arr[index - 1].card;
-        const currentCard = cardElement.card;
-
-        return (
-          prevCard.color !== currentCard.color &&
-          prevCard.value === currentCard.value + 1
-        );
-      });
-    },
-
+    quickPassRules.redBlackAlternating,
     // Can't pass a group if not enough free spaces
     (
       source: PileElementType<PlayingCard>,
@@ -96,10 +60,8 @@ if (app) {
       card: CardElementType<PlayingCard>,
       ...extraArgs: unknown[]
     ) => {
+      // the best way to pass game specific info to rules
       const freeSpaces = (extraArgs[0] as number) ?? gameInfo.getFreeSpaces();
-
-      if (source.topCardElement === card) return true;
-
       const cardIndex = source.cardElements.findIndex((element) => {
         return JSON.stringify(element) === JSON.stringify(card);
       });
@@ -113,14 +75,7 @@ if (app) {
 
   // rules for free spots are pretty much just receive any top card if the pile is empty
   const freeSpotReceiveRules = [
-    // if theres a card in the spot its illegal
-    (source = s, dest = d, card = c) => {
-      if (dest.cardElements.length > 0) {
-        return false;
-      } else {
-        return true;
-      }
-    },
+    quickReceiveRules.onlyIfEmpty,
     // if your not passing the top card, its illegal
     (source = s, dest = d, card = c) => {
       if (source.topCardElement !== card) {
@@ -130,25 +85,21 @@ if (app) {
   ];
 
   // ace spot receive rules, must be an ace, or one higher in the same suit as the previous card
-  const aceSpotReceiveRules = [
-    (source = s, dest = d, card = c) => {
-      if (dest.cardElements.length > 0) {
-        const topCard = dest.topCardElement.card;
-        return (
-          topCard.suit === card.card.suit &&
-          card.card.value - 1 === topCard.value
-        );
-      } else return card.card.value === 1;
-    },
-  ];
+  const aceSpotReceiveRules = [quickReceiveRules.sameSuitPlusOneOrAce];
 
   // initializing all the rules for the 3 separate spots
   // rules for both passing and receiving
   const tableauRules = new Rules(tableauPassRuleArray, tableauReceiveRuleArray);
   // always able to pass a card, rules for receiving
-  const freeSpotRules = new Rules([() => true], freeSpotReceiveRules);
+  const freeSpotRules = new Rules(
+    [quickPassRules.alwaysPass],
+    freeSpotReceiveRules,
+  );
   // never pass a card, rules for receiving
-  const aceSpotRules = new Rules([() => false], aceSpotReceiveRules);
+  const aceSpotRules = new Rules(
+    [quickPassRules.neverPass],
+    aceSpotReceiveRules,
+  );
 
   // creating the pile Elements to display the cards
 
@@ -162,13 +113,14 @@ if (app) {
   for (let i = 1; i < 9; i++) {
     tableaus.push(
       gameDeck.createPileElement(`tableau${i}`, [], {
+        // uses option feature layout to show cards in a visible stack
         layout: "visibleStack",
-        // stops cards from being grabbed whlie dealing
-        rules: new Rules([
-          (source = s, dest = d, card = c) => {
-            return card.card.faceUp;
-          },
-        ]),
+        // stops cards from being grabbed whlie dealing also accepts any card during dealing.
+        // We will have to change the rules to the correct rule set once cards are dealt
+        rules: new Rules(
+          [quickPassRules.neverPass],
+          [quickReceiveRules.alwaysReceive],
+        ),
       }),
     );
   }
@@ -176,6 +128,8 @@ if (app) {
     freeSpots.push(
       gameDeck.createPileElement(`freeSpot${i}`, [], {
         rules: freeSpotRules,
+        // freeSpots are the only pile to take advantage of the callbacks
+        // I would like to update the 'freespot' number any time a card comes or goes
         receiveCardCallback: gameInfo.minusFreeSpace,
         passCardCallback: gameInfo.addFreeSpace,
       }),
@@ -183,7 +137,6 @@ if (app) {
     aceSpots.push(
       gameDeck.createPileElement(`aceSpot${i}`, [], {
         rules: aceSpotRules,
-        groupDrag: false,
       }),
     );
   }
@@ -197,6 +150,7 @@ if (app) {
   // Once the DomContent is loaded we can run some async operations
   // shuffle the deck before dom content loaded
   deck.shuffle();
+  // we will need to cascade the deck as it has had all the cards initiated in it
   deck.cascade();
   window.addEventListener("DOMContentLoaded", async () => {
     // deal the cards, then remove the dealers pile container.
@@ -211,6 +165,7 @@ if (app) {
     });
 
     //! These helper functions and listeners are only for adding extra double click functionality to the game
+    //! Drag and drop runs off the ruleSet above. These also will require the rules to be met.
     //! Drag and drop functionality will work without these
 
     // helper function to look for and return the first empty free spot
