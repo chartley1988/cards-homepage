@@ -6,14 +6,11 @@ import "./styles.css";
 import "../../src/components/navMenu/navMenu";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import Player from "../../src/components/player/player";
 import { deal, denyMove } from "../../src/components/animate/animate";
 import { PileElementType } from "../../src/types/pile.types";
 import { CardElementType } from "../../src/types/card.types";
 import { setTheme, redFelt } from "../../src/components/table/themes";
 import { Rules } from "../../src/components/rules/rules";
-import { pileElement } from "../../src/components/pile/pileElement";
-
 const app = document.getElementById("app");
 if (app) {
   // setting the background of the game
@@ -37,13 +34,6 @@ if (app) {
 
   // Initialize a deck of playing cards
   const gameDeck = StandardDeckOfCards();
-
-  // creating a class for freeCell Rules that extends Rules
-  class FreeCellRules extends Rules {
-    constructor(passRules?, receiveRules?) {
-      super(passRules, receiveRules);
-    }
-  }
 
   // Type casting my blank objects to ensure I have access to methods and props in my rules. The actual objects will be inserted during a pass.
   const s = {} as PileElementType<PlayingCard>;
@@ -69,45 +59,55 @@ if (app) {
 
   // rules for a tableau to be able to pass a card. Once again, SourcePile is the first arg, DestinationPile is the second, CardElement is the third.
   const tableauPassRuleArray = [
-    // can only pass if top card, or sequence is correct
+    // stops grabbing cards while dealing
+    (source = s, dest = d, card = c) => {
+      return card.card.faceUp;
+    },
+    // Can only pass if top card or sequence is correct
     (source = s, dest = d, card = c) => {
       if (source.topCardElement === card) return true;
-      const cardIndex = source.cardElements.findIndex((element) => {
-        return JSON.stringify(element) === JSON.stringify(card);
-      });
+
+      const cardIndex = source.cardElements.findIndex(
+        (element) => JSON.stringify(element) === JSON.stringify(card),
+      );
+
+      if (cardIndex === -1) return false;
+
       const cardsOnTop = source.cardElements.slice(cardIndex);
-      // to move a pile, must be in sequence
-      if (
-        cardsOnTop.every((cardElement, index, arr) => {
-          if (index === 0) return true; // First card has nothing to compare with
 
-          const prevCard = arr[index - 1].card;
-          const currentCard = cardElement.card;
+      // To move a pile, must be in sequence
+      return cardsOnTop.every((cardElement, index, arr) => {
+        if (index === 0) return true; // First card has nothing to compare with
 
-          return (
-            prevCard.color !== currentCard.color &&
-            prevCard.value === currentCard.value + 1
-          );
-        }) === false
-      )
-        return false;
-      else return true;
+        const prevCard = arr[index - 1].card;
+        const currentCard = cardElement.card;
+
+        return (
+          prevCard.color !== currentCard.color &&
+          prevCard.value === currentCard.value + 1
+        );
+      });
     },
-    // cant pass a group if not enough free spaces
-    (source = s, dest = d, card = c, freeSpaces = gameInfo.getFreeSpaces()) => {
+
+    // Can't pass a group if not enough free spaces
+    (
+      source: PileElementType<PlayingCard>,
+      dest: PileElementType<PlayingCard>,
+      card: CardElementType<PlayingCard>,
+      ...extraArgs: unknown[]
+    ) => {
+      const freeSpaces = (extraArgs[0] as number) ?? gameInfo.getFreeSpaces();
+
       if (source.topCardElement === card) return true;
+
       const cardIndex = source.cardElements.findIndex((element) => {
         return JSON.stringify(element) === JSON.stringify(card);
       });
+
+      if (cardIndex === -1) return false;
+
       const cardDepth = source.cardElements.length - 1 - cardIndex;
-      if (cardDepth > freeSpaces) return false;
-      else return true;
-    },
-    (source = s, dest = d, card = c) => {
-      if (card) return true;
-    },
-    (source = s, dest = d, card = c) => {
-      if (card) return true;
+      return cardDepth <= freeSpaces;
     },
   ];
 
@@ -144,14 +144,11 @@ if (app) {
 
   // initializing all the rules for the 3 separate spots
   // rules for both passing and receiving
-  const tableauRules = new FreeCellRules(
-    tableauPassRuleArray,
-    tableauReceiveRuleArray,
-  );
+  const tableauRules = new Rules(tableauPassRuleArray, tableauReceiveRuleArray);
   // always able to pass a card, rules for receiving
-  const freeSpotRules = new FreeCellRules([() => true], freeSpotReceiveRules);
+  const freeSpotRules = new Rules([() => true], freeSpotReceiveRules);
   // never pass a card, rules for receiving
-  const aceSpotRules = new FreeCellRules([() => false], aceSpotReceiveRules);
+  const aceSpotRules = new Rules([() => false], aceSpotReceiveRules);
 
   // creating the pile Elements to display the cards
 
@@ -164,7 +161,15 @@ if (app) {
   // running loops to make elements, as all tableaus are the same, all free spots, and all ace spots.
   for (let i = 1; i < 9; i++) {
     tableaus.push(
-      gameDeck.createPileElement(`tableau${i}`, [], { layout: "visibleStack" }),
+      gameDeck.createPileElement(`tableau${i}`, [], {
+        layout: "visibleStack",
+        // stops cards from being grabbed whlie dealing
+        rules: new Rules([
+          (source = s, dest = d, card = c) => {
+            return card.card.faceUp;
+          },
+        ]),
+      }),
     );
   }
   for (let i = 1; i < 5; i++) {

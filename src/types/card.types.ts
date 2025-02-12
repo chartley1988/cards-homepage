@@ -15,5 +15,5 @@ export type CardElementType<T extends Card> = {
     scale: string;
     rotate: string;
   };
-  flip: () => void;
+  flip: (delay?: number) => void;
 };

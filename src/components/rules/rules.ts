@@ -1,26 +1,81 @@
-export interface RuleSet {
-  canPass(arr: [() => boolean]): boolean;
-  canReceive(arr: [() => boolean]): boolean;
+import { CardElementType } from "../../types/card.types";
+import { PileElementType } from "../../types/pile.types";
+import Card from "../card/card";
+
+export interface RuleSet<T extends Card> {
+  canPass(
+    source: PileElementType<T>,
+    destination: PileElementType<T>,
+    card: CardElementType<T>,
+    ...extraArgs: unknown[]
+  ): boolean;
+  canReceive(
+    source: PileElementType<T>,
+    destination: PileElementType<T>,
+    card: CardElementType<T>,
+    ...extraArgs: unknown[]
+  ): boolean;
 }
 
-export class Rules implements RuleSet {
-  // Rules accept any number of arguments and return a boolean
-  passRules: Array<(...args: unknown[]) => boolean>;
-  receiveRules: Array<(...args: unknown[]) => boolean>;
+export class Rules<T extends Card> implements RuleSet<T> {
+  passRules: Array<
+    (
+      source: PileElementType<T>,
+      destination: PileElementType<T>,
+      card: CardElementType<T>,
+      ...extraArgs: unknown[]
+    ) => boolean
+  >;
+  receiveRules: Array<
+    (
+      source: PileElementType<T>,
+      destination: PileElementType<T>,
+      card: CardElementType<T>,
+      ...extraArgs: unknown[]
+    ) => boolean
+  >;
 
   constructor(
-    passRules: Array<(...args: unknown[]) => boolean> = [],
-    receiveRules: Array<(...args: unknown[]) => boolean> = [],
+    passRules: Array<
+      (
+        source: PileElementType<T>,
+        destination: PileElementType<T>,
+        card: CardElementType<T>,
+        ...extraArgs: unknown[]
+      ) => boolean
+    > = [],
+    receiveRules: Array<
+      (
+        source: PileElementType<T>,
+        destination: PileElementType<T>,
+        card: CardElementType<T>,
+        ...extraArgs: unknown[]
+      ) => boolean
+    > = [],
   ) {
     this.passRules = passRules;
     this.receiveRules = receiveRules;
   }
 
-  canPass(...args: unknown[]): boolean {
-    return this.passRules.every((rule) => rule(...args));
+  canPass(
+    source: PileElementType<T>,
+    destination: PileElementType<T>,
+    card: CardElementType<T>,
+    ...extraArgs: unknown[]
+  ): boolean {
+    return this.passRules.every((rule) =>
+      rule(source, destination, card, ...extraArgs),
+    );
   }
 
-  canReceive(...args: unknown[]): boolean {
-    return this.receiveRules.every((rule) => rule(...args));
+  canReceive(
+    source: PileElementType<T>,
+    destination: PileElementType<T>,
+    card: CardElementType<T>,
+    ...extraArgs: unknown[]
+  ): boolean {
+    return this.receiveRules.every((rule) =>
+      rule(source, destination, card, ...extraArgs),
+    );
   }
 }

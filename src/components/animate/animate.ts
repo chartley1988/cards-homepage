@@ -30,7 +30,7 @@ export const slideCard = async <T extends Card>(
 
   const anim = cardElement.container.animate(keys, options);
   cardElement.container.dispatchEvent(new Event("animationstart"));
-  return await anim.finished.then((animation) => {
+  return anim.finished.then((animation) => {
     cardElement.container.style.transform = transform;
     cardElement.container.dispatchEvent(new Event("animationend"));
     return animation;
@@ -65,7 +65,7 @@ export const spinCard = async <T extends Card>(
 
   const anim = cardElement.container.animate(keys, options);
   cardElement.container.dispatchEvent(new Event("animationstart"));
-  return await anim.finished.then(() => {
+  return anim.finished.then(() => {
     cardElement.container.style.transform = transform;
     cardElement.container.dispatchEvent(new Event("animationend"));
     return Promise.resolve(true);
@@ -96,11 +96,9 @@ export const zoomCard = async <T extends Card>(
   };
 
   const anim = cardElement.container.animate(keys, options);
-  await anim.finished.then(() => {
+  return anim.finished.then(() => {
     cardElement.container.style.transform = transform;
   });
-
-  return anim;
 };
 
 //! I havent tested this
@@ -128,13 +126,14 @@ export const slideDeck = async <T extends Card>(
   };
 
   const anim = pile.container.animate(keys, options);
-  await anim.finished.then(() => {
+  return anim.finished.then(() => {
     pile.container.style.transform = transform;
   });
 };
 
 /**
  *
+ * This is an ASYNC function. You likely want to AWAIT this before performing more operations
  * @param numberOfCards The number of cards to deal out
  * @param from The pile the cards are coming from
  * @param to The pile(s?) the cards are going to
@@ -217,9 +216,9 @@ export async function denyMove<T extends Card>(
   cardElement.container.style.backgroundColor = "red";
   const anim = cardElement.container.animate(keys, options);
   cardElement.container.dispatchEvent(new Event("animationstart"));
-  return await anim.finished.then(() => {
+  return anim.finished.then((promise) => {
     cardElement.container.dispatchEvent(new Event("animationend"));
     cardElement.container.removeChild(backgroundOverlay);
-    return Promise.resolve(true);
+    return promise;
   });
 }

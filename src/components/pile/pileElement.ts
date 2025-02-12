@@ -274,21 +274,17 @@ export const pileElement = <T extends Card>(
     cardElement.container.draggable = false;
 
     // animate the card moving from the current transform (appearing on source pile) to its rightful spot in destination cascade
-    const returnPromise = await slideCard(cardElement, vector2, 600).then(
-      (animation) => {
-        // wait for the card to move, adjust the draggable setting to that of the new pile
-        cardElement.container.draggable = destination.options.draggable;
-        // adjust the ZIndex of both piles cardElements
-        adjustZIndex(destination.cardElements);
-        adjustZIndex(cardElements);
-        // We must adjust the transform on the card to be that of the destinations cascade now.
-        cardElement.transform.translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
-        cardElement.container.style.transform = `${`translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`} ${scale} ${rotate}`;
-        return animation;
-      },
-    );
-
-    return returnPromise;
+    return slideCard(cardElement, vector2, 600).then((animation) => {
+      // wait for the card to move, adjust the draggable setting to that of the new pile
+      cardElement.container.draggable = destination.options.draggable;
+      // adjust the ZIndex of both piles cardElements
+      adjustZIndex(destination.cardElements);
+      adjustZIndex(cardElements);
+      // We must adjust the transform on the card to be that of the destinations cascade now.
+      cardElement.transform.translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
+      cardElement.container.style.transform = `${`translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`} ${scale} ${rotate}`;
+      return animation;
+    });
   }
 
   // resets the container of the DeckBase
@@ -358,7 +354,7 @@ export const pileElement = <T extends Card>(
     if (
       options.rules.canPass(
         findPileElement(container.id),
-        undefined,
+        {} as PileElementType<T>,
         cardElement,
       ) === false
     ) {
@@ -395,7 +391,13 @@ export const pileElement = <T extends Card>(
         // Clone each card element and append to dragImage.
         if (cardIndex >= originalIndex) {
           element.container.classList.add("card-dragging");
+          const originalTransform = element.container.style.transform;
+          const containerScale = container.style.transform;
+          const newTransform = `${originalTransform} ${containerScale}`;
+          element.container.style.transform = newTransform;
           const clone = element.container.cloneNode(true);
+          element.container.style.transform = originalTransform;
+
           dragImage.appendChild(clone);
           if (cardIndex !== originalIndex) {
             data.indexs.push(cardIndex);
@@ -408,6 +410,8 @@ export const pileElement = <T extends Card>(
       dragImage.style.top = "-9999px";
       dragImage.style.pointerEvents = "none"; // Prevent interference
       dragImage.style.zIndex = "1";
+      dragImage.style.transform = pileElement.style.transform;
+
       document.body.appendChild(dragImage);
 
       // calculating where the click occurred on the original card

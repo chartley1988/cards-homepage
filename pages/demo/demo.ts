@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import "../../src/styles/style.css";
 import "../../src/styles/card.css";
 import "../../src/styles/theme.css";
@@ -6,13 +5,8 @@ import "./styles.css";
 import "../../src/components/navMenu/navMenu";
 import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import Player from "../../src/components/player/player";
-import { deal, denyMove } from "../../src/components/animate/animate";
 import { PileElementType } from "../../src/types/pile.types";
-import { CardElementType } from "../../src/types/card.types";
 import { setTheme, greenFelt } from "../../src/components/table/themes";
-import { Rules } from "../../src/components/rules/rules";
-import { pileElement } from "../../src/components/pile/pileElement";
 
 const app = document.getElementById("app");
 if (app) {
