@@ -391,7 +391,13 @@ export const pileElement = <T extends Card>(
         // Clone each card element and append to dragImage.
         if (cardIndex >= originalIndex) {
           element.container.classList.add("card-dragging");
+          const originalTransform = element.container.style.transform;
+          const containerScale = container.style.transform;
+          const newTransform = `${originalTransform} ${containerScale}`;
+          element.container.style.transform = newTransform;
           const clone = element.container.cloneNode(true);
+          element.container.style.transform = originalTransform;
+
           dragImage.appendChild(clone);
           if (cardIndex !== originalIndex) {
             data.indexs.push(cardIndex);
@@ -404,6 +410,8 @@ export const pileElement = <T extends Card>(
       dragImage.style.top = "-9999px";
       dragImage.style.pointerEvents = "none"; // Prevent interference
       dragImage.style.zIndex = "1";
+      dragImage.style.transform = pileElement.style.transform;
+
       document.body.appendChild(dragImage);
 
       // calculating where the click occurred on the original card
