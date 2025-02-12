@@ -83,6 +83,12 @@ function pagesPlugin() {
 
 export default defineConfig(({ command }) => {
   const config = {
+    resolve: {
+      alias: [
+        { find: "@", replacement: path.resolve(__dirname, "src") },
+        { find: /^@\//, replacement: path.resolve(__dirname, "src") + "/" },
+      ],
+    },
     build: {
       outDir: "dist",
       rollupOptions: {
