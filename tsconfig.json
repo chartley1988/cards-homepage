@@ -15,7 +15,21 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["src", "commitlint.config.js"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".git",
+    "commitlint.config.js",
+    "eslint.config.js",
+    "src/legacy/**/*",
+    "pages/**/*"
+  ]
 }

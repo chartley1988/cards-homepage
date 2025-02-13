@@ -15,6 +15,7 @@ export default defineConfig({
         text: "Guides",
         items: [
           { text: "Running Project", link: "/running-project" },
+          { text: "Getting Started", link: "/getting-started" },
           { text: "Contribution Guide", link: "/contribution-guide" },
         ],
       },
@@ -27,4 +28,5 @@ export default defineConfig({
       },
     ],
   },
+  ignoreDeadLinks: "localhostLinks",
 });

@@ -1,12 +1,12 @@
-import "../../src/styles/style.css";
-import "../../src/styles/card.css";
-import "../../src/styles/theme.css";
+import "@/styles/style.css";
+import "@/styles/card.css";
+import "@/styles/theme.css";
 import "./styles.css";
-import "../../src/components/navMenu/navMenu";
-import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
-import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import { PileElementType } from "../../src/types/pile.types";
-import { setTheme, greenFelt } from "../../src/components/table/themes";
+import "@/components/navMenu/navMenu";
+import PlayingCard from "@/components/card/playingCard/playingCardClass";
+import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import { PileElementType } from "@/types/pile.types";
+import { setTheme, greenFelt } from "@/components/table/themes";
 
 const app = document.getElementById("app");
 if (app) {
