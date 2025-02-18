@@ -150,9 +150,10 @@ if (app) {
   // Once the DomContent is loaded we can run some async operations
   // shuffle the deck before dom content loaded
   deck.shuffle();
-  // we will need to cascade the deck as it has had all the cards initiated in it
-  deck.cascade();
   window.addEventListener("DOMContentLoaded", async () => {
+    // we will need to cascade the deck as it has had all the cards initiated in it
+    // await the cascade, as it may cause a glitch in the first card otherwise
+    await deck.cascade();
     // deal the cards, then remove the dealers pile container.
     await deal(7, deck, tableaus, 100);
     document.getElementById("deck")?.removeChild(deck.container);
