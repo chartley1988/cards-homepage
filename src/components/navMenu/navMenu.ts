@@ -65,7 +65,7 @@ const navMenu = (data: NavItem[]): void => {
 
   nav.appendChild(menuList);
 
-  const navTarget = document.getElementById("app");
+  const navTarget = document.body.firstElementChild;
   if (navTarget) {
     navTarget.prepend(nav);
   }
