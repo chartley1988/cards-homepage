@@ -67,6 +67,9 @@ export const pileElement = <T extends Card>(
     });
     container.addEventListener("touchend", handleTouchEnd);
   }
+  window.addEventListener("resize", () => {
+    cascade();
+  });
   const { cardElements } = options;
 
   /**
