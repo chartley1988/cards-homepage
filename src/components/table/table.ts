@@ -30,7 +30,7 @@ export class Table {
   private options: TableSettings;
   private appElement: HTMLElement;
 
-  constructor(options: TableOptions = {}) {
+  constructor(element: HTMLElement, options: TableOptions = {}) {
     this.options = {
       tileImage: options.tileImage ?? "/images/45-degree-fabric-light.png",
       overlayStartColor: options.overlayStartColor ?? "rgba(0, 100, 0, 0.6)",
@@ -47,46 +47,10 @@ export class Table {
       },
       backgroundColor: options.backgroundColor ?? "#1a472a",
     };
-
-    document.documentElement.style.margin = "0";
-    document.documentElement.style.padding = "0";
-    document.documentElement.style.height = "100%";
-    document.documentElement.style.width = "100%";
-    document.documentElement.style.overflow = "hidden";
-    document.documentElement.style.position = "relative";
-
-    document.body.style.margin = "0";
-    document.body.style.padding = "0";
-    document.body.style.height = "100vh";
-    document.body.style.width = "100vw";
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "relative";
-    document.body.style.boxSizing = "border-box";
-
-    const element = document.getElementById("app");
-    if (!element) {
-      throw new Error('No element with id "app" found');
-    }
     this.appElement = element;
-
-    // Ensure parent containers are properly set up
-    document.body.style.margin = "0";
-    document.body.style.padding = "0";
-    document.body.style.height = "100vh";
-    document.documentElement.style.height = "100%";
   }
 
   public setBackground(): void {
-    // Set essential container styles
-    this.appElement.style.minHeight = "100vh";
-    this.appElement.style.width = "100vw";
-    this.appElement.style.maxWidth = "100vw";
-    this.appElement.style.margin = "0";
-    this.appElement.style.padding = "0";
-    this.appElement.style.position = "relative";
-    this.appElement.style.overflowY = "auto";
-    this.appElement.style.overflowX = "hidden";
-    this.appElement.style.boxSizing = "border-box";
     this.appElement.style.backgroundColor = this.options.backgroundColor;
 
     const backgroundImages = [];

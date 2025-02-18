@@ -11,7 +11,7 @@ import { setTheme, greenFelt } from "@/components/table/themes";
 const app = document.getElementById("app");
 if (app) {
   // setting the background of the game
-  setTheme(greenFelt);
+  setTheme(greenFelt, app);
 
   // Initialize a deck of playing cards
   const gameDeck = StandardDeckOfCards();

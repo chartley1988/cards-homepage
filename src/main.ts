@@ -9,7 +9,7 @@ import { deal } from "./components/animate/animate";
 
 const app = document.getElementById("app");
 if (app) {
-  setTheme(redFelt);
+  setTheme(redFelt, app);
   const deck = StandardDeckOfCards();
 
   const dealer = deck.createPileElement("dealer", deck.cards);

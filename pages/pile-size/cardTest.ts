@@ -10,7 +10,7 @@ import { setTheme, tanTiles } from "../../src/components/table/themes";
 const app = document.getElementById("app");
 
 if (app) {
-  setTheme(tanTiles);
+  setTheme(tanTiles, app);
 
   const deck = StandardDeckOfCards();
 

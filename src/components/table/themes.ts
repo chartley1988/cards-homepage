@@ -85,7 +85,7 @@ export const tanTiles: TableSettings = {
   },
 };
 
-export function setTheme(theme: TableSettings) {
-  const table = new Table(theme);
+export function setTheme(theme: TableSettings, element: HTMLElement) {
+  const table = new Table(element, theme);
   table.setBackground();
 }

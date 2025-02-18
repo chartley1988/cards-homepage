@@ -15,10 +15,10 @@ import {
   quickPassRules,
   quickReceiveRules,
 } from "../../src/components/rules/quickRules";
-const app = document.getElementById("app");
-if (app) {
+const freeCell = document.getElementById("freeCell");
+if (freeCell) {
   // setting the background of the game
-  setTheme(redFelt);
+  setTheme(redFelt, freeCell);
 
   // Game specific log
   const gameInfo = {

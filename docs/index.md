@@ -5,9 +5,12 @@ layout: home
 hero:
   name: "CardsJS"
   text: "A Javascript library for creating card games"
-  tagline: I don't think it updates
+  tagline: ""
 
 features:
+  - title: Getting Started
+    details: Instructions for using the package
+    link: /getting-started
   - title: Running Project
     details: Instructions for dev server, building, and testing builds
     link: /running-project

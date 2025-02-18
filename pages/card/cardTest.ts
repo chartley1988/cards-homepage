@@ -5,15 +5,12 @@ import "./styles.css";
 import "../../src/components/navMenu/navMenu";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
 import Player from "../../src/components/player/player";
-import { CardElementType } from "../../src/types/card.types";
-import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import { deal } from "../../src/components/animate/animate";
-import { PileElementType } from "../../src/types/pile.types";
 import { greenFelt, setTheme } from "../../src/components/table/themes";
 
 const app = document.getElementById("app");
 if (app) {
-  setTheme(greenFelt);
+  setTheme(greenFelt, app);
 
   const deck = StandardDeckOfCards();
 
@@ -83,7 +80,7 @@ if (app) {
     if (e.target instanceof HTMLElement) {
       const card = hand2.findCardContainer(e.target);
       if (card === null) return;
-      hand2.moveCardToPile(discard, card, rules(hand2, discard, card));
+      hand2.moveCardToPile(discard, card);
     }
   });
 
@@ -95,14 +92,4 @@ if (app) {
       card.flip();
     }
   });
-
-  const rules = (
-    sourcePile: PileElementType<PlayingCard>,
-    destinationPile: PileElementType<PlayingCard>,
-    card: CardElementType<PlayingCard>,
-  ): boolean => {
-    if (!card.faceUp) return false;
-    if (card.card.value < 6) return true;
-    else return true;
-  };
 }

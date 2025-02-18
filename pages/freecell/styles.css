@@ -1,8 +1,19 @@
-#freeCell {
+body {
+  margin: 0;
+  padding: 0;
   height: 100%;
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+}
+#freeCell {
+  min-height: 100vh;
+  min-width: 100vw;
+  padding-bottom: 2rem;
   display: flex;
   flex-direction: column;
-  gap: calc(var(--card-size) * 1.5);
+  gap: calc(var(--card-size) * 0.5);
+  overflow: scroll;
 }
 .top {
   display: flex;

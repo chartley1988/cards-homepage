@@ -1,52 +1,15 @@
-import { CardElement } from "../../src/components/card/cardElement";
 import "../../src/styles/style.css";
 import "../../src/styles/card.css";
 import "../../src/styles/theme.css";
 import "./styles.css";
 import "../../src/components/navMenu/navMenu";
-import addDeckBase from "../../src/legacy/scripts/cardFoundations/deckBase";
-import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import PlayingCardElement from "../../src/components/card/playingCard/playingCardElement";
 import { spinCard } from "../../src/components/animate/animate";
 import { setTheme, redOak } from "../../src/components/table/themes";
 
-setTheme(redOak);
-
-function instanceCard() {
-  const front = document.createElement("div");
-  front.classList.add("eh", "gfhfdgh", "yolo");
-  front.innerHTML = "heyyyy";
-  const card = CardElement();
-  card.container.addEventListener("click", () => {
-    card.flip();
-  });
-
-  return card;
-}
-const instanceCard2 = () => {
-  const card = new PlayingCard("K", "spade");
-  const cardElly = PlayingCardElement(card);
-
-  cardElly.container.addEventListener("click", () => {
-    cardElly.flip();
-  });
-
-  return cardElly;
-};
-
 const app = document.getElementById("app");
 if (app) {
-  const deckBase = addDeckBase();
-  const deckBase2 = addDeckBase();
-  const testCard = instanceCard();
-  const testCard2 = instanceCard2();
-  const p2DrawPile = document.getElementById("p2DrawPile");
-  p2DrawPile?.appendChild(deckBase.container);
-  deckBase.container?.appendChild(testCard.container);
-  const p1DrawPile = document.getElementById("p1Discard");
-  p1DrawPile?.appendChild(deckBase2.container);
-  deckBase2.container?.appendChild(testCard2.container);
+  setTheme(redOak, app);
 
   // Deck
   const playingCards = StandardDeckOfCards();
