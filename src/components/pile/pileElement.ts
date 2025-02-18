@@ -59,6 +59,13 @@ export const pileElement = <T extends Card>(
     container.ondragend = dragend;
     container.ondrop = drop;
     container.ondragover = allowDrop;
+    container.addEventListener("touchstart", handleTouchStart, {
+      passive: false,
+    });
+    container.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
+    container.addEventListener("touchend", handleTouchEnd);
   }
   const { cardElements } = options;
 
@@ -497,6 +504,181 @@ export const pileElement = <T extends Card>(
         );
       });
     }
+  }
+
+  const touchData: {
+    startX: number;
+    startY: number;
+    cardElement: CardElementType<T>[];
+    indexs: number[];
+    dragImage: HTMLElement | null;
+  } = {
+    startX: 0,
+    startY: 0,
+    cardElement: [],
+    indexs: [],
+    dragImage: null,
+  };
+
+  // Handle touch start
+  function handleTouchStart(e: TouchEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (cardElements[cardElements.length - 1].transform.active === true) {
+      return;
+    }
+    if (!(e.target instanceof HTMLElement)) return;
+
+    const touch = e.touches[0];
+    const cardElement = findCardContainer(e.target);
+    if (!cardElement) return;
+    if (
+      options.rules.canPass(
+        findPileElement(container.id),
+        {} as PileElementType<T>,
+        cardElement,
+      ) === false
+    ) {
+      denyMove(cardElement);
+      return;
+    }
+
+    touchData.startX = touch.clientX;
+    touchData.startY = touch.clientY;
+    touchData.cardElement.push(cardElement);
+
+    // Create a drag image similar to the desktop version
+    const rect = cardElement.container.getBoundingClientRect();
+    touchData.startX = touch.pageX - window.scrollX - rect.left;
+    touchData.startY = touch.pageY - window.scrollY - rect.top;
+    const originalTransform = cardElement.container.style.transform;
+    cardElement.container.style.transform = "";
+    const dragImage = document.createElement("div");
+    dragImage.id = "card-dragImage";
+    dragImage.classList.add("drag-image");
+    const currentDragItem = cardElement.container.cloneNode(
+      true,
+    ) as HTMLElement;
+    cardElement.container.style.transform = originalTransform;
+    dragImage.style.position = "absolute";
+    dragImage.style.left = `${touch.pageX - touchData.startX}px`;
+    dragImage.style.top = `${touch.pageY - touchData.startY}px`;
+    dragImage.style.opacity = "0.5";
+    dragImage.style.pointerEvents = "none";
+    dragImage.id = "card-dragImage";
+    dragImage.appendChild(currentDragItem);
+    document.body.appendChild(dragImage);
+    touchData.dragImage = dragImage;
+    touchData.indexs.push(cardElements.indexOf(cardElement));
+
+    // Apply dragging class
+    cardElement.container.classList.add("card-dragging");
+    if (options.groupDrag) {
+      // Get the parent element that holds the card and its siblings.
+      const pileElement = cardElement.container.parentElement;
+      if (!pileElement) return;
+      const originalIndex = cardElements.indexOf(cardElement);
+      // Iterate over all children in the pile.
+      cardElements.forEach((element) => {
+        // Get the card's z-index as a number.
+        const cardIndex = cardElements.indexOf(element);
+
+        // Only add the class if the card's z-index is higher than the original.
+        // Clone each card element and append to dragImage.
+        if (cardIndex > originalIndex) {
+          const offsetDifference = cardIndex - originalIndex;
+          const Xoffset =
+            cascadeOffset[0] *
+            cardElement.container.offsetWidth *
+            offsetDifference;
+          const Yoffset =
+            cascadeOffset[1] *
+            cardElement.container.offsetHeight *
+            offsetDifference;
+          element.container.classList.add("card-dragging");
+          const originalTransform = element.container.style.transform;
+          const containerScale = container.style.transform;
+          const newTransform = `translate(${Xoffset}px, ${Yoffset}px) ${containerScale}`;
+          element.container.style.transform = newTransform;
+          const clone = element.container.cloneNode(true);
+          element.container.style.transform = originalTransform;
+          dragImage.appendChild(clone);
+          if (cardIndex !== originalIndex) {
+            touchData.indexs.push(cardIndex);
+          }
+        }
+      });
+    }
+  }
+
+  // Handle touch move
+  function handleTouchMove(e: TouchEvent) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const { dragImage } = touchData;
+
+    if (dragImage) {
+      // Use pageX/pageY for zoom-safe movement
+      dragImage.style.left = `${touch.pageX - touchData.startX}px`;
+      dragImage.style.top = `${touch.pageY - touchData.startY}px`;
+    }
+  }
+
+  // Handle touch end
+  function handleTouchEnd(e: TouchEvent) {
+    if (cardElements[cardElements.length - 1].transform.active === true) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    if (!(e.target instanceof HTMLElement)) return;
+    const cardElement = findCardContainer(e.target);
+
+    const { dragImage } = touchData;
+    if (!cardElement || !dragImage) return;
+    if (cardElement === null || cardElement === undefined) return;
+    const parent = cardElement.container.parentElement;
+    // clears dragging class from all selected elements
+    if (parent) {
+      Array.from(parent.children).forEach((child) => {
+        child.classList.remove("card-dragging");
+      });
+    }
+    // Remove drag image and dragging class
+    dragImage.remove();
+
+    // Simulate drop based on final touch position
+    const touch = e.changedTouches[0];
+    const dropTarget = document.elementFromPoint(
+      touch.clientX,
+      touch.clientY,
+    ) as HTMLElement;
+
+    const data = {
+      indexs: touchData.indexs,
+      sourcePileContainerId: container.id,
+    };
+    // simulate dataTransfer object
+    const dataXfer = new DataTransfer();
+    dataXfer.setData("application/json", JSON.stringify(data));
+
+    if (dropTarget) {
+      const dropEvent = new DragEvent("drop", {
+        bubbles: true,
+        cancelable: true,
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        dataTransfer: dataXfer,
+      });
+      dropTarget.dispatchEvent(dropEvent);
+    }
+
+    // Reset touchData
+    touchData.startX = 0;
+    touchData.startY = 0;
+    touchData.cardElement.length = 0;
+    touchData.indexs.length = 0;
+    touchData.dragImage = null;
   }
 
   /**
