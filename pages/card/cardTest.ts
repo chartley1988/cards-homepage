@@ -1,95 +1,41 @@
-import "../../src/styles/style.css";
-import "../../src/styles/card.css";
-import "../../src/styles/theme.css";
+import { setTheme, greenFelt } from "@/components/table/themes";
+import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
 import "./styles.css";
-import "../../src/components/navMenu/navMenu";
-import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import Player from "../../src/components/player/player";
-import { deal } from "../../src/components/animate/animate";
-import { greenFelt, setTheme } from "../../src/components/table/themes";
 
-const app = document.getElementById("app");
-if (app) {
-  setTheme(greenFelt, app);
-
-  const deck = StandardDeckOfCards();
-
-  const player1 = new Player("dave", deck, [
-    {
-      name: "hand",
-      options: { draggable: true, groupDrag: false, layout: "cascade" },
-    },
-  ]);
-  const main = new Player(
-    "main",
-    deck,
-    [{ name: "draw" }, { name: "discard" }],
-    "draw",
-  );
-  const player2 = new Player("hups", deck, [
-    { name: "hand", options: { layout: "cascade" } },
-  ]);
-
-  const hand1 = player1.getPile("hand");
-  document.getElementById("p1Hand")?.appendChild(hand1.container);
-
-  const hand2 = player2.getPile("hand");
-  document.getElementById("p2Hand")?.appendChild(hand2.container);
-
-  const draw = main.getPile("draw");
-  document.getElementById("mainDraw")?.appendChild(draw.container);
-
-  const discard = main.getPile("discard");
-  document.getElementById("mainDiscard")?.appendChild(discard.container);
-
-  let currentPlayer = player1;
-  player1.getPile("hand").applyCascadeLayout("visibleStack");
-  player1.getPile("hand").createCascadeLayout("flop", [0.5, 0.5]);
-  player2.getPile("hand").applyCascadeLayout("visibleStack");
-  //player1.getPile("hand").cascadeOffset = [0.3, 0];
-
-  draw.cascade();
-
-  window.addEventListener("DOMContentLoaded", () => {
-    deal(5, draw, [hand1, hand2]);
-  });
-
-  draw.container.addEventListener("dblclick", () => {
-    main.getPile("draw").moveCardToPile(currentPlayer.getPile("hand"));
-    currentPlayer = currentPlayer === player1 ? player2 : player1;
-  });
-
-  main.getPile("draw").container.addEventListener("click", () => {
-    if (!main.getPile("draw").topCardElement.faceUp)
-      main.getPile("draw").topCardElement.flip();
-  });
-
-  hand1.container.addEventListener("dblclick", () => {
-    hand1.applyCascadeLayout("cascade");
-    hand1.cascade(1000);
-  });
-  hand1.container.addEventListener("click", (e) => {
-    if (e.target instanceof HTMLElement) {
-      const card = hand1.findCardContainer(e.target);
-      if (card === null) return;
-      card.flip();
-    }
-  });
-
-  hand2.container.addEventListener("dblclick", (e) => {
-    if (e.target instanceof HTMLElement) {
-      const card = hand2.findCardContainer(e.target);
-      if (card === null) return;
-      hand2.moveCardToPile(discard, card);
-    }
-  });
-
-  hand2.container.addEventListener("click", (e) => {
-    if (e.target instanceof HTMLElement) {
-      const card = hand2.findCardContainer(e.target);
-      if (card === null) return;
-      if (card.faceUp) return;
-      card.flip();
-    }
-  });
+const body = document.querySelector("body");
+if (body) {
+  setTheme(greenFelt, body);
 }
+const deck = StandardDeckOfCards(); // StandardDeckOfCards(true) will provide 2 jokers
+const discardPile = deck.createPileElement("discardPile");
+const drawPile = deck.createPileElement("drawPile", deck.cards); // initiate all cards here
+const playerHand = deck.createPileElement("Hand"); // will begin with no cards
+
+const discardDiv = document.getElementById("discardPile");
+discardDiv.appendChild(discardPile.container);
+
+const drawDiv = document.getElementById("drawPile");
+drawDiv.appendChild(drawPile.container);
+
+const handDiv = document.getElementById("hand");
+handDiv.appendChild(playerHand.container);
+
+drawPile.shuffle();
+window.addEventListener("DOMContentLoaded", async () => {
+  drawPile.cascade();
+  drawPile.container.addEventListener("click", () => {
+    drawPile.topCardElement.flip();
+  });
+  playerHand.applyCascadeLayout("cascade");
+  drawPile.container.addEventListener("click", () => {
+    drawPile.topCardElement.flip();
+  });
+  playerHand.container.addEventListener("click", (e) => {
+    if (!(e.target instanceof HTMLElement)) return;
+    const cardElement = playerHand.findCardContainer(e.target);
+    if (cardElement === null) return;
+    if (cardElement.faceUp) return;
+    cardElement.flip();
+  });
+  playerHand.options.groupDrag = false;
+});

@@ -4,202 +4,228 @@ outline: deep
 
 # Getting Started with CardsJS
 
-## Table Setup
+## Theme Configuration
 
-CardsJS provides flexible table theming capabilities through its theming system. This guide will walk you through setting up and customizing your card table.
-
-### Theme Configuration
-
-#### Quick Setup
-
-The fastest way to apply a theme is using the `setTheme` function with a predefined theme:
+The fastest way to apply a theme is using the `setTheme` function with a predefined theme on your playing surface. On this example we will make the body our playing surface:
 
 ```typescript
 import { setTheme, greenFelt } from "@/components/table/themes";
 
-const app = document.getElementById("app");
-if (app) {
-  setTheme(greenFelt);
+const body = document.querySelector("body");
+if (body) {
+  setTheme(greenFelt, body);
 }
 ```
 
-#### Custom Theme Configuration
+## Initiating a Deck of Cards
 
-For more control, you can configure the table directly using the `Table` class:
-
-```typescript
-import { TableSettings, Table } from "@/components/table/table";
-
-// Define your custom theme
-const customTheme: TableSettings = {
-  tileImage: "/images/45-degree-fabric-light.png",
-  backgroundColor: "rgb(38, 133, 72)",
-  overlayStartColor: "rgba(0, 100, 0, 0)",
-  overlayEndColor: "rgba(0, 0, 0, 1)",
-  overlayGradientType: "radial",
-  overlayDirection: "to bottom",
-  overlayCenter: "center",
-  overlaySize: "100%",
-  vignette: {
-    enabled: true,
-    center: "center",
-    size: "80%",
-    color: "rgba(0, 0, 0, 0.4)",
-  },
-};
-
-// Apply the theme
-const table = new Table(customTheme);
-table.setBackground();
-```
-
-### Theme Properties
-
-| Property              | Type                   | Description                            | Default             |
-| --------------------- | ---------------------- | -------------------------------------- | ------------------- |
-| `tileImage`           | `string`               | Path to the background texture image   | Required            |
-| `backgroundColor`     | `string`               | Base color of the table                | Required            |
-| `overlayStartColor`   | `string`               | Starting color of the gradient overlay | Required            |
-| `overlayEndColor`     | `string`               | Ending color of the gradient overlay   | Required            |
-| `overlayGradientType` | `"radial" \| "linear"` | Type of gradient to apply              | Required            |
-| `overlayDirection`    | `string`               | Direction of the gradient              | Required            |
-| `overlayCenter`       | `string`               | Center point of the overlay            | Required            |
-| `overlaySize`         | `string`               | Size of the overlay                    | Required            |
-| `vignette.enabled`    | `boolean`              | Whether to enable vignette effect      | `false`             |
-| `vignette.center`     | `string`               | Center point of vignette               | Required if enabled |
-| `vignette.size`       | `string`               | Size of vignette effect                | Required if enabled |
-| `vignette.color`      | `string`               | Color of vignette effect               | Required if enabled |
-
-### Predefined Themes
-
-CardsJS comes with several predefined themes that you can use out of the box. These themes can be found and customized in `/src/components/table/themes.ts`:
-
-#### greenFelt
-
-Classic casino table felt with a deep green background and subtle fabric texture.
+To create a deck of standard playing cards (52 cards, Ace to King, 4 suits) we have provided a quick function.
 
 ```typescript
-const greenFelt: TableSettings = {
-  tileImage: "/images/45-degree-fabric-light.png",
-  backgroundColor: "rgb(38, 133, 72)",
-  overlayStartColor: "rgba(0, 100, 0, 0)",
-  overlayEndColor: "rgba(0, 0, 0, 1)",
-  overlayGradientType: "radial",
-  overlayDirection: "to bottom",
-  overlayCenter: "center",
-  overlaySize: "100%",
-  vignette: {
-    enabled: true,
-    center: "center",
-    size: "80%",
-    color: "rgba(0, 0, 0, 0.4)",
-  },
-};
+import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+
+const deck = StandardDeckOfCards(); // StandardDeckOfCards(true) will also provide 2 jokers
 ```
 
-#### redFelt
+The deck contains all of the card DOM elements, but is not used to display anything on browsers. It is purely a functional component.
 
-Traditional card room aesthetic with rich red tones and fabric texture.
+## Creating Piles
+
+Piles are visually where cards will appear on the screen. Think of any possible stack or hand or "pile" of cards as a distinct pile. The best method of creating piles is by using the deck initiated in the previous step.
+Below we will initiate 3 piles, an empty discard pile, an empty hand, and a draw pile with all 52 cards in it.
 
 ```typescript
-const redFelt: TableSettings = {
-  tileImage: "/images/45-degree-fabric-light.png",
-  backgroundColor: "rgb(181 44 44)",
-  overlayStartColor: "rgba(0, 100, 0, 0)",
-  overlayEndColor: "rgba(0, 0, 0, 0.6)",
-  overlayGradientType: "radial",
-  overlayDirection: "to bottom",
-  overlayCenter: "center",
-  overlaySize: "100%",
-  vignette: {
-    enabled: true,
-    center: "center",
-    size: "80%",
-    color: "rgba(0, 0, 0, 0.4)",
-  },
-};
+const discardPile = deck.createPileElement("discardPile");
+const drawPile = deck.createPileElement("drawPile", deck.cards); // initiate all cards here
+const playerHand = deck.createPileElement("Hand"); // will begin with no cards
 ```
 
-#### brickWall
+Piles also have more advanced options, which is the third optional argument to createPileElement. Please see more on [Piles Options]()
 
-Unique brick pattern background with dramatic linear gradient overlay.
+### Appending Piles to Page
+
+I will now append these pileElements to the page. PileElements are objects that contain many methods, and properties. The HTML Element of a pileElement is found under the property container.
+For all pileElements properties and methods see [PileElements]()
+Please ensure script src matches your script.
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <script type="module" src="./card.ts"></script>
+  </head>
+  <body>
+    <div id="discardPile"></div>
+    <div id="drawPile"></div>
+    <div id="hand"></div>
+  </body>
+</html>
+```
 
 ```typescript
-const brickWall: TableSettings = {
-  tileImage: "/images/brick-wall.png",
-  backgroundColor: "rgba(114, 6, 6, 1)",
-  overlayStartColor: "rgba(0, 100, 0, 0)",
-  overlayEndColor: "rgba(0, 0, 0, 1)",
-  overlayGradientType: "linear",
-  overlayDirection: "to bottom",
-  overlayCenter: "top",
-  overlaySize: "100%",
-  vignette: {
-    enabled: false,
-    center: "center",
-    size: "80%",
-    color: "rgba(0, 0, 0, 0.4)",
-  },
-};
+const discardDiv = document.getElementById("discardPile");
+discardDiv.appendChild(discardPile.container);
+
+const drawDiv = document.getElementById("drawPile");
+drawDiv.appendChild(drawPile.container);
+
+const handDiv = document.getElementById("hand");
+handDiv.appendChild(playerHand.container);
 ```
 
-#### redOak
-
-Elegant wooden table finish with subtle vignette effect.
+We have created our piles, taken our bare bones html file and appended our piles to them. One more step will have us able to interact with the cards.
+We will have to wait for the DOMContent to be loaded, and then run cascade on any piles that have cards initiated in them.
+Cascade is essentially, re-stack, and is an async function which should be awaited.
+Lets also just shuffle up the cards before we re-stack them. Note any time you shuffle cards, you should re-stack (cascade()) them.
 
 ```typescript
-const redOak: TableSettings = {
-  tileImage: "/images/wood-pattern.png",
-  backgroundColor: "rgb(100 70 70)",
-  overlayStartColor: "rgba(0, 100, 0, 0)",
-  overlayEndColor: "rgba(0, 0, 0, 0.6)",
-  overlayGradientType: "radial",
-  overlayDirection: "to bottom",
-  overlayCenter: "center",
-  overlaySize: "100%",
-  vignette: {
-    enabled: true,
-    center: "center",
-    size: "80%",
-    color: "rgba(0, 0, 0, 0.4)",
-  },
-};
+drawPile.shuffle();
+window.addEventListener("DOMContentLoaded", async () => {
+  await drawPile.cascade();
+});
 ```
 
-#### tanTiles
+Bingo! We now have playing in a stack in the middle, a pile above and a pile below.
+The cards are able to be dragged and dropped by default, however any other interactions are up to us to code.
+Currently I am sure that it doesn't look great, part of the card is likely cut off and the piles are overlapping a bit, but we haven't written any css yet!
 
-Modern geometric pattern with warm tan colors.
+## Card Sizing
+
+To change the default card sizing, which is quite large, we will need to configure a css file.
+lets create one called styles.css and target the card size. I will also add some minimal styling on the body to clean up the look of our table.
+
+```css
+:root {
+  --card-size: 50px;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+```
+
+And we will import this into our typescript file after all other imports.
 
 ```typescript
-const tanTiles: TableSettings = {
-  tileImage: "/images/gradient-squares.png",
-  backgroundColor: "rgb(175 157 149)",
-  overlayStartColor: "rgba(118 60 28 / 35%)",
-  overlayEndColor: "rgba(0, 0, 0, 1)",
-  overlayGradientType: "radial",
-  overlayDirection: "to bottom",
-  overlayCenter: "center",
-  overlaySize: "100%",
-  vignette: {
-    enabled: true,
-    center: "center",
-    size: "80%",
-    color: "rgba(0, 0, 0, 0.4)",
-  },
-};
+import { setTheme, greenFelt } from "@/components/table/themes";
+import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import "./styles.css";
 ```
 
-### Best Practices
+## Interactivity With Cards
 
-1. Always check if the DOM element exists before applying themes
-2. Use TypeScript interfaces for better type safety
-3. Consider performance when using custom background images
-4. Test themes across different screen sizes
+Now that we have some cards on the screen, we can start adding functionality to them, the best way is to add event listeners to the piles themselves. Lets start with flipping the top card on the draw pile when it is clicked.
 
-<!-- ### Next Steps
+```typescript
+drawPile.container.addEventListener("click", () => {
+  drawPile.topCardElement.flip();
+});
+```
 
-- Learn about [card positioning and dealing]()
-- Explore [animation options]()
-- Understand [event handling]() -->
+Awesome! But, personally I don't think the hand looks much like a hand. It's still a pile, lets change an option to the hand so that cards that get put in there are spread out horizontally.
+One of the options to a pileElement is layout, lets change hand from the default layout (stack) to a layout of cascade.
 
-For more examples and advanced usage, visit our [GitHub repository]()
+```typescript
+playerHand.applyCascadeLayout("cascade");
+```
+
+Ok, you may have noticed that we can move a whole bunch of cards from draw pile to the hand. We have included some functions with pile to help figure out which card was clicked on. Lets add an event listener to hand so that we can flip over any card we touch, not just the top card as long as it is face down.
+I'm going to write this type safe, to continue using our useful typescript auto-complete
+
+```typescript
+playerHand.container.addEventListener("click", (e) => {
+  if (!(e.target instanceof HTMLElement)) return;
+  const cardElement = playerHand.findCardContainer(e.target);
+  if (cardElement === null) return;
+  if (cardElement.faceUp) return;
+  cardElement.flip();
+});
+```
+
+Now you may be saying, how do I just grab a middle card from my hand and not the whole stack? It's just another option in pile. Lets fix that so we can play one card at a time.
+
+```typescript
+playerHand.options.groupDrag = false;
+```
+
+## Wrapping Up
+
+Ok, That's it for the basics! The final code for the basic tutorial is below, in case you got lost along the way.
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <script type="module" src="./card.ts"></script>
+  </head>
+  <body>
+    <div id="discardPile"></div>
+    <div id="drawPile"></div>
+    <div id="hand"></div>
+  </body>
+</html>
+```
+
+```typescript
+import { setTheme, greenFelt } from "@/components/table/themes";
+import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import "./styles.css";
+
+const body = document.querySelector("body");
+if (body) {
+  setTheme(greenFelt, body);
+}
+const deck = StandardDeckOfCards(); // StandardDeckOfCards(true) will provide 2 jokers
+const discardPile = deck.createPileElement("discardPile");
+const drawPile = deck.createPileElement("drawPile", deck.cards); // initiate all cards here
+const playerHand = deck.createPileElement("Hand"); // will begin with no cards
+
+const discardDiv = document.getElementById("discardPile");
+discardDiv.appendChild(discardPile.container);
+
+const drawDiv = document.getElementById("drawPile");
+drawDiv.appendChild(drawPile.container);
+
+const handDiv = document.getElementById("hand");
+handDiv.appendChild(playerHand.container);
+
+drawPile.shuffle();
+window.addEventListener("DOMContentLoaded", async () => {
+  drawPile.cascade();
+  drawPile.container.addEventListener("click", () => {
+    drawPile.topCardElement.flip();
+  });
+  playerHand.applyCascadeLayout("cascade");
+  drawPile.container.addEventListener("click", () => {
+    drawPile.topCardElement.flip();
+  });
+  playerHand.container.addEventListener("click", (e) => {
+    if (!(e.target instanceof HTMLElement)) return;
+    const cardElement = playerHand.findCardContainer(e.target);
+    if (cardElement === null) return;
+    if (cardElement.faceUp) return;
+    cardElement.flip();
+  });
+  playerHand.options.groupDrag = false;
+});
+```
+
+```css
+:root {
+  --card-size: 50px;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+```

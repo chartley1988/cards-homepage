@@ -1,11 +1,12 @@
-.flex-container-column {
+:root {
+  --card-size: 50px;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
-  gap: 5rem;
-}
-.flex-container-row {
-  display: flex;
-  flex-direction: row;
-  gap: 5rem;
-  justify-content: space-evenly;
+  justify-content: space-around;
+  align-items: center;
 }

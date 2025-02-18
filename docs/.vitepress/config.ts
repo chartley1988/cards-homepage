@@ -12,11 +12,18 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: "Guides",
+        text: "Getting Started",
+        items: [{ text: "Basic Setup", link: "/getting-started" }],
+      },
+      {
+        text: "Advanced ",
+        items: [{ text: "Custom Themes", link: "/custom-themes" }],
+      },
+      {
+        text: "Contributing",
         items: [
-          { text: "Running Project", link: "/running-project" },
-          { text: "Getting Started", link: "/getting-started" },
           { text: "Contribution Guide", link: "/contribution-guide" },
+          { text: "Running Project", link: "/running-project" },
         ],
       },
     ],
