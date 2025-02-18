@@ -1,26 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import "../../src/styles/style.css";
-import "../../src/styles/card.css";
-import "../../src/styles/theme.css";
-import "./styles.css";
-import "../../src/components/navMenu/navMenu";
-import PlayingCard from "../../src/components/card/playingCard/playingCardClass";
-import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import { deal, denyMove } from "../../src/components/animate/animate";
-import { PileElementType } from "../../src/types/pile.types";
-import { CardElementType } from "../../src/types/card.types";
-import { setTheme, redFelt } from "../../src/components/table/themes";
-import { Rules } from "../../src/components/rules/rules";
+import "@/styles/style.css";
+import "@/components/navMenu/navMenu";
+import PlayingCard from "@/components/card/playingCard/playingCardClass";
+import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import { deal, denyMove } from "@/components/animate/animate";
+import { PileElementType } from "@/types/pile.types";
+import { CardElementType } from "@/types/card.types";
+import { setTheme, redFelt } from "@/components/table/themes";
+import { Rules } from "@/components/rules/rules";
 import {
   quickPassRules,
   quickReceiveRules,
-} from "../../src/components/rules/quickRules";
+} from "@/components/rules/quickRules";
+import "./styles.css";
+
 const freeCell = document.getElementById("freeCell");
 if (freeCell) {
   // setting the background of the game
   setTheme(redFelt, freeCell);
 
-  // Game specific log
+  // Game specific info
   const gameInfo = {
     freeSpaces: 4,
     getFreeSpaces: () => {
@@ -77,6 +75,7 @@ if (freeCell) {
   const freeSpotReceiveRules = [
     quickReceiveRules.onlyIfEmpty,
     // if your not passing the top card, its illegal
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (source = s, dest = d, card = c) => {
       if (source.topCardElement !== card) {
         return false;
@@ -100,7 +99,6 @@ if (freeCell) {
     [quickPassRules.neverPass],
     aceSpotReceiveRules,
   );
-
   // creating the pile Elements to display the cards
 
   // deck get made as a pile with all of the cards initialized in it
@@ -286,5 +284,3 @@ if (freeCell) {
     });
   });
 }
-
-// TODO: Re-enable linting on this file, and fix errors

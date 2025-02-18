@@ -1,5 +1,6 @@
 import Card from "./card";
 import { CardElementType } from "../../types/card.types";
+import "../../styles/card.css";
 
 export const CardElement = <T extends Card>(
   thisCard = new Card() as T,

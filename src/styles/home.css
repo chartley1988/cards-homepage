@@ -29,3 +29,7 @@ h1 {
 h1 > * {
   text-shadow: none;
 }
+.deck-base {
+  box-shadow: none;
+  background-color: inherit;
+}
