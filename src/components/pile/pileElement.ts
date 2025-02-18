@@ -213,9 +213,7 @@ export const pileElement = <T extends Card>(
     );
   }
 
-  // Only to do with animations.
-  // I had to now reference where things used to be in objects, because the card
-  // has been moved in the Objects, but not visually on the screen
+  // animates, and also moves the cardElement to new pile
   async function animateMoveCardToNewPile(
     destination: PileElementType<T>,
     cardElement: CardElementType<T>,
@@ -317,6 +315,34 @@ export const pileElement = <T extends Card>(
       card.container.style.zIndex = String(index);
     }
   };
+
+  /**
+   * shuffles the pile object, then sorts the cardElements to match the pile
+   */
+  const shuffle = () => {
+    pile.shuffle();
+    // Sort cardElements[] to match the shuffled order of cards[]
+    cardElements.sort(
+      (a, b) => pile.cards.indexOf(a.card) - pile.cards.indexOf(b.card),
+    );
+  };
+  //
+  //
+  //
+  //
+  //
+  //
+  /********************************************************************************
+   * ********************** Drag and Drop Below ***********************************
+   * ******************************************************************************
+   */
+  //
+  //
+  //
+  //
+  //
+  //
+  //
 
   /**
    *  Used during custom click handlers to return which card element was clicked on.
@@ -506,6 +532,24 @@ export const pileElement = <T extends Card>(
     }
   }
 
+  //
+  //
+  //
+  //
+  //
+  //
+  /********************************************************************************
+   * ********************** Touch and Drop Below ***********************************
+   * ******************************************************************************
+   */
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+
   const touchData: {
     startX: number;
     startY: number;
@@ -522,16 +566,21 @@ export const pileElement = <T extends Card>(
 
   // Handle touch start
   function handleTouchStart(e: TouchEvent) {
+    // prevent default stops the scrolling of the page during a touch event
     e.preventDefault();
     e.stopPropagation();
+    // if the top card is moving, return
     if (cardElements[cardElements.length - 1].transform.active === true) {
       return;
     }
     if (!(e.target instanceof HTMLElement)) return;
 
+    // separate the touch event and the card element touched
     const touch = e.touches[0];
     const cardElement = findCardContainer(e.target);
+
     if (!cardElement) return;
+    // ensure the card grabbed is passable
     if (
       options.rules.canPass(
         findPileElement(container.id),
@@ -543,36 +592,47 @@ export const pileElement = <T extends Card>(
       return;
     }
 
+    // update touch data
     touchData.startX = touch.clientX;
     touchData.startY = touch.clientY;
     touchData.cardElement.push(cardElement);
 
     // Create a drag image similar to the desktop version
     const rect = cardElement.container.getBoundingClientRect();
+    // using window.scrollX vs clientX because on zoom on mobile clientX causes wrong placement
     touchData.startX = touch.pageX - window.scrollX - rect.left;
     touchData.startY = touch.pageY - window.scrollY - rect.top;
+    // save original transform info
     const originalTransform = cardElement.container.style.transform;
-    cardElement.container.style.transform = "";
+
+    // setup the drag image div
     const dragImage = document.createElement("div");
     dragImage.id = "card-dragImage";
     dragImage.classList.add("drag-image");
-    const currentDragItem = cardElement.container.cloneNode(
-      true,
-    ) as HTMLElement;
-    cardElement.container.style.transform = originalTransform;
     dragImage.style.position = "absolute";
     dragImage.style.left = `${touch.pageX - touchData.startX}px`;
     dragImage.style.top = `${touch.pageY - touchData.startY}px`;
     dragImage.style.opacity = "0.5";
     dragImage.style.pointerEvents = "none";
     dragImage.id = "card-dragImage";
-    dragImage.appendChild(currentDragItem);
-    document.body.appendChild(dragImage);
-    touchData.dragImage = dragImage;
-    touchData.indexs.push(cardElements.indexOf(cardElement));
 
+    // clear the transform for the original drag image. (this one is absolute, so a transform will unnecessarily move it)
+    cardElement.container.style.transform = "";
+    const currentDragItem = cardElement.container.cloneNode(
+      true,
+    ) as HTMLElement;
+    // add the original transform back on after cloned
+    cardElement.container.style.transform = originalTransform;
     // Apply dragging class
     cardElement.container.classList.add("card-dragging");
+
+    // append dragItem to dragImage, add to page
+    dragImage.appendChild(currentDragItem);
+    document.body.appendChild(dragImage);
+
+    // save data to touchData
+    touchData.indexs.push(cardElements.indexOf(cardElement));
+
     if (options.groupDrag) {
       // Get the parent element that holds the card and its siblings.
       const pileElement = cardElement.container.parentElement;
@@ -586,6 +646,7 @@ export const pileElement = <T extends Card>(
         // Only add the class if the card's z-index is higher than the original.
         // Clone each card element and append to dragImage.
         if (cardIndex > originalIndex) {
+          // since were dealing with absolute positioning we have to manually figure out the cascade offset for each subsequent card
           const offsetDifference = cardIndex - originalIndex;
           const Xoffset =
             cascadeOffset[0] *
@@ -595,13 +656,19 @@ export const pileElement = <T extends Card>(
             cascadeOffset[1] *
             cardElement.container.offsetHeight *
             offsetDifference;
+          // add dragging class to next element
           element.container.classList.add("card-dragging");
+
+          // save original transform info
           const originalTransform = element.container.style.transform;
           const containerScale = container.style.transform;
+          // change the transform of the card, so we can accurately clone the element
           const newTransform = `translate(${Xoffset}px, ${Yoffset}px) ${containerScale}`;
           element.container.style.transform = newTransform;
           const clone = element.container.cloneNode(true);
+          // after clone, revert to original
           element.container.style.transform = originalTransform;
+          // add new element to dragImage
           dragImage.appendChild(clone);
           if (cardIndex !== originalIndex) {
             touchData.indexs.push(cardIndex);
@@ -609,11 +676,16 @@ export const pileElement = <T extends Card>(
         }
       });
     }
+    // save data to touchData
+    touchData.dragImage = dragImage;
   }
 
   // Handle touch move
   function handleTouchMove(e: TouchEvent) {
+    // stops scrolling
     e.preventDefault();
+
+    // separate the touch event and get the dragImage from data
     const touch = e.touches[0];
     const { dragImage } = touchData;
 
@@ -627,14 +699,17 @@ export const pileElement = <T extends Card>(
   // Handle touch end
   function handleTouchEnd(e: TouchEvent) {
     if (cardElements[cardElements.length - 1].transform.active === true) {
+      // stop scrolling
       e.preventDefault();
       e.stopPropagation();
       return;
     }
     if (!(e.target instanceof HTMLElement)) return;
+    // get the cardElement
     const cardElement = findCardContainer(e.target);
 
     const { dragImage } = touchData;
+    // ensure all the data was found
     if (!cardElement || !dragImage) return;
     if (cardElement === null || cardElement === undefined) return;
     const parent = cardElement.container.parentElement;
@@ -663,6 +738,7 @@ export const pileElement = <T extends Card>(
     dataXfer.setData("application/json", JSON.stringify(data));
 
     if (dropTarget) {
+      // use the drop event from mouse events
       const dropEvent = new DragEvent("drop", {
         bubbles: true,
         cancelable: true,
@@ -680,17 +756,6 @@ export const pileElement = <T extends Card>(
     touchData.indexs.length = 0;
     touchData.dragImage = null;
   }
-
-  /**
-   * shuffles the pile object, then sorts the cardElements to match the pile
-   */
-  const shuffle = () => {
-    pile.shuffle();
-    // Sort cardElements[] to match the shuffled order of cards[]
-    cardElements.sort(
-      (a, b) => pile.cards.indexOf(a.card) - pile.cards.indexOf(b.card),
-    );
-  };
 
   return {
     get pile() {
