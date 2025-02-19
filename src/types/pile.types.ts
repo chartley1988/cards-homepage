@@ -42,8 +42,18 @@ export type pileOptionsType<T extends Card> = {
   rules: Rules<T>;
   draggable: boolean;
   groupDrag: boolean;
-  receiveCardCallback: (...args: unknown[]) => boolean;
-  passCardCallback: (...args: unknown[]) => boolean;
+  receiveCardCallback: (
+    card: CardElementType<T>,
+    source: PileElementType<T>,
+    destination: PileElementType<T>,
+    ...extraArgs: unknown[]
+  ) => boolean;
+  passCardCallback: (
+    card: CardElementType<T>,
+    source: PileElementType<T>,
+    destination: PileElementType<T>,
+    ...extraArgs: unknown[]
+  ) => boolean;
 };
 
 export type Offset = [number, number];
@@ -57,4 +67,12 @@ export type Layout = {
   cascade: LayoutSection;
   [key: string]: LayoutSection;
   visibleStack: LayoutSection;
+};
+
+export type PileType<T extends Card> = {
+  name: string;
+  readonly cards: T[];
+  receiveCard: (cards: T | T[], conditions?: boolean) => boolean;
+  passCard: (target: Pile<T>, card?: T, rules?: boolean) => boolean;
+  shuffle: () => void;
 };

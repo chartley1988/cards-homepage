@@ -4,6 +4,7 @@ import Pile from "../pile/pile";
 import { createDefaultOptions, pileElement } from "../pile/pileElement";
 import { PileElementType, pileOptionsType } from "../../types/pile.types";
 import { CardElementType } from "../../types/card.types";
+import { DeckType } from "@/types/deck.types";
 
 /**
  * A deck is all of the cards to be used in your game.
@@ -16,12 +17,13 @@ import { CardElementType } from "../../types/card.types";
  *
  * Pass an argument of an array of Cards to build deck with cards added already. Or initiate a deck and use function addCards to populate cards.
  */
-export default class Deck<T extends Card> {
+export default class Deck<T extends Card> implements DeckType<T> {
   private _cards: T[];
   private _piles: Pile<T>[];
-  pileElements: PileElementType<T>[];
   private _graveyard: Pile<T>;
   private _cardBuilder: (card: T) => CardElementType<T>;
+  pileElements: PileElementType<T>[];
+
   constructor(
     cards: T[],
     cardBuilder: (card: T) => CardElementType<T> = (card: T) =>
@@ -29,12 +31,12 @@ export default class Deck<T extends Card> {
   ) {
     this._cards = cards;
     this._piles = [];
-    this._graveyard = new Pile<T>("graveyard"); // to remove a card already in play it has to be passed to a pile... this is the graveyard pile it goes to. Rare use case.
+    this._graveyard = new Pile<T>("graveyard");
     this._cardBuilder = cardBuilder;
     this.pileElements = [];
   }
 
-  get cards() {
+  get cards(): T[] {
     return this._cards;
   }
 
@@ -52,11 +54,12 @@ export default class Deck<T extends Card> {
     }
     return;
   };
+
   /**
    * This will create a pile for draw piles, discard piles, hands. Anywhere cards can go!
    * @returns Piles
    */
-  createPile = (name: string, cards: T[] = []) => {
+  createPile = (name: string, cards: T[] = []): Pile<T> => {
     const pile = new Pile(name, cards);
     this._piles.push(pile);
     return pile;
@@ -66,7 +69,7 @@ export default class Deck<T extends Card> {
     name: string,
     cards: T[] = [],
     options: Partial<pileOptionsType<T>> = {},
-  ) => {
+  ): PileElementType<T> => {
     const mergedOptions: pileOptionsType<T> = {
       ...createDefaultOptions(),
       ...{ cardElements: cards.map((card) => this._cardBuilder(card)) },
@@ -87,7 +90,7 @@ export default class Deck<T extends Card> {
    */
 
   //! This will need to pop them from pile elements too
-  removeCard = (card: T) => {
+  removeCard = (card: T): boolean => {
     this.cards.forEach((item) => {
       if (JSON.stringify(item) === JSON.stringify(card)) {
         const removalCard = this._cards.splice(

@@ -1,47 +1,20 @@
+import { PlayingCardType } from "@/types/card.types";
 import Card from "../card";
 
 /**
- * @props suit, symbol, number, value
+ * @props suit, symbol, number, value, color
  * @methods updateValue(newValue)
  */
-export default class PlayingCard extends Card {
-  suit: "diamond" | "spade" | "heart" | "club" | "joker";
-  symbol: "♦" | "♠" | "♥" | "♣" | "joker";
-  number:
-    | "A"
-    | "2"
-    | "3"
-    | "4"
-    | "5"
-    | "6"
-    | "7"
-    | "8"
-    | "9"
-    | "10"
-    | "J"
-    | "Q"
-    | "K"
-    | "joker";
-  value: number;
-  color: "red" | "black" | "joker";
+export default class PlayingCard extends Card implements PlayingCardType {
+  suit: PlayingCardType["suit"];
+  symbol: PlayingCardType["symbol"];
+  number: PlayingCardType["number"];
+  value: PlayingCardType["value"];
+  color: PlayingCardType["color"];
 
   constructor(
-    number:
-      | "A"
-      | "2"
-      | "3"
-      | "4"
-      | "5"
-      | "6"
-      | "7"
-      | "8"
-      | "9"
-      | "10"
-      | "J"
-      | "Q"
-      | "K"
-      | "joker",
-    suit: "diamond" | "spade" | "heart" | "club" | "joker",
+    number: PlayingCardType["number"],
+    suit: PlayingCardType["suit"],
     value: number = 0,
   ) {
     super();
@@ -49,59 +22,58 @@ export default class PlayingCard extends Card {
     this.number = number;
     this.value = value;
 
+    // Set value based on number
+    this.value = this.getCardValue(number);
+
+    // Set symbol & color based on suit
+    this.symbol = this.getCardSymbol(suit);
+    this.color = this.getCardColor(suit);
+  }
+
+  private getCardValue(number: PlayingCardType["number"]): number {
     switch (number) {
       case "A":
-        this.value = 1;
-        break;
-      case "2":
-      case "3":
-      case "4":
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-      case "9":
-      case "10":
-        this.value = parseInt(number);
-        break;
+        return 1;
       case "J":
-        this.value = 11;
-        break;
+        return 11;
       case "Q":
-        this.value = 12;
-        break;
+        return 12;
       case "K":
-        this.value = 13;
-        break;
+        return 13;
       case "joker":
-        this.value = 100;
-        break;
+        return 100;
       default:
-        this.value = Number(number);
-    }
-
-    switch (suit) {
-      case "spade":
-        this.symbol = "♠";
-        this.color = "black";
-        break;
-      case "diamond":
-        this.symbol = "♦";
-        this.color = "red";
-        break;
-      case "club":
-        this.symbol = "♣";
-        this.color = "black";
-        break;
-      case "heart":
-        this.symbol = "♥";
-        this.color = "red";
-        break;
-      default:
-        this.symbol = "joker";
-        this.color = "joker";
+        return parseInt(number);
     }
   }
+
+  private getCardSymbol(
+    suit: PlayingCardType["suit"],
+  ): PlayingCardType["symbol"] {
+    const symbols: Record<PlayingCardType["suit"], PlayingCardType["symbol"]> =
+      {
+        spade: "♠",
+        diamond: "♦",
+        club: "♣",
+        heart: "♥",
+        joker: "joker",
+      };
+    return symbols[suit];
+  }
+
+  private getCardColor(
+    suit: PlayingCardType["suit"],
+  ): PlayingCardType["color"] {
+    const colors: Record<PlayingCardType["suit"], PlayingCardType["color"]> = {
+      spade: "black",
+      club: "black",
+      diamond: "red",
+      heart: "red",
+      joker: "joker",
+    };
+    return colors[suit];
+  }
+
   updateValue = (newValue: number) => {
     this.value = newValue;
   };

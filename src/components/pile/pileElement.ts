@@ -191,8 +191,12 @@ export const pileElement = <T extends Card>(
     }
 
     // hit the callbacks for both passing and recieving cards
-    options.passCardCallback();
-    destinationPile.options.receiveCardCallback();
+    options.passCardCallback(cardElement, this, destinationPile);
+    destinationPile.options.receiveCardCallback(
+      cardElement,
+      this,
+      destinationPile,
+    );
 
     // if the animation callback is set to null, don't animate anything and return
     //! untested
