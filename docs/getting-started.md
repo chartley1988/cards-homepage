@@ -8,6 +8,8 @@ outline: deep
 
 The fastest way to apply a theme is using the `setTheme` function with a predefined theme on your playing surface. On this example we will make the body our playing surface:
 
+**card.ts**
+
 ```typescript
 import { setTheme, greenFelt } from "@/components/table/themes";
 
@@ -21,6 +23,8 @@ if (body) {
 
 To create a deck of standard playing cards (52 cards, Ace to King, 4 suits) we have provided a quick function.
 
+**card.ts**
+
 ```typescript
 import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
 
@@ -32,7 +36,10 @@ The deck contains all of the card DOM elements, but is not used to display anyth
 ## Creating Piles
 
 Piles are visually where cards will appear on the screen. Think of any possible stack or hand or "pile" of cards as a distinct pile. The best method of creating piles is by using the deck initiated in the previous step.
+
 Below we will initiate 3 piles, an empty discard pile, an empty hand, and a draw pile with all 52 cards in it.
+
+**card.ts**
 
 ```typescript
 const discardPile = deck.createPileElement("discardPile");
@@ -45,8 +52,12 @@ Piles also have more advanced options, which is the third optional argument to c
 ### Appending Piles to Page
 
 I will now append these pileElements to the page. PileElements are objects that contain many methods, and properties. The HTML Element of a pileElement is found under the property container.
+
 For all pileElements properties and methods see [PileElements]()
+
 Please ensure script src matches your script.
+
+**index.html**
 
 ```html
 <!doctype html>
@@ -62,6 +73,8 @@ Please ensure script src matches your script.
 </html>
 ```
 
+**card.ts**
+
 ```typescript
 const discardDiv = document.getElementById("discardPile");
 discardDiv.appendChild(discardPile.container);
@@ -74,9 +87,15 @@ handDiv.appendChild(playerHand.container);
 ```
 
 We have created our piles, taken our bare bones html file and appended our piles to them. One more step will have us able to interact with the cards.
+
 We will have to wait for the DOMContent to be loaded, and then run cascade on any piles that have cards initiated in them.
+
 Cascade is essentially, re-stack, and is an async function which should be awaited.
-Lets also just shuffle up the cards before we re-stack them. Note any time you shuffle cards, you should re-stack (cascade()) them.
+Lets also just shuffle up the cards before we re-stack them.
+
+**Note any time you shuffle cards, you should re-stack `cascade()` them.**
+
+**card.ts**
 
 ```typescript
 drawPile.shuffle();
@@ -85,14 +104,18 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 ```
 
-Bingo! We now have playing in a stack in the middle, a pile above and a pile below.
+Bingo! We now have playing cards in a stack in the middle, an empty pile above, and below.
 The cards are able to be dragged and dropped by default, however any other interactions are up to us to code.
+
 Currently I am sure that it doesn't look great, part of the card is likely cut off and the piles are overlapping a bit, but we haven't written any css yet!
 
 ## Card Sizing
 
 To change the default card sizing, which is quite large, we will need to configure a css file.
+
 lets create one called styles.css and target the card size. I will also add some minimal styling on the body to clean up the look of our table.
+
+**styles.css**
 
 ```css
 :root {
@@ -111,6 +134,8 @@ body {
 
 And we will import this into our typescript file after all other imports.
 
+**card.ts**
+
 ```typescript
 import { setTheme, greenFelt } from "@/components/table/themes";
 import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
@@ -121,6 +146,8 @@ import "./styles.css";
 
 Now that we have some cards on the screen, we can start adding functionality to them, the best way is to add event listeners to the piles themselves. Lets start with flipping the top card on the draw pile when it is clicked.
 
+**card.ts**
+
 ```typescript
 drawPile.container.addEventListener("click", () => {
   drawPile.topCardElement.flip();
@@ -128,14 +155,20 @@ drawPile.container.addEventListener("click", () => {
 ```
 
 Awesome! But, personally I don't think the hand looks much like a hand. It's still a pile, lets change an option to the hand so that cards that get put in there are spread out horizontally.
+
 One of the options to a pileElement is layout, lets change hand from the default layout (stack) to a layout of cascade.
+
+**card.ts**
 
 ```typescript
 playerHand.applyCascadeLayout("cascade");
 ```
 
 Ok, you may have noticed that we can move a whole bunch of cards from draw pile to the hand. We have included some functions with pile to help figure out which card was clicked on. Lets add an event listener to hand so that we can flip over any card we touch, not just the top card as long as it is face down.
+
 I'm going to write this type safe, to continue using our useful typescript auto-complete
+
+**card.ts**
 
 ```typescript
 playerHand.container.addEventListener("click", (e) => {
@@ -149,6 +182,8 @@ playerHand.container.addEventListener("click", (e) => {
 
 Now you may be saying, how do I just grab a middle card from my hand and not the whole stack? It's just another option in pile. Lets fix that so we can play one card at a time.
 
+**card.ts**
+
 ```typescript
 playerHand.options.groupDrag = false;
 ```
@@ -156,6 +191,8 @@ playerHand.options.groupDrag = false;
 ## Wrapping Up
 
 Ok, That's it for the basics! The final code for the basic tutorial is below, in case you got lost along the way.
+
+**index.html**
 
 ```html
 <!doctype html>
@@ -170,6 +207,8 @@ Ok, That's it for the basics! The final code for the basic tutorial is below, in
   </body>
 </html>
 ```
+
+**card.ts**
 
 ```typescript
 import { setTheme, greenFelt } from "@/components/table/themes";
@@ -214,6 +253,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   playerHand.options.groupDrag = false;
 });
 ```
+
+**styles.css**
 
 ```css
 :root {

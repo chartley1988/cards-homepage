@@ -6,6 +6,7 @@ const body = document.querySelector("body");
 if (body) {
   setTheme(greenFelt, body);
 }
+
 const deck = StandardDeckOfCards(); // StandardDeckOfCards(true) will provide 2 jokers
 const discardPile = deck.createPileElement("discardPile");
 const drawPile = deck.createPileElement("drawPile", deck.cards); // initiate all cards here
