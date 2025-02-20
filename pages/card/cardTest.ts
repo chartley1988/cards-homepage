@@ -40,3 +40,37 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
   playerHand.options.groupDrag = false;
 });
+
+playerHand.applyCascadeLayout("cascade");
+playerHand.cascade();
+
+let activePile = null;
+let activeCard = null;
+
+drawPile.container.addEventListener("click", () => {
+  //check if theres already an active pile
+  if (!activePile) {
+    // drawpile only wants to pass the top card
+    const cardElement = drawPile.topCardElement;
+    // if theres no cards, return
+    if (cardElement === null) return;
+    // else we will make this pile and the top card active
+    else {
+      activePile = drawPile;
+      activeCard = cardElement;
+      return;
+    }
+  }
+  // if this is the active pile, its been clicked twice in a row, we will cancel
+  if (activePile === drawPile) {
+    activePile = null;
+    activeCard = null;
+    return;
+  }
+  // otherwise, the other pile is active, and we can pass a card
+  else {
+    activePile.moveCardToPile(drawPile, activeCard);
+    activePile = null;
+    activeCard = null;
+  }
+});

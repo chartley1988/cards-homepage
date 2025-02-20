@@ -4,15 +4,15 @@ import { CardElementType } from "../../types/card.types";
 
 export const slideCard = async <T extends Card>(
   cardElement: CardElementType<T>,
-  vector2: number[],
+  vector: number[],
   duration: number,
 ) => {
   if (cardElement.transform.active) return;
-  if (vector2.length !== 2) {
-    throw "Error: vector2 must be an array of 2 values, x and y.";
+  if (vector.length !== 2) {
+    throw "Error: vector must be an array of 2 values, x and y.";
   }
   const { scale, rotate } = cardElement.transform;
-  const newTranslate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
+  const newTranslate = `translate(${vector[0]}px, ${vector[1]}px)`;
   cardElement.transform.translate = newTranslate;
 
   const transform = `${newTranslate} ${scale} ${rotate}`;
@@ -37,7 +37,7 @@ export const slideCard = async <T extends Card>(
   });
 };
 
-export const spinCard = async <T extends Card>(
+export const turnCard = async <T extends Card>(
   cardElement: CardElementType<T>,
   duration: number,
 ) => {
@@ -72,7 +72,6 @@ export const spinCard = async <T extends Card>(
   });
 };
 
-//! I haven't tested this
 export const zoomCard = async <T extends Card>(
   cardElement: CardElementType<T>,
   factor: number,
@@ -104,14 +103,14 @@ export const zoomCard = async <T extends Card>(
 //! I havent tested this
 export const slideDeck = async <T extends Card>(
   pile: PileElementType<T>,
-  vector2: number[],
+  vector: number[],
   duration: number,
 ) => {
-  if (vector2.length !== 2) {
-    throw "Error: vector2 must be an array of 2 values, x and y.";
+  if (vector.length !== 2) {
+    throw "Error: vector must be an array of 2 values, x and y.";
   }
 
-  const translate = `translate(${vector2[0]}px, ${vector2[1]}px)`;
+  const translate = `translate(${vector[0]}px, ${vector[1]}px)`;
   const transform = `${translate} scale(1) rotate(0deg)`;
 
   const keys = {
@@ -220,5 +219,71 @@ export async function denyMove<T extends Card>(
     cardElement.container.dispatchEvent(new Event("animationend"));
     cardElement.container.removeChild(backgroundOverlay);
     return promise;
+  });
+}
+
+// animates, and also moves the cardElement to new pile
+export async function animateMoveCardToNewPile<T extends Card>(
+  source: PileElementType<T>,
+  destination: PileElementType<T>,
+  cardElement: CardElementType<T>,
+  index: number,
+  groupOffset: number = 0,
+) {
+  // ensure moving card has higher z-index than both decks
+  cardElement.container.style.zIndex = String(destination.cards.length + 1000);
+
+  // get the values for where the card is and where its going
+  const sourceBox = source.container.getBoundingClientRect();
+  const destinationBox = destination.container.getBoundingClientRect();
+
+  // The calculation for how far the card needs to be determined by the cascade vectors of the destination pile and the number of cards.
+  const destinationCascade = [
+    destination.cascadeOffset[0] *
+      cardElement.container.offsetWidth *
+      (destination.cards.length - 1),
+    destination.cascadeOffset[1] *
+      cardElement.container.offsetHeight *
+      (destination.cards.length - 1),
+  ];
+  // When the card is appeneded to the new pile, and keeps the old transform, it will move that far away again.
+  const sourceCascade = [
+    source.cascadeOffset[0] *
+      cardElement.container.offsetWidth *
+      (index + groupOffset),
+    source.cascadeOffset[1] *
+      cardElement.container.offsetHeight *
+      (index + groupOffset),
+  ];
+
+  // change the value of the cards transform to make it appear as it is still on top of the "source" pile
+  const { scale, rotate } = cardElement.transform;
+  const translate = `translate(${sourceBox.x - destinationBox.x + sourceCascade[0]}px, ${sourceBox.y - destinationBox.y + sourceCascade[1]}px)`;
+  cardElement.transform.translate = translate;
+  cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
+
+  // the vector to where slideCard will move the card to
+  const vector2: [number, number] = [
+    destinationCascade[0],
+    destinationCascade[1],
+  ];
+  cardElement.container.draggable = false;
+  const adjustZIndex = (cardElements: CardElementType<T>[]) => {
+    for (let index = 0; index < cardElements.length; index++) {
+      const card = cardElements[index];
+      card.container.style.zIndex = String(index);
+    }
+  };
+  // animate the card moving from the current transform (appearing on source pile) to its rightful spot in destination cascade
+  return slideCard(cardElement, vector2, 600).then((animation) => {
+    // wait for the card to move, adjust the draggable setting to that of the new pile
+    cardElement.container.draggable = destination.options.draggable;
+    // adjust the ZIndex of both piles cardElements
+    adjustZIndex(destination.cardElements);
+    adjustZIndex(source.cardElements);
+    // We must adjust the transform on the card to be that of the destinations cascade now.
+    cardElement.transform.translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
+    cardElement.container.style.transform = `${`translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`} ${scale} ${rotate}`;
+    return animation;
   });
 }

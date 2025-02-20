@@ -1,5 +1,13 @@
+:root {
+  --card-flip-speed: 0.3s;
+  --card-size: 55px;
+}
+
+.back-center {
+  background-image: none;
+}
+
 .deck-base {
-  background-color: aqua;
   color: black;
   position: relative;
   width: calc(var(--card-size) * 2.5);

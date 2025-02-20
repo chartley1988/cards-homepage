@@ -104,7 +104,7 @@ if (app) {
 
       for (let index = totalCards - 1; index > -1; index--) {
         const card = titleCards.cardElements[index];
-        card.flip();
+        card.flip(100);
 
         // Wait for transition to complete before moving to next card
         await new Promise((resolve) => setTimeout(resolve, 400));
