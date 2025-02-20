@@ -1,10 +1,10 @@
 import "./components/navMenu/navMenu";
-import "./styles/style.css";
 import "./styles/theme.css";
 import "./styles/card.css";
 import { setTheme, redFelt } from "./components/table/themes";
 import StandardDeckOfCards from "./components/card/playingCard/standardDeckOfCards";
 import { deal } from "./components/animate/animate";
+import "./styles/style.css";
 import "./styles/home.css";
 
 const app = document.getElementById("app");
