@@ -32,6 +32,16 @@ type PlayingCardType = {
 };
 ```
 
+## Constructor
+
+```typescript
+  constructor(
+    number: PlayingCardType["number"],
+    suit: PlayingCardType["suit"],
+    value: number = 0,
+  )
+```
+
 ## Making a playing card
 
 If you use our pre-made deck you will have cards built for you. To use our pre-made deck use:

@@ -47,7 +47,19 @@ export default defineConfig({
               { text: "Animations", link: "/animations" },
             ],
           },
+          { text: "Player Class", link: "/playerClass" },
+
           { text: "Custom Themes", link: "/custom-themes" },
+          { text: "Override CSS", link: "/overrideCSS" },
+        ],
+      },
+      {
+        text: "Creating Your Own Card Type",
+        items: [
+          { text: "Guidelines", link: "/guidelines" },
+          { text: "Extending Card", link: "/extend-card" },
+          { text: "Custom Card Element", link: "/custom-element" },
+          { text: "Final Steps", link: "/custom-card-final-steps" },
         ],
       },
       {

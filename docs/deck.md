@@ -90,23 +90,17 @@ export default StandardDeckOfCards;
 
 The best way to create [Pile Elements](/pileElement) is by using your deck or by using the [Player Class](/playerClass)
 
-## Creating Pile Elements
-
-The best way to create [Pile Elements](/pileElement) is by using your deck or by using the [Player Class](/playerClass).
-
 ```typescript
 const discardPile = deck.createPileElement("discardPile");
 ```
 
 createPileElement can take 3 arguments:
 
-::: v-pre
-| parameter name | type | required |
-|---------------|----------------------------|------------------------|
-| name | `string` | Yes |
-| cards | `Array of Cards<T>` | Only if adding options |
-| options | `Partial<pileOptionsType<T>>` | No |
-:::
+| parameter name | type                          | required               |
+| -------------- | ----------------------------- | ---------------------- |
+| name           | `string`                      | Yes                    |
+| cards          | `Array of Cards<T>`           | Only if adding options |
+| options        | `Partial<pileOptionsType<T>>` | No                     |
 
 Providing any cards to the second argument will initiate those cards in that pile. All cards being used **MUST** be initialized in some pile.
 
