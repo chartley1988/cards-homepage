@@ -6,7 +6,11 @@ import Card from "../card/card";
 import "../../styles/pile.css";
 import type { Layout, Offset, PileElementType } from "../../types/pile.types";
 import Deck from "../deck/deck";
-import { denyMove, slideCard } from "../animate/animate";
+import {
+  animateMoveCardToNewPile,
+  denyMove,
+  slideCard,
+} from "../animate/animate";
 import { Rules } from "../rules/rules";
 
 // These are recipes for cascade()
@@ -30,6 +34,7 @@ export const createDefaultOptions = <T extends Card>(): pileOptionsType<T> => ({
   groupDrag: true,
   receiveCardCallback: () => true,
   passCardCallback: () => true,
+  moveCardAnimation: animateMoveCardToNewPile,
 });
 
 // Adds a base the size of the card to be the basis of deck layouts.\
@@ -111,6 +116,7 @@ export const pileElement = <T extends Card>(
    */
   const cascade = (duration = cascadeDuration) => {
     reset();
+    updateShadows();
     const arrayFinished = [];
     for (let i = 0; i < cardElements.length; i++) {
       const vector2 = [];
@@ -163,33 +169,41 @@ export const pileElement = <T extends Card>(
     this: PileElementType<T>,
     destinationPile: PileElementType<T>,
     cardElement = cardElements[cardElements.length - 1],
-    gameRules = options.rules, // ability to pass in rules for passing the card from one deckbase to another
     groupOffset: number = 0,
-    animationCallback = animateMoveCardToNewPile, // probably un-needed arg... but allows us to change the animation, or use null to not animate the move
   ) {
-    if (cardElements.indexOf(cardElement) === -1) return false;
+    const gameRules = options.rules;
+    const animationCallback = options.moveCardAnimation;
+    try {
+      // checks to find the card in the source pile
+      if (cardElements.indexOf(cardElement) === -1) {
+        throw "could not find card in source pile";
+      }
 
-    // checks to see if this deck can pass that card
-    if (gameRules.canPass(this, destinationPile, cardElement) === false) {
-      return false;
-    }
-    // checks to see if the destination deck can receive this card
-    if (
-      destinationPile.options.rules.canReceive(
-        this,
-        destinationPile,
-        cardElement,
-      ) === false
-    ) {
-      return false;
-    }
-    // attempt the pass within the pile objects
-    const cardPassed = pile.passCard(destinationPile.pile, cardElement.card);
-    // if the attempt to pass the card is a fail, return immediately
-    if (cardPassed === false) {
-      return false;
-    }
+      // checks to see if this deck can pass that card
+      if (gameRules.canPass(this, destinationPile, cardElement) === false) {
+        throw "source pile cannot pass card";
+      }
 
+      // checks to see if the destination deck can receive this card
+      if (
+        destinationPile.options.rules.canReceive(
+          this,
+          destinationPile,
+          cardElement,
+        ) === false
+      ) {
+        throw "destination pile cannot receive card";
+      }
+      // attempt the pass within the pile objects
+      const cardPassed = pile.passCard(destinationPile.pile, cardElement.card);
+      // if the attempt to pass the card is a fail, return false
+      if (cardPassed === false) {
+        throw "pile object could not pass card object";
+      }
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
     // hit the callbacks for both passing and recieving cards
     options.passCardCallback(cardElement, this, destinationPile);
     destinationPile.options.receiveCardCallback(
@@ -206,39 +220,13 @@ export const pileElement = <T extends Card>(
       );
       cascade();
       destinationPile.cascade();
-      return false;
+      return Promise.resolve(undefined);
     }
 
-    // the card got passed, and this is the animation we want to show.
-    return animationCallback(destinationPile, cardElement, groupOffset).then(
-      (animation) => {
-        // wait for the card to move, then update the shadows on both piles
-        this.updateShadows();
-        destinationPile.updateShadows();
-        return animation;
-      },
-    );
-  }
-
-  // animates, and also moves the cardElement to new pile
-  async function animateMoveCardToNewPile(
-    destination: PileElementType<T>,
-    cardElement: CardElementType<T>,
-    groupOffset: number = 0,
-  ) {
-    // ensure moving card has higher z-index than both decks
-    cardElement.container.style.zIndex = String(
-      destination.cards.length + 1000,
-    );
-
+    // Adds card to destination, removes from this pile
     // append the new card to the other container, and cardElement array
-    destination.container.appendChild(cardElement.container);
-    destination.cardElements.push(cardElement);
-
-    // get the values for where the card is and where its going
-    const sourceBox = container.getBoundingClientRect();
-    const destinationBox = destination.container.getBoundingClientRect();
-
+    destinationPile.container.appendChild(cardElement.container);
+    destinationPile.cardElements.push(cardElement);
     // find the indes of the card element
     const index = cardElements.findIndex((element) => {
       return JSON.stringify(element) === JSON.stringify(cardElement);
@@ -253,54 +241,23 @@ export const pileElement = <T extends Card>(
     } else {
       cardElements.splice(cardElements.indexOf(cardElement), 1);
     }
-    // The calculation for how far the card needs to be determined by the cascade vectors of the destination pile and the number of cards.
-    const destinationCascade = [
-      destination.cascadeOffset[0] *
-        cardElement.container.offsetWidth *
-        (destination.cards.length - 1),
-      destination.cascadeOffset[1] *
-        cardElement.container.offsetHeight *
-        (destination.cards.length - 1),
-    ];
-    // When the card is appeneded to the new pile, and keeps the old transform, it will move that far away again.
-    const sourceCascade = [
-      cascadeOffset[0] *
-        cardElement.container.offsetWidth *
-        (index + groupOffset),
-      cascadeOffset[1] *
-        cardElement.container.offsetHeight *
-        (index + groupOffset),
-    ];
 
-    // change the value of the cards transform to make it appear as it is still on top of the "source" pile
-    const { scale, rotate } = cardElement.transform;
-    const translate = `translate(${sourceBox.x - destinationBox.x + sourceCascade[0]}px, ${sourceBox.y - destinationBox.y + sourceCascade[1]}px)`;
-    cardElement.transform.translate = translate;
-    cardElement.container.style.transform = `${translate} ${scale} ${rotate}`;
-
-    // the vector to where slideCard will move the card to
-    const vector2: [number, number] = [
-      destinationCascade[0],
-      destinationCascade[1],
-    ];
-    cardElement.container.draggable = false;
-
-    // animate the card moving from the current transform (appearing on source pile) to its rightful spot in destination cascade
-    return slideCard(cardElement, vector2, 600).then((animation) => {
-      // wait for the card to move, adjust the draggable setting to that of the new pile
-      cardElement.container.draggable = destination.options.draggable;
-      // adjust the ZIndex of both piles cardElements
-      adjustZIndex(destination.cardElements);
-      adjustZIndex(cardElements);
-      // We must adjust the transform on the card to be that of the destinations cascade now.
-      cardElement.transform.translate = `translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`;
-      cardElement.container.style.transform = `${`translate(${destinationCascade[0]}px, ${destinationCascade[1]}px)`} ${scale} ${rotate}`;
+    // the card got passed, and this is the animation we want to show.
+    return animationCallback(
+      this,
+      destinationPile,
+      cardElement,
+      index,
+      groupOffset,
+    ).then((animation) => {
+      // wait for the card to move, then update the shadows on both piles
+      updateShadows();
+      destinationPile.updateShadows();
       return animation;
     });
   }
 
   // resets the container of the DeckBase
-  //! Do we need this...?
   const reset = () => {
     while (container.firstElementChild) {
       container.removeChild(container.firstElementChild);
@@ -529,12 +486,7 @@ export const pileElement = <T extends Card>(
     else {
       cardElements.splice(0, 1);
       cardElements.forEach((element, index) => {
-        sourcePile.moveCardToPile(
-          destinationPile,
-          element,
-          sourcePile.options.rules,
-          index + 1,
-        );
+        sourcePile.moveCardToPile(destinationPile, element, index + 1);
       });
     }
   }
@@ -792,7 +744,6 @@ export const pileElement = <T extends Card>(
     cascade,
     applyCascadeLayout,
     createCascadeLayout,
-    reset,
     findCardContainer,
     shuffle,
   };

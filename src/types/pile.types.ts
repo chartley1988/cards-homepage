@@ -18,14 +18,8 @@ export type PileElementType<T extends Card> = {
   moveCardToPile: (
     destinationPile: PileElementType<T>,
     cardElement?: CardElementType<T>,
-    gameRules?: Rules<T>,
     groupOffset?: number,
-    animationCallback?: (
-      destination: PileElementType<T>,
-      cardThatWasPassed: CardElementType<T>,
-    ) => Promise<Animation | undefined>,
   ) => Promise<Animation | undefined> | false;
-  reset: () => void;
   findCardContainer: (element: HTMLElement) => null | CardElementType<T>;
   shuffle: () => void;
   options: pileOptionsType<T>;
@@ -54,6 +48,15 @@ export type pileOptionsType<T extends Card> = {
     destination: PileElementType<T>,
     ...extraArgs: unknown[]
   ) => boolean;
+  moveCardAnimation:
+    | ((
+        source: PileElementType<T>,
+        destination: PileElementType<T>,
+        cardThatWasPassed: CardElementType<T>,
+        index: number,
+        groupOffset?: number,
+      ) => Promise<Animation | undefined>)
+    | null;
 };
 
 export type Offset = [number, number];
