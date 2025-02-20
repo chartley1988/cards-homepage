@@ -34,6 +34,10 @@ const navMenuData: NavItem[] = [
     text: "Demo",
     slug: "/demo/",
   },
+  {
+    text: "Flash Card",
+    slug: "/flashCard/",
+  },
 ];
 
 const navMenu = (data: NavItem[]): void => {
