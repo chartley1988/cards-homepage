@@ -2,7 +2,7 @@
   --card-size: 50px;
 }
 
-body {
+.body-div {
   height: 100vh;
   width: 100vw;
   display: flex;

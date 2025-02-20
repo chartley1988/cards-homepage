@@ -33,7 +33,7 @@ type PlayerType<T extends Card> = {
 
 Below we will create 3 players, 2 "human" players with hands, and one "dealer" player which will act as our draw pile and discard pile.
 
-All of the cards will be initiated in the Draw pile or the Dealer Player.
+All of the cards will be initiated in the Draw pile of the Dealer Player.
 
 ```typescript
 const player1 = new Player("Player 1", deck, [{ name: "Hand" }]);

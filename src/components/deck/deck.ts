@@ -22,6 +22,7 @@ export default class Deck<T extends Card> implements DeckType<T> {
   private _piles: Pile<T>[];
   private _graveyard: Pile<T>;
   private _cardBuilder: (card: T) => CardElementType<T>;
+
   pileElements: PileElementType<T>[];
 
   constructor(

@@ -1,7 +1,9 @@
+import "@/components/navMenu/navMenu";
 import FlashCard from "@/components/card/flashCard/flashCardClass";
 import Deck from "@/components/deck/deck";
 import FlashCardElement from "@/components/card/flashCard/flashCardElement";
 import "./styles.css";
+import "@/styles/reset.css";
 
 // the info I want on my flashcards
 const flashcards = [
@@ -23,14 +25,18 @@ const flashcards = [
   },
 ];
 
+const informationalCard = new FlashCard(
+  "Double Click to Flip Flashcards!",
+  "Drag and Drop to the other pile!",
+);
+
 // building the flashCardObjects in an Array from the generic object above
 const cardClasses = flashcards.map((flashCard) => {
   return new FlashCard(flashCard.question, flashCard.answer);
 });
 
 // creating a deck containing my flashCardObjects, using the factory function I built in the last step
-const deck = new Deck(cardClasses, FlashCardElement);
-
+const deck = new Deck([...cardClasses, informationalCard], FlashCardElement);
 // using my deck to create two pileElements
 const drawPile = deck.createPileElement("draw", deck.cards);
 const discardPile = deck.createPileElement("discard");
@@ -54,4 +60,12 @@ drawPile.container.addEventListener("dblclick", () => {
 
 discardPile.container.addEventListener("dblclick", () => {
   discardPile.topCardElement.flip();
+});
+
+window.addEventListener("DOMContentLoaded", async () => {
+  const cardElem = drawPile.cardElements.find(
+    (card) => card.card === informationalCard,
+  );
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  drawPile.moveCardToPile(discardPile, cardElem);
 });
