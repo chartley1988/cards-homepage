@@ -13,7 +13,10 @@ export default defineConfig({
     sidebar: [
       {
         text: "Getting Started",
-        items: [{ text: "Basic Setup", link: "/getting-started" }],
+        items: [
+          { text: "Downloading Library", link: "/downloading-the-package" },
+          { text: "Basic Setup", link: "/getting-started" },
+        ],
       },
       {
         text: "Advanced ",
