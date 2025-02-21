@@ -10,3 +10,34 @@
   justify-content: space-around;
   align-items: center;
 }
+@font-face {
+  font-family: "Playfair Display";
+  src: url("fonts/PlayfairDisplay-VariableFont_wght.ttf") format("woff2");
+  font-display: swap; /* or optional, block, fallback */
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+h1 {
+  font-family: "Playfair Display";
+  font-size: clamp(3rem, 5vw + 2rem, 6rem);
+  line-height: 1.1;
+  position: relative;
+}
+.read-the-docs {
+  color: #888;
+}
+body {
+  margin: 0;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+}

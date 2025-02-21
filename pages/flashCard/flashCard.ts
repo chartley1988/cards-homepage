@@ -3,7 +3,7 @@ import FlashCard from "@/components/card/flashCard/flashCardClass";
 import Deck from "@/components/deck/deck";
 import FlashCardElement from "@/components/card/flashCard/flashCardElement";
 import "./styles.css";
-import "../reset.css";
+import "../styles/reset.css";
 
 // the info I want on my flashcards
 const flashcards = [

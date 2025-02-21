@@ -1,8 +1,9 @@
 import "../navMenu/navMenu";
 import { setTheme, greenFelt } from "@/components/table/themes";
 import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import "../styles/style.css";
 import "./styles.css";
-import "../reset.css";
+import "../styles/reset.css";
 const body = document.querySelector("body");
 if (body) {
   setTheme(greenFelt, body);

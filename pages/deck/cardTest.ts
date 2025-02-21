@@ -1,9 +1,8 @@
-import "@/styles/card.css";
-import "@/styles/theme.css";
 import "../navMenu/navMenu";
 import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
 import { slideCard, zoomCard } from "@/components/animate/animate";
 import { setTheme, redOak } from "@/components/table/themes";
+import "../styles/reset.css";
 import "./styles.css";
 
 const app = document.getElementById("app");

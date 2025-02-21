@@ -1,4 +1,4 @@
-import "../style.css";
+import "../styles/style.css";
 import "@/styles/card.css";
 import "@/styles/theme.css";
 import "./styles.css";

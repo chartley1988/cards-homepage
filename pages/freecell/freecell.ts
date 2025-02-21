@@ -1,4 +1,4 @@
-import "../style.css";
+import "../styles/style.css";
 import "../navMenu/navMenu";
 import PlayingCard from "@/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
@@ -99,8 +99,8 @@ if (freeCell) {
     [quickPassRules.neverPass],
     aceSpotReceiveRules,
   );
-  // creating the pile Elements to display the cards
 
+  // creating the pile Elements to display the cards
   // deck get made as a pile with all of the cards initialized in it
   const deck = gameDeck.createPileElement("deck", gameDeck.cards);
   // Type casting my blank arrays to ensure I have access to methods and props
@@ -165,7 +165,7 @@ if (freeCell) {
 
     //! These helper functions and listeners are only for adding extra double click functionality to the game
     //! Drag and drop runs off the ruleSet above. These also will require the rules to be met.
-    //! Drag and drop functionality will work without these
+    //! Drag and drop functionality will work without these listeners
 
     // helper function to look for and return the first empty free spot
     function checkForAvailableFreeSpot() {
