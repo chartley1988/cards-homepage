@@ -106,6 +106,9 @@ export default defineConfig(({ command }) => {
 
   if (command === "serve") {
     config.server = {
+      allowedHosts: [
+        "4b1e-2001-56a-e92c-3000-7c9b-b919-1685-a43.ngrok-free.app",
+      ],
       proxy: {
         "^/docs$": {
           target: "http://localhost:5174",

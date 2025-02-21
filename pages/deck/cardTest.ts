@@ -3,7 +3,7 @@ import "../../src/styles/card.css";
 import "../../src/styles/theme.css";
 import "../../src/components/navMenu/navMenu";
 import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import { turnCard } from "@/components/animate/animate";
+import { slideCard, zoomCard } from "@/components/animate/animate";
 import { setTheme, redOak } from "../../src/components/table/themes";
 import "./styles.css";
 
@@ -39,16 +39,16 @@ if (app) {
   const p1Hand = document.getElementById("p1Hand");
   p1Hand?.appendChild(player1HandPile.container);
   player1HandPile.cascade();
-  player1HandPile.container.addEventListener("click", () => {
+  player1HandPile.container.addEventListener("click", async () => {
     const card = player1HandPile.topCardElement;
-    turnCard(card, 1000);
+    //turnCard(card, 1000);
 
-    // denyMove(card);
+    //denyMove(card);
 
-    // slideCard(card, [100, 100], 1000).then(() => slideCard(card, [0, 0], 1000));
+    slideCard(card, [100, 100], 1000).then(() => slideCard(card, [0, 0], 1000));
 
     /* uncomment the next two lines together to see await */
-    // await zoomCard(card, 2, 1000);
-    // zoomCard(card, 1, 2000);
+    await zoomCard(card, 2, 1000);
+    zoomCard(card, 1, 2000);
   });
 }
