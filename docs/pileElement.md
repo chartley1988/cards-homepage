@@ -42,7 +42,7 @@ Both methods to create a pile above have a way to initiate the cards in a given 
 **IMPORTANT** A pile with cards initialized in it will require a `cascade()` once the DOMContent has loaded.
 **IMPORTANT** After a `shuffle()` the pile will also require a `cascade()`
 
-## When to cascade()?
+## When to cascade()? {#cascade}
 
 Any time you manipulate cardElements without an animation you should run `cascade()` on that pile afterwords.
 

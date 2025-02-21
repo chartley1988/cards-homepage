@@ -4,9 +4,11 @@ outline: deep
 
 # Getting Started with CardsJS
 
+We will take you on a quick walkthrough on how to use our library
+
 ## Theme Configuration
 
-The fastest way to apply a theme is using the `setTheme` function with a predefined theme on your playing surface. On this example we will make the body our playing surface:
+The fastest way to apply a [theme](/custom-themes) is using the `setTheme` function with a predefined theme on your playing surface. On this example we will make the body our playing surface:
 
 **card.ts**
 
@@ -21,7 +23,7 @@ if (body) {
 
 ## Initiating a Deck of Cards
 
-To create a deck of standard playing cards (52 cards, Ace to King, 4 suits) we have provided a quick function.
+To create a [deck](/deck) of standard playing cards (52 cards, Ace to King, 4 suits) we have provided a quick function.
 
 **card.ts**
 
@@ -31,13 +33,15 @@ import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCar
 const deck = StandardDeckOfCards(); // StandardDeckOfCards(true) will also provide 2 jokers
 ```
 
-The deck contains all of the card DOM elements, but is not used to display anything on browsers. It is purely a functional component.
+The deck contains all of the card objects, but is not used to display anything on browsers. It is purely a functional component. Where the cards will get displayed is in the [pile Elements](/pileElement)
 
-## Creating Piles
+## Creating Pile Elements
 
-Piles are visually where cards will appear on the screen. Think of any possible stack or hand or "pile" of cards as a distinct pile. The best method of creating piles is by using the deck initiated in the previous step.
+Pile Elements are visually where cards will appear on the screen. Think of any possible stack or hand or "pile" of cards as a distinct pile Element. The best method of creating piles is by using the deck initiated in the previous step.
 
 Below we will initiate 3 piles, an empty discard pile, an empty hand, and a draw pile with all 52 cards in it.
+
+We can initiate cards in a pile element by passing an array of cards as the second argument to `deck.createPileElement()`
 
 **card.ts**
 
@@ -47,13 +51,13 @@ const drawPile = deck.createPileElement("drawPile", deck.cards); // initiate all
 const playerHand = deck.createPileElement("Hand"); // will begin with no cards
 ```
 
-Piles also have more advanced options, which is the third optional argument to createPileElement. Please see more on [Piles Options]()
+Piles also have more advanced options, which is the third optional argument to createPileElement. Please see more on [Piles Options](/pile-options)
 
 ### Appending Piles to Page
 
 I will now append these pileElements to the page. PileElements are objects that contain many methods, and properties. The HTML Element of a pileElement is found under the property container.
 
-For all pileElements properties and methods see [PileElements]()
+For all pileElements properties and methods see [PileElements](/pileElement)
 
 Please ensure script src matches your script.
 
@@ -88,7 +92,7 @@ handDiv.appendChild(playerHand.container);
 
 We have created our piles, taken our bare bones html file and appended our piles to them. One more step will have us able to interact with the cards.
 
-We will have to wait for the DOMContent to be loaded, and then run cascade on any piles that have cards initiated in them.
+We will have to wait for the DOMContent to be loaded, and then run [cascade](/pileElement#cascade) on any piles that have cards initiated in them.
 
 Cascade is essentially, re-stack, and is an async function which should be awaited.
 Lets also just shuffle up the cards before we re-stack them.
@@ -111,7 +115,7 @@ Currently I am sure that it doesn't look great, part of the card is likely cut o
 
 ## Card Sizing
 
-To change the default card sizing, which is quite large, we will need to configure a css file.
+To [override css](/overrideCSS) on the default card sizing, which is quite large, we will need to configure a css file.
 
 lets create one called styles.css and target the card size. I will also add some minimal styling on the body to clean up the look of our table.
 
@@ -154,7 +158,7 @@ drawPile.container.addEventListener("click", () => {
 });
 ```
 
-Awesome! But, personally I don't think the hand looks much like a hand. It's still a pile, lets change an option to the hand so that cards that get put in there are spread out horizontally.
+Awesome! But, personally I don't think the hand looks much like a hand. It's still a pile, lets change an [option](/pile-options) to the hand so that cards that get put in there are spread out horizontally.
 
 One of the options to a pileElement is layout, lets change hand from the default layout (stack) to a layout of cascade.
 

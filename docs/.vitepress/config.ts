@@ -56,7 +56,7 @@ export default defineConfig({
       {
         text: "Creating Your Own Card Type",
         items: [
-          { text: "Guidelines", link: "/guidelines" },
+          { text: "Custom Card Guidelines", link: "/custom-card-guidelines" },
           { text: "Extending Card", link: "/extend-card" },
           { text: "Custom Card Element", link: "/custom-element" },
           { text: "Final Steps", link: "/custom-card-final-steps" },
