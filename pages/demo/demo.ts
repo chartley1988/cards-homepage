@@ -1,8 +1,8 @@
-import "@/styles/style.css";
+import "../style.css";
 import "@/styles/card.css";
 import "@/styles/theme.css";
 import "./styles.css";
-import "@/components/navMenu/navMenu";
+import "../navMenu/navMenu";
 import PlayingCard from "@/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
 import { PileElementType } from "@/types/pile.types";

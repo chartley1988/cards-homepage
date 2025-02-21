@@ -1,5 +1,5 @@
-import "@/styles/style.css";
-import "@/components/navMenu/navMenu";
+import "../style.css";
+import "../navMenu/navMenu";
 import PlayingCard from "@/components/card/playingCard/playingCardClass";
 import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
 import { deal, denyMove } from "@/components/animate/animate";

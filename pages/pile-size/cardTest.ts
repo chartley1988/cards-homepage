@@ -1,11 +1,11 @@
-import "../../src/styles/style.css";
-import "../../src/styles/card.css";
-import "../../src/styles/theme.css";
+import "../style.css";
+import "@/styles/card.css";
+import "@/styles/theme.css";
 import "./styles.css";
-import "../../src/components/navMenu/navMenu";
-import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
-import Player from "../../src/components/player/player";
-import { setTheme, tanTiles } from "../../src/components/table/themes";
+import "../navMenu/navMenu";
+import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import Player from "@/components/player/player";
+import { setTheme, tanTiles } from "@/components/table/themes";
 
 const app = document.getElementById("app");
 

@@ -4,7 +4,7 @@ import Pile from "../pile/pile";
 import { createDefaultOptions, pileElement } from "../pile/pileElement";
 import { PileElementType, pileOptionsType } from "../../types/pile.types";
 import { CardElementType } from "../../types/card.types";
-import { DeckType } from "@/types/deck.types";
+import { DeckType } from "../../types/deck.types";
 
 /**
  * A deck is all of the cards to be used in your game.
@@ -89,8 +89,6 @@ export default class Deck<T extends Card> implements DeckType<T> {
    * @returns true if card was removed
    * @returns false if card was not found in deck
    */
-
-  //! This will need to pop them from pile elements too
   removeCard = (card: T): boolean => {
     this.cards.forEach((item) => {
       if (JSON.stringify(item) === JSON.stringify(card)) {

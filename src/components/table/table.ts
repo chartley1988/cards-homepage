@@ -1,30 +1,4 @@
-// table.ts
-type GradientType = "linear" | "radial";
-type Direction = `to ${string}` | `${number}deg`;
-
-interface VignetteOptions {
-  enabled?: boolean;
-  center?: string;
-  size?: string;
-  color?: string;
-}
-
-interface TableOptions {
-  tileImage?: string; // ex: /images/black-felt.png
-  overlayStartColor?: string;
-  overlayEndColor?: string;
-  overlayGradientType?: GradientType;
-  overlayDirection?: Direction;
-  overlayCenter?: string;
-  overlaySize?: string;
-  vignette?: VignetteOptions;
-  backgroundColor?: string;
-}
-
-export interface TableSettings
-  extends Required<Omit<TableOptions, "vignette">> {
-  vignette: Required<VignetteOptions>;
-}
+import { TableSettings, TableOptions } from "@/types/table.types";
 
 export class Table {
   private options: TableSettings;

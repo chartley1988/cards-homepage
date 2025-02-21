@@ -84,9 +84,7 @@ cards-npm-package/
 │   ├── legacy/             # Legacy code
 │   ├── styles/             # Stylesheets
 │   ├── types/              # TypeScript type definitions
-│   ├── typescript.svg
 │   ├── main.ts             # Main entry point
-│   └── vite-env.d.ts       # Vite environment declarations
 ├── tests/                  # Test files
 ├── .gitignore              # Git ignore configuration
 ├── .prettierrc.js          # Prettier configuration

@@ -1,4 +1,4 @@
-import { cardNumber, suit } from "@/types/card.types";
+import { cardNumber, suit } from "@/types/playCard.types";
 import Deck from "../../deck/deck";
 import PlayingCard from "./playingCardClass";
 import PlayingCardElement from "./playingCardElement";

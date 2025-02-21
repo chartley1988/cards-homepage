@@ -1,10 +1,9 @@
-import "../../src/styles/style.css";
-import "../../src/styles/card.css";
-import "../../src/styles/theme.css";
-import "../../src/components/navMenu/navMenu";
-import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
+import "@/styles/card.css";
+import "@/styles/theme.css";
+import "../navMenu/navMenu";
+import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
 import { slideCard, zoomCard } from "@/components/animate/animate";
-import { setTheme, redOak } from "../../src/components/table/themes";
+import { setTheme, redOak } from "@/components/table/themes";
 import "./styles.css";
 
 const app = document.getElementById("app");

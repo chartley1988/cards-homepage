@@ -1,4 +1,4 @@
-import { PlayingCardType } from "@/types/card.types";
+import { PlayingCardType } from "@/types/playCard.types";
 import Card from "../card";
 
 /**

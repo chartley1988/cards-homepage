@@ -1,18 +1,5 @@
-import { CardElementType } from "../../types/card.types";
-import { PileElementType } from "../../types/pile.types";
+import { RuleSet, Rule } from "@/types/rules.types";
 import Card from "../card/card";
-
-export interface RuleSet<T extends Card> {
-  canPass: Rule<T>;
-  canReceive: Rule<T>;
-}
-
-export type Rule<T extends Card> = (
-  source: PileElementType<T>,
-  destination: PileElementType<T>,
-  card: CardElementType<T>,
-  ...extraArgs: unknown[]
-) => boolean;
 
 export class Rules<T extends Card> implements RuleSet<T> {
   passRules: Rule<T>[];

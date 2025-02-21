@@ -1,4 +1,5 @@
-import { TableSettings, Table } from "@/components/table/table";
+import { Table } from "@/components/table/table";
+import { TableSettings } from "@/types/table.types";
 
 export const greenFelt: TableSettings = {
   tileImage: "/images/45-degree-fabric-light.png",
