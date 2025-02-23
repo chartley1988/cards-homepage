@@ -10,7 +10,7 @@ h1 {
 
   margin-top: clamp(2rem, 5vw + 2rem, 2rem);
 
-  color: black;
+  color: white;
   text-shadow:
     0 1px 0 #ccc,
     0 2px 0 #c9c9c9,

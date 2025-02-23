@@ -10,6 +10,7 @@
 :root {
   --card-flip-speed: 0.3s;
   --card-size: 75px;
+  --border-color: black;
 }
 
 .card-container {
@@ -71,7 +72,7 @@
 .card-front {
   padding: calc(var(--card-size) / 15);
   background-color: whitesmoke;
-  border: calc(0.05 * var(--card-size)) solid;
+  border: calc(0.05 * var(--card-size)) solid var(--border-color);
   transform: perspective(1000px) rotateY(0deg);
 }
 
