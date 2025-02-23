@@ -18,8 +18,8 @@ if (app) {
   const titleCards = deck.createPileElement("title");
 
   (function createTitle() {
-    const titleContainer = document.createElement("div");
-    titleContainer.classList.add("title-container");
+    const titleContainer: HTMLDivElement = document.createElement("div");
+    titleContainer.classList.add("title");
     titleContainer.style.position = "relative";
     titleContainer.style.display = "flex";
     titleContainer.style.justifyContent = "center";
@@ -59,58 +59,95 @@ if (app) {
     scale(${scale})
   `;
     });
-  })();
 
-  window.addEventListener("DOMContentLoaded", async () => {
-    titleCards.cascade();
-    await deal(3, dealer, titleCards);
+    // Add decorative fan cards as a logo behind title text
+    window.addEventListener("DOMContentLoaded", async () => {
+      titleCards.cascade();
+      await deal(3, dealer, titleCards);
 
-    async function fanTitleCards() {
-      const totalCards = titleCards.cardElements.length;
-      const fanSpread = 30; // Total angle of the fan (degrees)
-      const startAngle = -fanSpread / 2; // Start from negative angle to center the fan
-      const fanTilt = 30; // Overall tilt of the entire fan
+      // Create fan effect on cards behind H1 text
+      await (async function fanTitleCards() {
+        const totalCards = titleCards.cardElements.length;
+        const fanSpread = 30; // Total angle of the fan (degrees)
+        const startAngle = -fanSpread / 2; // Start from negative angle to center the fan
+        const fanTilt = 30; // Overall tilt of the entire fan
 
-      for (let index = 0; index < totalCards; index++) {
-        const card = titleCards.cardElements[index];
+        for (let index = 0; index < totalCards; index++) {
+          const card = titleCards.cardElements[index];
 
-        // Calculate rotation for this card + the overall fan tilt
-        const rotation =
-          startAngle + (fanSpread / (totalCards - 1)) * index + fanTilt;
+          // Calculate rotation for this card + the overall fan tilt
+          const rotation =
+            startAngle + (fanSpread / (totalCards - 1)) * index + fanTilt;
 
-        // Calculate slight vertical offset for arc effect
-        const yOffset = Math.abs(rotation - fanTilt) * 0.5; // Subtract fanTilt to keep arc based on relative positions
+          // Calculate slight vertical offset for arc effect
+          const yOffset = Math.abs(rotation - fanTilt) * 0.5; // Subtract fanTilt to keep arc based on relative positions
 
-        // Apply all transformations in one style
-        card.container.style.position = "absolute";
-        card.container.style.transformOrigin = "bottom center";
-        card.container.style.transitionDuration = "0.2s";
-        card.container.style.transform = `
+          // Apply all transformations in one style
+          card.container.style.position = "absolute";
+          card.container.style.transformOrigin = "bottom center";
+          card.container.style.transitionDuration = "0.2s";
+          card.container.style.transform = `
       translate(-50%, 0)
       rotate(${rotation}deg)
       translateY(${yOffset}px)
     `;
 
-        // Add a tiny z-index adjustment so cards stack properly left to right
-        card.container.style.zIndex = `${index}`;
+          // Add a tiny z-index adjustment so cards stack properly left to right
+          card.container.style.zIndex = `${index}`;
 
-        // Wait for transition to complete before moving to next card
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      }
-    }
-    await fanTitleCards();
-    async function flipTitleCards() {
-      const totalCards = titleCards.cardElements.length;
-      await new Promise((resolve) => setTimeout(resolve, 400));
+          // Wait for transition to complete before moving to next card
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+      })();
 
-      for (let index = totalCards - 1; index > -1; index--) {
-        const card = titleCards.cardElements[index];
-        card.flip(100);
-
-        // Wait for transition to complete before moving to next card
+      // After cards have fanned, flip them one by one
+      (async function flipTitleCards() {
+        const totalCards = titleCards.cardElements.length;
         await new Promise((resolve) => setTimeout(resolve, 400));
-      }
-    }
-    flipTitleCards();
-  });
+
+        for (let index = totalCards - 1; index > -1; index--) {
+          const card = titleCards.cardElements[index];
+          card.flip(100);
+
+          // Wait for transition to complete before moving to next card
+          await new Promise((resolve) => setTimeout(resolve, 400));
+        }
+      })();
+    });
+  })();
+
+  (function createHero() {
+    const content = {
+      heading: "Build Anything with Cards",
+      subheading:
+        "A lightweight JavaScript library for creating card games, trading card systems, and educational tools",
+    };
+
+    // Create hero wrapper
+    const container = document.createElement("div");
+    container.classList.add("hero");
+
+    // Create Hero text content
+    (function createHeroText() {
+      const text = document.createElement("div");
+      const heading = document.createElement("div");
+      heading.classList.add("heading");
+      heading.textContent = content.heading;
+      const subheading = document.createElement("div");
+      heading.classList.add("subheading");
+      subheading.textContent = content.subheading;
+      text.append(heading);
+      text.append(subheading);
+      container.append(text);
+    })();
+
+    dealer.container.style.setProperty("--card-size", "min(15vw, 80px)");
+    container.append(dealer.container);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      dealer.cascade();
+    });
+
+    app.append(container);
+  })();
 }

@@ -26,10 +26,31 @@ h1 {
     0 20px 20px rgba(0, 0, 0, 0.15);
 }
 
-h1 > * {
-  text-shadow: none;
+.title {
+  margin-bottom: min(20vw, 15rem);
+  & h1 > * {
+    text-shadow: none;
+  }
+
+  & .deck-base {
+    box-shadow: none;
+    background-color: inherit;
+  }
 }
-.deck-base {
-  box-shadow: none;
-  background-color: inherit;
+
+.hero {
+  max-width: 900px;
+  margin: auto;
+
+  display: flex;
+  justify-content: center;
+  gap: min(5vw, 3rem);
+
+  .heading {
+    font-size: 3rem;
+  }
+
+  .subheading {
+    font-size: 2rem;
+  }
 }
