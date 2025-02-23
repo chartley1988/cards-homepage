@@ -8,12 +8,13 @@ Rules are what controls whether a card is able to be passed, or able to be recie
 
 ## Rules Properties
 
-| Property       | Type                                      | Description                                           | Default      | Alternative Options |
-| -------------- | ----------------------------------------- | ----------------------------------------------------- | ------------ | ------------------- |
-| `passRules`    | `Array of Functions that return booleans` | Rules to allow card(s?) to be passed                  | [() => true] | Provide Array       |
-| `receiveRules` | `Array of Functions that return booleans` | Rules to allow card(s?) to be received                | [() => true] | Provide Array       |
-| `canPass`      | `Function that returns boolean`           | Runs every pass rule, if all are true returns true    | function     | none: required      |
-| `canReceive`   | `Function that returns boolean`           | Runs every receive rule, if all are true returns true | function     | none: required      |
+| Property       | Type                                                          | Description                                                           | Default                           | Alternative Options               |
+| -------------- | ------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------- | --------------------------------- |
+| `passRules`    | `Array of Functions that return booleans`                     | Rules to allow card(s?) to be passed                                  | [() => true]                      | Provide Array                     |
+| `receiveRules` | `Array of Functions that return booleans`                     | Rules to allow card(s?) to be received                                | [() => true]                      | Provide Array                     |
+| `type`         | `object {pass: 'every' or 'any', receieve: 'every' or 'any'}` | Whether all rules, or any rule needs to be true to pass/receieve card | `{pass:'every', receieve:'every}` | `{pass: 'any', receive: 'any'  }` |
+| `canPass`      | `Function that returns boolean`                               | Runs every pass rule, if all are true returns true                    | function                          | none: required                    |
+| `canReceive`   | `Function that returns boolean`                               | Runs every receive rule, if all are true returns true                 | function                          | none: required                    |
 
 ## Rules Type
 
@@ -21,6 +22,7 @@ Rules are what controls whether a card is able to be passed, or able to be recie
 export interface RuleSet<T extends Card> {
   canPass: Rule<T>;
   canReceive: Rule<T>;
+  type: { pass: "every" | "any"; receive: "every" | "any" };
 }
 
 export type Rule<T extends Card> = (
@@ -37,9 +39,14 @@ export type Rule<T extends Card> = (
   constructor(
     passRules: Rule<T>[] = [() => true],
     receiveRules: Rule<T>[] = [() => true],
+    type: { pass: "every" | "any"; receive: "every" | "any" } = {
+      pass: "every",
+      receive: "every",
+    },
   ) {
     this.passRules = passRules;
     this.receiveRules = receiveRules;
+    this.type = type;
   }
 ```
 
@@ -107,7 +114,7 @@ hand.options.rules = rules;
 ```
 
 Why did we adjust the follow suit rule and not just make a new rule that would be true if the card was an 8?
-EVERY rule needs to be true in order to pass a card. This means we may have to shortcut some rules with base cases. If you find yourself having multiple base cases (likely) a shortcut function may be helpful.
+EVERY rule needs to be true in order to pass a card by default. This means we may have to shortcut some rules with base cases. If you find yourself having multiple base cases (likely) a shortcut function may be helpful, or changing the rules to allow ANY true to pass may suffice.
 
 ```typescript
 const allowAnEight = () => {}; // ...code
@@ -135,6 +142,45 @@ hand.options.rules = rules;
 ```
 
 Now if the card played is an 8, the same number as the last card, or another variable it well default to true.
+
+## Alternative - change rules to pass for any true rule
+
+We can change the default type of rules to allow the pass to occur when any of the rules are true. Any and Every will both have flaws, as they both may require base cases.
+
+Lets change the above rules to accomodate ANY rules.
+
+```typescript
+const allowAnEight = () => {
+  if (onlyPassToDiscard(...args) === false) return false;
+}; // ... rest of code
+const allowSameNumber = () => {
+  if (onlyPassToDiscard(...args) === false) return false;
+}; // ... rest of code
+const allowSomethingElse = () => {
+  if (onlyPassToDiscard(...args) === false) return false;
+}; // ... rest of code
+
+const followSuit: Rule<PlayingCard> = (source, destination, cardElement) => {
+  {
+    if (onlyPassToDiscard(source, destination, cardElement) === false)
+      return false;
+  }
+  const card = cardElement.card;
+  const destTopCard = destination.topCardElement.card;
+  if (destTopCard.suit === card.suit) return true;
+  else return false;
+};
+
+const rules = new Rules(
+  [allowAnEight, allowSameNumber, allowSomethingElse, followSuit],
+  [() => true],
+);
+hand.options.rules = rules;
+```
+
+As you can see, we can accomplish the same outcome, but now onlyPassToDiscard has become a base case in every rule that will return false if the destination isnt the discard pile.
+
+This is up to you to decide which rule variation suits your game, and coding style best. Let's face it, rules are hard, and having a system to accomodate any rule is hard to imagine.
 
 ### How do I know if it should be a passRule or a receiveRule?
 
