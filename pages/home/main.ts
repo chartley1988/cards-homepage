@@ -1,6 +1,4 @@
 import "../navMenu/navMenu";
-import "@/src/styles/theme.css";
-import "@/src/styles/card.css";
 import "../styles/reset.css";
 import "./home.css";
 import "../styles/style.css";
