@@ -1,11 +1,7 @@
 import "../styles/style.css";
-import "@/styles/card.css";
-import "@/styles/theme.css";
 import "./styles.css";
 import "../navMenu/navMenu";
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
-import Player from "@/components/player/player";
-import { setTheme, tanTiles } from "@/components/table/themes";
+import { setTheme, tanTiles, StandardDeckOfCards, Player } from "@/src";
 
 const app = document.getElementById("app");
 

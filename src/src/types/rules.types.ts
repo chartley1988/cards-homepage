@@ -1,4 +1,4 @@
-import Card from "@/components/card/card";
+import Card from "../components/card/card";
 import { CardElementType } from "./card.types";
 import { PileElementType } from "./pile.types";
 

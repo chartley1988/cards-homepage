@@ -1,6 +1,6 @@
 import FlashCard from "./flashCardClass";
 import { CardElement } from "../cardElement";
-import "./flashCard.css";
+import "../../../styles/flashCard.css";
 
 const FlashCardElement = (card: FlashCard) => {
   // pull info out of flashcard

@@ -1,5 +1,5 @@
 import PlayingCard from "./playingCardClass";
-import "./playingCard.css";
+import "../../../styles/playingCard.css";
 import { CardElement } from "../cardElement";
 
 const PlayingCardElement = (card: PlayingCard) => {

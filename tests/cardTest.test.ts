@@ -1,8 +1,5 @@
+import { Card, PlayingCard, Deck, StandardDeckOfCards } from "../src/src/index";
 import { test, expect } from "vitest";
-import Card from "../src/components/card/card";
-import PlayingCard from "../src/components/card/playingCard/playingCardClass";
-import Deck from "../src/components/deck/deck";
-import StandardDeckOfCards from "../src/components/card/playingCard/standardDeckOfCards";
 
 test("can flip a blank card", () => {
   const card = new Card();

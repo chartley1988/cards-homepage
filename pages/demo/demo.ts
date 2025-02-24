@@ -1,12 +1,8 @@
 import "../styles/style.css";
-import "@/styles/card.css";
-import "@/styles/theme.css";
 import "./styles.css";
 import "../navMenu/navMenu";
-import PlayingCard from "@/components/card/playingCard/playingCardClass";
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
-import { PileElementType } from "@/types/pile.types";
-import { setTheme, greenFelt } from "@/components/table/themes";
+import { setTheme, greenFelt, StandardDeckOfCards, PlayingCard } from "@/src";
+import { PileElementType } from "@/src/types/pile.types";
 
 const app = document.getElementById("app");
 if (app) {

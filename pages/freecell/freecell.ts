@@ -1,17 +1,19 @@
 import "../styles/style.css";
 import "../navMenu/navMenu";
-import PlayingCard from "@/components/card/playingCard/playingCardClass";
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
-import { deal, denyMove } from "@/components/animate/animate";
-import { PileElementType } from "@/types/pile.types";
-import { CardElementType } from "@/types/card.types";
-import { setTheme, redFelt } from "@/components/table/themes";
-import { Rules } from "@/components/rules/rules";
-import {
-  quickPassRules,
-  quickReceiveRules,
-} from "@/components/rules/quickRules";
 import "./styles.css";
+import {
+  setTheme,
+  redFelt,
+  StandardDeckOfCards,
+  PlayingCard,
+  quickReceiveRules,
+  quickPassRules,
+  Rules,
+  deal,
+} from "@/src";
+import { denyMove } from "@/src/components/animate/animate";
+import { CardElementType } from "@/src/types/card.types";
+import { PileElementType } from "@/src/types/pile.types";
 
 const freeCell = document.getElementById("freeCell");
 if (freeCell) {

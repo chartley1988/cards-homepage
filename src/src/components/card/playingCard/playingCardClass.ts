@@ -1,5 +1,5 @@
-import { PlayingCardType } from "@/components/card/playingCard/playCard.types";
 import Card from "../card";
+import { PlayingCardType } from "./playCard.types";
 
 /**
  * @props suit, symbol, number, value, color

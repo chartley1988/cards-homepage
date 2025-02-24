@@ -1,5 +1,5 @@
-import Card from "@/components/card/card";
-import Pile from "@/components/pile/pile";
+import Card from "../components/card/card";
+import Pile from "../components/pile/pile";
 import { PileElementType, pileOptionsType } from "./pile.types";
 
 export type DeckType<T extends Card> = {
