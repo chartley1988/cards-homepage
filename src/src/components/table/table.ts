@@ -6,7 +6,8 @@ export class Table {
 
   constructor(element: HTMLElement, options: TableOptions = {}) {
     this.options = {
-      tileImage: options.tileImage ?? "/images/45-degree-fabric-light.png",
+      tileImage:
+        options.tileImage ?? "../../styles/images/45-degree-fabric-light.png",
       overlayStartColor: options.overlayStartColor ?? "rgba(0, 100, 0, 0.6)",
       overlayEndColor: options.overlayEndColor ?? "rgba(0, 60, 0, 0.8)",
       overlayGradientType: options.overlayGradientType ?? "linear",
@@ -34,8 +35,11 @@ export class Table {
     const backgroundAttachments = [];
 
     // Add texture if path exists
+
     if (this.options.tileImage) {
-      backgroundImages.push(`url("${this.options.tileImage}")`);
+      backgroundImages.push(
+        `url("${new URL(this.options.tileImage, import.meta.url)}")`,
+      );
       backgroundSizes.push("auto");
       backgroundRepeats.push("repeat");
       backgroundPositions.push("center");

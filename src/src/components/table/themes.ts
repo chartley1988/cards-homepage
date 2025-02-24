@@ -1,8 +1,7 @@
 import { TableSettings } from "@/types/table.types";
 import { Table } from "./table";
-
 export const greenFelt: TableSettings = {
-  tileImage: "/images/45-degree-fabric-light.png",
+  tileImage: "../../styles/images/45-degree-fabric-light.png",
   backgroundColor: "rgb(38, 133, 72)",
   overlayStartColor: "rgba(0, 100, 0, 0)",
   overlayEndColor: "rgba(0, 0, 0, 1)",
@@ -19,7 +18,7 @@ export const greenFelt: TableSettings = {
 };
 
 export const redFelt: TableSettings = {
-  tileImage: "/images/45-degree-fabric-light.png",
+  tileImage: "../../styles/images/45-degree-fabric-light.png",
   backgroundColor: "rgb(181 44 44)",
   overlayStartColor: "rgba(0, 100, 0, 0)",
   overlayEndColor: "rgba(0, 0, 0, 0.6)",
@@ -36,7 +35,7 @@ export const redFelt: TableSettings = {
 };
 
 export const brickWall: TableSettings = {
-  tileImage: "/images/brick-wall.png",
+  tileImage: "../../styles/images/brick-wall.png",
   backgroundColor: "rgba(114, 6, 6, 1)",
   overlayStartColor: "rgba(0, 100, 0, 0)",
   overlayEndColor: "rgba(0, 0, 0, 1)",
@@ -53,7 +52,7 @@ export const brickWall: TableSettings = {
 };
 
 export const redOak: TableSettings = {
-  tileImage: "/images/wood-pattern.png",
+  tileImage: "../../styles/images/wood-pattern.png",
   backgroundColor: "rgb(100 70 70)",
   overlayStartColor: "rgba(0, 100, 0, 0)",
   overlayEndColor: "rgba(0, 0, 0, 0.6)",
@@ -70,7 +69,7 @@ export const redOak: TableSettings = {
 };
 
 export const tanTiles: TableSettings = {
-  tileImage: "/images/gradient-squares.png",
+  tileImage: "../../styles/images/gradient-squares.png",
   backgroundColor: "rgb(175 157 149)",
   overlayStartColor: "rgba(118 60 28 / 35%)",
   overlayEndColor: "rgba(0, 0, 0, 1)",
