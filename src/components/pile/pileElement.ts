@@ -366,58 +366,69 @@ export const pileElement = <T extends Card>(
       sourcePileContainerId: container.id,
     };
 
-    if (options.groupDrag) {
-      // Create a custom drag image that visually represents the group.
-      const dragImage = document.createElement("div");
-      dragImage.id = "card-dragImage";
-      dragImage.classList.add("drag-image");
+    // Create a custom drag image that visually represents the group.
+    const dragImage = document.createElement("div");
+    dragImage.id = "card-dragImage";
+    dragImage.classList.add("drag-image");
 
-      // Get the parent element that holds the card and its siblings.
-      const pileElement = cardElement.container.parentElement;
-      if (!pileElement) return;
+    // Get the parent element that holds the card and its siblings.
+    const pileElement = cardElement.container.parentElement;
+    if (!pileElement) return;
 
-      // Card dragged index
-      const originalIndex = cardElements.indexOf(cardElement);
+    // Card dragged index
+    const originalIndex = cardElements.indexOf(cardElement);
 
-      // Iterate over all children in the pile.
-      cardElements.forEach((element) => {
-        // Get the card's z-index as a number.
-        const cardIndex = cardElements.indexOf(element);
+    // Iterate over all children in the pile.
+    cardElements.forEach((element) => {
+      // Get the card's z-index as a number.
+      const cardIndex = cardElements.indexOf(element);
 
-        // Only add the class if the card's z-index is higher than the original.
-        // Clone each card element and append to dragImage.
-        if (cardIndex >= originalIndex) {
-          element.container.classList.add("card-dragging");
-          const originalTransform = element.container.style.transform;
-          const containerScale = container.style.transform;
-          const newTransform = `${originalTransform} ${containerScale}`;
-          element.container.style.transform = newTransform;
-          const clone = element.container.cloneNode(true);
-          element.container.style.transform = originalTransform;
+      if (cardIndex === originalIndex && options.groupDrag === false) {
+        element.container.classList.add("card-dragging");
+        const originalTransform = element.container.style.transform;
+        const containerScale = container.style.transform;
+        const newTransform = `${originalTransform} ${containerScale}`;
+        element.container.style.transform = newTransform;
+        const clone = element.container.cloneNode(true);
+        element.container.style.transform = originalTransform;
 
-          dragImage.appendChild(clone);
-          if (cardIndex !== originalIndex) {
-            data.indexs.push(cardIndex);
-          }
+        dragImage.appendChild(clone);
+      }
+
+      // Only add the class if the card's z-index is higher than the original.
+      // Clone each card element and append to dragImage.
+      if (cardIndex >= originalIndex && options.groupDrag === true) {
+        element.container.classList.add("card-dragging");
+        const originalTransform = element.container.style.transform;
+        const containerScale = container.style.transform;
+        const newTransform = `${originalTransform} ${containerScale}`;
+        element.container.style.transform = newTransform;
+        const clone = element.container.cloneNode(true);
+        element.container.style.transform = originalTransform;
+
+        dragImage.appendChild(clone);
+        if (cardIndex !== originalIndex) {
+          data.indexs.push(cardIndex);
         }
-      });
+      }
+    });
 
-      // It is necessary to add the drag image element off-screen before using it.
-      dragImage.style.position = "absolute";
-      dragImage.style.top = "-9999px";
-      dragImage.style.pointerEvents = "none"; // Prevent interference
-      dragImage.style.zIndex = "1";
-      dragImage.style.transform = pileElement.style.transform;
+    // It is necessary to add the drag image element off-screen before using it.
+    dragImage.style.position = "absolute";
+    dragImage.style.top = "-9999px";
+    dragImage.style.pointerEvents = "none"; // Prevent interference
+    dragImage.style.zIndex = "1";
+    dragImage.style.transform = pileElement.style.transform;
 
-      document.body.appendChild(dragImage);
+    document.body.appendChild(dragImage);
 
-      // calculating where the click occurred on the original card
-      const rect = cardElement.container.getBoundingClientRect(); // Get element position
-      const offsetX = e.clientX - rect.left; // X offset from where user clicked
-      const offsetY = e.clientY - rect.top; // Y offset from where user clicked
+    // calculating where the click occurred on the original card
+    const rect = cardElement.container.getBoundingClientRect(); // Get element position
+    const offsetX = e.clientX - rect.left; // X offset from where user clicked
+    const offsetY = e.clientY - rect.top; // Y offset from where user clicked
 
-      e.dataTransfer?.setDragImage(dragImage, offsetX, offsetY);
-    }
+    e.dataTransfer?.setDragImage(dragImage, offsetX, offsetY);
+
     e.dataTransfer?.setData("application/json", JSON.stringify(data));
   }
 
