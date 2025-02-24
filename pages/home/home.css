@@ -27,7 +27,7 @@ h1 {
 }
 
 .title {
-  margin-bottom: min(20vw, 15rem);
+  margin-bottom: min(25vw, 15rem);
   & h1 > * {
     text-shadow: none;
   }
@@ -39,18 +39,32 @@ h1 {
 }
 
 .hero {
-  max-width: 900px;
+  max-width: 768px;
   margin: auto;
+  text-align: left;
 
   display: flex;
-  justify-content: center;
+  flex-direction: column-reverse;
   gap: min(5vw, 3rem);
+  align-items: center;
 
-  .heading {
-    font-size: 3rem;
+  & .text {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    margin: min(1rem, 10vw);
   }
 
-  .subheading {
-    font-size: 2rem;
+  & .heading {
+    font-size: clamp(2rem, 1rem + 3vw, 3rem);
+  }
+
+  & .subheading {
+    font-size: clamp(1rem, 0.5rem + 3vw, 1.75rem);
+    color: rgb(232, 231, 231);
+  }
+
+  @media (min-width: 768px) {
+    flex-direction: row;
   }
 }

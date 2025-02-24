@@ -17,7 +17,7 @@ if (app) {
   dealer.shuffle();
   const titleCards = deck.createPileElement("title");
 
-  (function createTitle() {
+  (async function createTitle() {
     const titleContainer: HTMLDivElement = document.createElement("div");
     titleContainer.classList.add("title");
     titleContainer.style.position = "relative";
@@ -117,10 +117,11 @@ if (app) {
   })();
 
   (function createHero() {
+    // Hero copy
     const content = {
-      heading: "Build Anything with Cards",
+      heading: "Your Cards, Your Rules",
       subheading:
-        "A lightweight JavaScript library for creating card games, trading card systems, and educational tools",
+        "A comprehensive library for card manipulation. Built by developers, for developers.",
     };
 
     // Create hero wrapper
@@ -130,11 +131,12 @@ if (app) {
     // Create Hero text content
     (function createHeroText() {
       const text = document.createElement("div");
+      text.classList.add("text");
       const heading = document.createElement("div");
       heading.classList.add("heading");
       heading.textContent = content.heading;
       const subheading = document.createElement("div");
-      heading.classList.add("subheading");
+      subheading.classList.add("subheading");
       subheading.textContent = content.subheading;
       text.append(heading);
       text.append(subheading);
@@ -146,6 +148,9 @@ if (app) {
 
     document.addEventListener("DOMContentLoaded", () => {
       dealer.cascade();
+      setTimeout(() => {
+        dealer.topCardElement.flip(1);
+      }, 3400);
     });
 
     app.append(container);
