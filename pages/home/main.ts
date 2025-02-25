@@ -122,6 +122,16 @@ if (app) {
       heading: "Your Cards, Your Rules",
       subheading:
         "A comprehensive library for card manipulation. Built by developers, for developers.",
+      primaryButton: {
+        text: "Get Started",
+        url: "/docs/getting-started",
+        icon: "/icons/mdi--check-bold.svg",
+      },
+      secondaryButton: {
+        text: "GitHub Repo",
+        url: "https://github.com/Daver067/cards-npm-package",
+        icon: "/icons/mdi--github.svg",
+      },
     };
 
     // Create hero wrapper
@@ -141,6 +151,31 @@ if (app) {
       text.append(heading);
       text.append(subheading);
       container.append(text);
+
+      function createButton(button: {
+        text: string;
+        url: string;
+        icon: string;
+      }) {
+        const buttonElement = document.createElement("a");
+        buttonElement.classList.add("btn");
+        buttonElement.textContent = button.text;
+        buttonElement.href = button.url;
+
+        const icon = document.createElement("img");
+        icon.src = button.icon;
+        buttonElement.append(icon);
+
+        return buttonElement;
+      }
+
+      const primaryButton = createButton(content.primaryButton);
+      const secondaryButton = createButton(content.secondaryButton);
+
+      const buttons = document.createElement("div");
+      buttons.classList.add("buttons");
+      buttons.append(primaryButton, secondaryButton);
+      text.append(buttons);
     })();
 
     dealer.container.style.setProperty("--card-size", "min(15vw, 80px)");

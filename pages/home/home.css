@@ -41,6 +41,7 @@ h1 {
 .hero {
   max-width: 768px;
   margin: auto;
+  margin-bottom: 2rem;
   text-align: left;
 
   display: flex;
@@ -51,8 +52,10 @@ h1 {
   & .text {
     display: flex;
     flex-direction: column;
+    gap: 1rem;
     align-items: start;
     margin: min(1rem, 10vw);
+    text-shadow: 2px 2px 2px #000000;
   }
 
   & .heading {
@@ -62,6 +65,25 @@ h1 {
   & .subheading {
     font-size: clamp(1rem, 0.5rem + 3vw, 1.75rem);
     color: rgb(232, 231, 231);
+  }
+
+  & .buttons {
+    display: flex;
+    gap: 1rem;
+  }
+
+  & .btn {
+    background-color: black;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-direction: row-reverse;
+
+    & img {
+      filter: invert(1);
+    }
   }
 
   @media (min-width: 768px) {
