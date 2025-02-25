@@ -6,7 +6,7 @@ outline: deep
 
 The deck what creates all of the cardElements, cards, pileElements, and piles.
 
-Most games will only require one deck, even if players have separate draw piles typically the game only has one deck; the cards from that deck are just separated into different [piles](/piles).
+Most games will only require one deck, even if players have separate draw piles typically the game only has one deck; the cards from that deck are just separated into different [piles](/pile).
 
 Exceptions can be found in games where players would bring their own deck, example is Magic the Gathering.
 
