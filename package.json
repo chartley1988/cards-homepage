@@ -18,7 +18,7 @@
     "commitlint": "commitlint --edit"
   },
   "lint-staged": {
-    "src/src/**/*.{js,jsx,ts,tsx}": [
+    "./**/*.{js,jsx,ts,tsx}": [
       "prettier --write",
       "eslint --fix"
     ],
