@@ -1,7 +1,11 @@
+import {
+  setTheme,
+  redOak,
+  StandardDeckOfCards,
+  slideCard,
+  zoomCard,
+} from "@/src";
 import "../navMenu/navMenu";
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
-import { slideCard, zoomCard } from "@/components/animate/animate";
-import { setTheme, redOak } from "@/components/table/themes";
 import "../styles/reset.css";
 import "./styles.css";
 

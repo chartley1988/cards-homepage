@@ -1,9 +1,7 @@
 import "../navMenu/navMenu";
-import FlashCard from "@/components/card/flashCard/flashCardClass";
-import Deck from "@/components/deck/deck";
-import FlashCardElement from "@/components/card/flashCard/flashCardElement";
 import "./styles.css";
 import "../styles/reset.css";
+import { FlashCard, Deck, FlashCardElement } from "@/src";
 
 // the info I want on my flashcards
 const flashcards = [

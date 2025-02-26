@@ -1,12 +1,8 @@
 import "../navMenu/navMenu";
-import "@/styles/theme.css";
-import "@/styles/card.css";
-import { setTheme, redFelt } from "@/components/table/themes";
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
-import { deal } from "@/components/animate/animate";
 import "../styles/reset.css";
 import "./home.css";
 import "../styles/style.css";
+import { setTheme, redFelt, StandardDeckOfCards, deal } from "@/src";
 
 const app = document.getElementById("app");
 if (app) {

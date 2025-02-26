@@ -18,7 +18,7 @@
     "commitlint": "commitlint --edit"
   },
   "lint-staged": {
-    "{src/!(legacy)/**/,pages/**/}*.{js,jsx,ts,tsx}": [
+    "src/src/**/*.{js,jsx,ts,tsx}": [
       "prettier --write",
       "eslint --fix"
     ],
