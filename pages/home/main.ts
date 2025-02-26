@@ -1,4 +1,4 @@
-import "../navMenu/navMenu";
+import "../../src/navMenu/navMenu";
 import "../styles/reset.css";
 import "./home.css";
 import "../styles/style.css";

@@ -1,8 +1,13 @@
 import "../styles/style.css";
 import "./styles.css";
-import "../navMenu/navMenu";
-import { setTheme, greenFelt, StandardDeckOfCards, PlayingCard } from "@/src";
-import { PileElementType } from "@/src/types/pile.types";
+import "../../src/navMenu/navMenu";
+import {
+  setTheme,
+  greenFelt,
+  StandardDeckOfCards,
+  PlayingCard,
+} from "card-factory";
+import { PileElementType } from "card-factory/dist/types/pile.types";
 
 const app = document.getElementById("app");
 if (app) {

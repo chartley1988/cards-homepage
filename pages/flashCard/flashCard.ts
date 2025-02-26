@@ -1,7 +1,7 @@
-import "../navMenu/navMenu";
+import "../../src/navMenu/navMenu";
 import "./styles.css";
 import "../styles/reset.css";
-import { FlashCard, Deck, FlashCardElement } from "@/src";
+import { FlashCard, Deck, FlashCardElement } from "card-factory";
 
 // the info I want on my flashcards
 const flashcards = [

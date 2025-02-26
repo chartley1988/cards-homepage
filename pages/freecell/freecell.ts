@@ -1,5 +1,5 @@
 import "../styles/style.css";
-import "../navMenu/navMenu";
+import "../../src/navMenu/navMenu";
 import "./styles.css";
 import {
   setTheme,
@@ -10,10 +10,10 @@ import {
   quickPassRules,
   Rules,
   deal,
-} from "@/src";
-import { denyMove } from "@/src/components/animate/animate";
-import { CardElementType } from "@/src/types/card.types";
-import { PileElementType } from "@/src/types/pile.types";
+} from "card-factory";
+import { denyMove } from "card-factory";
+import { PileElementType } from "card-factory/dist/types/pile.types";
+import { CardElementType } from "card-factory/dist/types/card.types";
 
 const freeCell = document.getElementById("freeCell");
 if (freeCell) {

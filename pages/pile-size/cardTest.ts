@@ -1,7 +1,7 @@
 import "../styles/style.css";
 import "./styles.css";
-import "../navMenu/navMenu";
-import { setTheme, tanTiles, StandardDeckOfCards, Player } from "@/src";
+import "../../src/navMenu/navMenu";
+import { setTheme, tanTiles, StandardDeckOfCards, Player } from "card-factory";
 
 const app = document.getElementById("app");
 

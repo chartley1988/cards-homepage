@@ -1,8 +1,8 @@
-import "../navMenu/navMenu";
+import "../../src/navMenu/navMenu";
 import "../styles/style.css";
 import "./styles.css";
 import "../styles/reset.css";
-import { setTheme, greenFelt, StandardDeckOfCards } from "@/src";
+import { setTheme, greenFelt, StandardDeckOfCards } from "card-factory";
 const body = document.querySelector("body");
 if (body) {
   setTheme(greenFelt, body);

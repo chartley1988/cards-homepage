@@ -4,8 +4,8 @@ import {
   StandardDeckOfCards,
   slideCard,
   zoomCard,
-} from "@/src";
-import "../navMenu/navMenu";
+} from "card-factory";
+import "../../src/navMenu/navMenu";
 import "../styles/reset.css";
 import "./styles.css";
 
