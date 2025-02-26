@@ -6,4 +6,4 @@ outline: deep
 
 run the command:
 
-`npm -i cardsjs` ?????? Probably????
+`npm -i card-factory`
