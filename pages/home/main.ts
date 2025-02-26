@@ -2,7 +2,7 @@ import "../navMenu/navMenu";
 import "../styles/reset.css";
 import "./home.css";
 import "../styles/style.css";
-import { setTheme, redFelt, StandardDeckOfCards, deal } from "@/src";
+import { setTheme, redFelt, StandardDeckOfCards, deal } from "card-factory";
 
 const app = document.getElementById("app");
 if (app) {
