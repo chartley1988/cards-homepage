@@ -45,6 +45,6 @@
     "vitest": "^3.0.7"
   },
   "dependencies": {
-    "card-factory": "^1.0.7"
+    "card-factory": "^1.0.9"
   }
 }
