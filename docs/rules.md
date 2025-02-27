@@ -203,7 +203,7 @@ This gets shipped with a couple of quick and easy rules to implement. Most are d
 
 ### Quick Pass Rules
 
-Use import statement: `import { quickPassRules } from "@/components/rules/quickRules";`
+Use import statement: `import { quickPassRules } from "card-factory"`
 
 | Name                | Usage                              | Description                                              |
 | ------------------- | ---------------------------------- | -------------------------------------------------------- |
@@ -224,7 +224,7 @@ const solitareRules = new Rules(solitarePassRules, solitareReceiveRules);
 
 ### Quick Receive Rules
 
-Use import statement: `import { quickReceiveRules } from "@/components/rules/quickRules";`
+Use import statement: `import { quickReceiveRules } from "card-factory"`
 
 | Name                        | Usage                                      | Description                                                                      |
 | --------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------- |

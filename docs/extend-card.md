@@ -11,7 +11,7 @@ To make your own type of card, you will have to extend the base class of Card.
 ## Extending Card Class
 
 ```typescript
-import Card from "../card";
+import Card from "card-factory";
 
 export default class FlashCard extends Card {
   question: string;

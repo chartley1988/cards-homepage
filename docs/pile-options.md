@@ -61,7 +61,7 @@ Options can be set directly when creating a pileElement, or altered after the pi
 Its suggested to use a deck to create pileElements, the drag and drop system works more cohesively when decks are used to create individual piles.
 
 ```typescript
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import { StandardDeckOfCards } from "card-factory";
 
 const deck = StandardDeckOfCards();
 const handOptions = {

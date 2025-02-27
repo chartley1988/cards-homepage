@@ -47,7 +47,7 @@ type PlayingCardType = {
 If you use our pre-made deck you will have cards built for you. To use our pre-made deck use:
 
 ```typescript
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import { StandardDeckOfCards } from "card-factory";
 
 const deck = StandardDeckOfCards();
 ```
@@ -55,7 +55,7 @@ const deck = StandardDeckOfCards();
 If you would like to create cards yourself:
 
 ```typescript
-import PlayingCard from "@/components/card/playingCard/playingCardClass";
+import { PlayingCard } from "card-factory";
 
 const aceOfSpades = new PlayingCard("A", "spade");
 const jackOfdiamonds = new PlayingCard("J", "diamond");

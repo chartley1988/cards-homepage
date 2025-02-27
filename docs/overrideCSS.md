@@ -13,7 +13,7 @@ Create your own css file, target the classes you with to alter in the css file, 
 **script file**
 
 ```typescript
-import StandardDeckOfCards from "../../src/components/card/playingCard/standardDeckOfCards";
+import { StandardDeckOfCards } from "card-factory";
 import "./styles.css"; // always import last, to override other stylings
 
 const playingCards = StandardDeckOfCards();

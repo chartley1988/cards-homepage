@@ -13,7 +13,7 @@ The fastest way to apply a [theme](/custom-themes) is using the `setTheme` funct
 **card.ts**
 
 ```typescript
-import { setTheme, greenFelt } from "@/components/table/themes";
+import { setTheme, greenFelt } from "card-factory";
 
 const body = document.querySelector("body");
 if (body) {
@@ -28,7 +28,7 @@ To create a [deck](/deck) of standard playing cards (52 cards, Ace to King, 4 su
 **card.ts**
 
 ```typescript
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import StandardDeckOfCards from "card-factory";
 
 const deck = StandardDeckOfCards(); // StandardDeckOfCards(true) will also provide 2 jokers
 ```
@@ -141,8 +141,7 @@ And we will import this into our typescript file after all other imports.
 **card.ts**
 
 ```typescript
-import { setTheme, greenFelt } from "@/components/table/themes";
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import { setTheme, greenFelt, StandardDeckOfCards } from "card-factory";
 import "./styles.css";
 ```
 
@@ -215,8 +214,7 @@ Ok, That's it for the basics! The final code for the basic tutorial is below, in
 **card.ts**
 
 ```typescript
-import { setTheme, greenFelt } from "@/components/table/themes";
-import StandardDeckOfCards from "@/components/card/playingCard/standardDeckOfCards";
+import { setTheme, greenFelt, StandardDeckOfCards } from "card-factory";
 import "./styles.css";
 
 const body = document.querySelector("body");

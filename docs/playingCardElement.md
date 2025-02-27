@@ -13,8 +13,7 @@ No new properties are added in the element, it is purely for typecasting, and vi
 First you must construct a [playing card](/playingCard), before constructing a playing card Element.
 
 ```typescript
-import PlayingCard from "@/components/card/playingCard/playingCardClass";
-import PlayingCardElement from "@/components/card/playingCard/playingCardElement";
+import { PlayingCard, PlayingCardElement } from "card-factory";
 
 const aceOfSpades = new PlayingCard("A", "spade");
 const jackOfdiamonds = new PlayingCard("J", "diamond");
