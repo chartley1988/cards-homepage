@@ -1,7 +1,18 @@
 import "../../src/navMenu/navMenu";
 import "./styles.css";
 import "../styles/reset.css";
-import { FlashCard, Deck, FlashCardElement } from "card-factory";
+import {
+  FlashCard,
+  Deck,
+  FlashCardElement,
+  setTheme,
+  redFelt,
+} from "card-factory";
+
+const app = document.getElementById("app");
+if (app) {
+  setTheme(redFelt, app);
+}
 
 // the info I want on my flashcards
 const flashcards = [

@@ -1,43 +1,79 @@
 /* nav.css */
 .nav {
+  --nav-bg: rgb(43, 43, 43);
+  --nav-height: 80px;
   width: 100%;
-  background-color: rgb(43, 43, 43);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 100vw;
+  height: var(--nav-height);
   padding: 1rem;
   display: flex;
   flex-direction: column;
   align-items: end;
   --link-color: #ff0040;
+  position: relative;
+  z-index: 1000;
+  box-sizing: border-box;
+
+  &::before {
+    content: "";
+    background-color: var(--nav-bg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
 
   & .list {
     list-style: none;
     margin: 0;
     padding: 0;
+    padding-bottom: 3vw;
     justify-content: start;
     gap: 2rem;
     max-width: 900px;
     width: 100%;
-    margin: 0;
-    margin-left: 2rem;
-    display: none;
+    transition-duration: 0.3s;
+    position: absolute;
+    background-color: var(--nav-bg);
+    top: var(--nav-height);
+    left: 0;
+    right: 100vw;
+    display: flex;
+    flex-direction: column;
+    z-index: -2;
   }
 
   &[data-open="false"] > .list {
-    display: none;
+    transform: translateY(calc(-100% - var(--nav-height)));
   }
 
   &[data-open="true"] > .list {
-    display: flex;
-    flex-direction: column;
+    transform: translateY(0);
   }
 
   @media (min-width: 900px) {
     align-items: center;
+    height: auto;
+    position: static;
+    width: 100%;
+    background-color: var(--nav-bg);
+
+    &::before {
+      display: none;
+    }
 
     &[data-open="false"] > .list,
     &[data-open="true"] {
+      position: static;
       display: flex;
       flex-direction: row;
+      transform: none;
+      transition-duration: 0ms;
+      z-index: auto;
+      padding: 0;
     }
 
     & .mobile-button {
@@ -73,7 +109,6 @@
   transform: scaleX(0);
   transition: transform 0.2s ease;
 }
-
 .nav__link:hover::after {
   transform: scaleX(1);
 }
@@ -87,23 +122,23 @@
 }
 
 .mobile-button {
-  transform: scale(0.75);
   border: none;
   background: none;
+  padding: 0;
 
   & label {
     display: flex;
     flex-direction: column;
-    width: 70px;
+    width: 50px; /* Changed from 70px to 50px */
     height: auto;
     cursor: pointer;
   }
 
   & label span {
     background: #fff;
-    border-radius: 10px;
-    height: 7px;
-    margin: 7px 0;
+    border-radius: 7px; /* Slightly reduced radius */
+    height: 5px; /* Reduced from 7px */
+    margin: 5px 0; /* Reduced from 7px */
     transition: 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
   }
 
@@ -125,7 +160,7 @@
 
   & input[type="checkbox"]:checked ~ span:nth-of-type(1) {
     transform-origin: bottom;
-    transform: rotatez(45deg) translate(8px, 0px);
+    transform: rotatez(45deg) translate(6px, 0px); /* Adjusted from 8px to 6px */
   }
 
   & input[type="checkbox"]:checked ~ span:nth-of-type(2) {
@@ -136,6 +171,6 @@
   & input[type="checkbox"]:checked ~ span:nth-of-type(3) {
     transform-origin: bottom;
     width: 50%;
-    transform: translate(30px, -11px) rotatez(45deg);
+    transform: translate(21px, -8px) rotatez(45deg); /* Adjusted from 30px, -11px */
   }
 }
