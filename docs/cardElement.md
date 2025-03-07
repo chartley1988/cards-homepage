@@ -57,7 +57,7 @@ cardElement.container.addEventListener("click", () => {
 
 Custom listeners may need to be de-activated while the card is animating to prevent unwanted behaviours.
 
-The following line should stop interaction while any cardsJS animations are running.
+The following line should stop interaction while any card-factory animations are running.
 
 ```typescript
 cardElement.container.addEventListener("click", () => {

@@ -2,7 +2,7 @@
 outline: deep
 ---
 
-# Getting Started with CardsJS
+# Getting Started with Card-Factory
 
 We will take you on a quick walkthrough on how to use our library
 

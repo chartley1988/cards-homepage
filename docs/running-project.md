@@ -6,7 +6,7 @@ outline: deep
 
 ## Overview
 
-CardsJS is a card game library developed using Vite. This documentation will guide you through setting up and running the project locally.
+Card-Factory is a card game library developed using Vite. This documentation will guide you through setting up and running the project locally.
 
 ## Prerequisites
 

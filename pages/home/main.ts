@@ -22,7 +22,7 @@ if (app) {
     titleContainer.style.alignItems = "center";
 
     const h1 = document.createElement("h1");
-    h1.textContent = "CardsJS";
+    h1.textContent = "Card-Factory";
     h1.style.position = "relative";
     h1.style.zIndex = "100";
 

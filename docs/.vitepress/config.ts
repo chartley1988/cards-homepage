@@ -2,7 +2,7 @@ import { defineConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "CardsJS",
+  title: "Card-Factory",
   base: "/docs/",
   outDir: "../dist/docs",
   description: "A Javascript library for creating card games",
