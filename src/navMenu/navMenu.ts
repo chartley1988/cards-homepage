@@ -8,11 +8,7 @@ interface NavItem {
 const navMenuData: NavItem[] = [
   { text: "Home", slug: "/" },
   { text: "Documentation", slug: "/docs/" },
-  { text: "Card", slug: "/card/" },
-  { text: "Deck", slug: "/deck/" },
-  { text: "Pile Size", slug: "/pile-size/" },
   { text: "FreeCell", slug: "/freecell/" },
-  { text: "Demo", slug: "/demo/" },
   { text: "Flash Card", slug: "/flashCard/" },
 ];
 
