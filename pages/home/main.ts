@@ -10,9 +10,9 @@ if (app) {
   const deck = StandardDeckOfCards();
   const dealer = deck.createPileElement("dealer", deck.cards);
   dealer.shuffle();
-  const titleCards = deck.createPileElement("title", [], {});
+  const titleCards = deck.createPileElement("title");
 
-  const createTitle = async () => {
+  const createTitle = () => {
     const titleContainer = document.createElement("div");
     titleContainer.classList.add("title");
     titleContainer.style.position = "relative";
@@ -43,13 +43,6 @@ if (app) {
     updateScale();
 
     window.addEventListener("resize", updateScale);
-    window.addEventListener("DOMContentLoaded", async () => {
-      await dealer.cascade();
-      await deal(3, dealer, titleCards);
-      await fanTitleCards();
-      await flipTitleCards();
-      dealer.topCardElement.flip(100);
-    });
   };
 
   const fanTitleCards = async () => {
@@ -73,6 +66,7 @@ if (app) {
       });
 
       await new Promise((resolve) => setTimeout(resolve, 200));
+      card.container.style.transitionDuration = null;
     }
   };
 
@@ -132,9 +126,14 @@ if (app) {
     app.append(container);
   };
 
-  const initialize = () => {
+  const initialize = async () => {
     createTitle();
     createHero();
+    await dealer.cascade();
+    await deal(3, dealer, titleCards);
+    await fanTitleCards();
+    await flipTitleCards();
+    dealer.topCardElement.flip(100);
   };
 
   initialize();
