@@ -90,3 +90,31 @@ h1 {
     flex-direction: row;
   }
 }
+@media (min-width: 1201px) {
+  .title {
+    & .deck-base {
+      top: -50%;
+    }
+  }
+}
+@media (min-width: 769px) and (max-width: 1200px) {
+  .title {
+    & .deck-base {
+      top: -90%;
+    }
+  }
+}
+@media (min-width: 481px) and (max-width: 768px) {
+  .title {
+    & .deck-base {
+      top: -120%;
+    }
+  }
+}
+@media (max-width: 481px) {
+  .title {
+    & .deck-base {
+      top: -170%;
+    }
+  }
+}
