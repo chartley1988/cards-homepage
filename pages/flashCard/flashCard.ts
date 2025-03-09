@@ -5,13 +5,13 @@ import {
   Deck,
   FlashCardElement,
   setTheme,
-  redFelt,
+  greenFelt,
 } from "card-factory";
 import "./styles.css";
 
 const body = document.querySelector("body");
 if (body) {
-  setTheme(redFelt, body);
+  setTheme(greenFelt, body);
 }
 
 // the info I want on my flashcards

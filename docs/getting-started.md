@@ -13,10 +13,6 @@ Lets create a new project folder, and install vite.
 
 `npm install -D vite`
 
-lets install the packages from that
-
-`npm install`
-
 next we will install our package, card-factory
 
 `npm install card-factory`
