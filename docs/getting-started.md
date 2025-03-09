@@ -2,9 +2,44 @@
 outline: deep
 ---
 
-# Getting Started with CardsJS
+# Getting Started with Card-Factory
 
 We will take you on a quick walkthrough on how to use our library
+
+## Project Setup
+
+Feel free to use any build tool you would like, we will be using a lightweight Vite setup for our demo.
+Lets create a new project folder, and install vite.
+
+`npm install -D vite`
+
+next we will install our package, card-factory
+
+`npm install card-factory`
+
+next lets create our index.html, our styles.css and our card.ts files and link them accordingly.
+
+**index.html**
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <script type="module" src="./card.ts"></script>
+  </head>
+  <body></body>
+</html>
+```
+
+**card.ts**
+
+```typescript
+import "./styles.css";
+```
+
+To run our app, we will use the command `npx vite`. That should run our project on localhost:5173.
+
+That should be it for a quick project setup!
 
 ## Theme Configuration
 
@@ -14,6 +49,7 @@ The fastest way to apply a [theme](/custom-themes) is using the `setTheme` funct
 
 ```typescript
 import { setTheme, greenFelt } from "card-factory";
+import "./styles.css"; // ensure this stays at end of imports to override default styles
 
 const body = document.querySelector("body");
 if (body) {
@@ -58,8 +94,6 @@ Piles also have more advanced options, which is the third optional argument to c
 I will now append these pileElements to the page. PileElements are objects that contain many methods, and properties. The HTML Element of a pileElement is found under the property container.
 
 For all pileElements properties and methods see [PileElements](/pileElement)
-
-Please ensure script src matches your script.
 
 **index.html**
 

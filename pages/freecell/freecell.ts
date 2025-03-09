@@ -1,6 +1,4 @@
-import "../styles/style.css";
 import "../../src/navMenu/navMenu";
-import "./styles.css";
 import {
   setTheme,
   redFelt,
@@ -14,6 +12,8 @@ import {
 import { denyMove } from "card-factory";
 import { PileElementType } from "card-factory/dist/types/pile.types";
 import { CardElementType } from "card-factory/dist/types/card.types";
+import "../styles/style.css";
+import "./styles.css";
 
 const freeCell = document.getElementById("freeCell");
 if (freeCell) {

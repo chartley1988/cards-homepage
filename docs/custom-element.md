@@ -26,7 +26,7 @@ const FlashCardElement = (card: FlashCard) => {
   // create the element for the front div
   const frontDiv = () => {
     const card = document.createElement("div");
-    card.classList.add("flash-front"); // Specific to Standard 52 Deck
+    card.classList.add("flash-front");
     const span = document.createElement("span");
     span.textContent = answer;
     card.appendChild(span);
@@ -82,12 +82,15 @@ I will provide the css file that is imported below for context.
 }
 
 /* widen the deckBase to look more like a flash card */
-.deck-base {
+
+.deck-base:has(.flash-back),
+.deck-base:has(.flash-front) {
   width: calc(var(--card-size) * 5);
 }
 
 /* also have to widen the card-parent the same size */
-.card-parent {
+.card-parent:has(.flash-back),
+.card-parent:has(.flash-front) {
   width: calc(var(--card-size) * 5);
 }
 

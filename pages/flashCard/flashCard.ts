@@ -1,7 +1,18 @@
 import "../../src/navMenu/navMenu";
-import "./styles.css";
 import "../styles/reset.css";
-import { FlashCard, Deck, FlashCardElement } from "card-factory";
+import {
+  FlashCard,
+  Deck,
+  FlashCardElement,
+  setTheme,
+  greenFelt,
+} from "card-factory";
+import "./styles.css";
+
+const body = document.querySelector("body");
+if (body) {
+  setTheme(greenFelt, body);
+}
 
 // the info I want on my flashcards
 const flashcards = [
@@ -59,6 +70,28 @@ drawPile.container.addEventListener("dblclick", () => {
 discardPile.container.addEventListener("dblclick", () => {
   discardPile.topCardElement.flip();
 });
+
+function addDoubleTapListener(element, callback) {
+  let lastTap = 0;
+  const doubleTapThreshold = 300;
+
+  element.addEventListener("touchend", (event) => {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+
+    if (tapLength < doubleTapThreshold && tapLength > 0) {
+      callback(event);
+    }
+
+    lastTap = currentTime;
+  });
+}
+
+// Apply double-tap and double-click to both piles
+addDoubleTapListener(drawPile.container, () => drawPile.topCardElement.flip());
+addDoubleTapListener(discardPile.container, () =>
+  discardPile.topCardElement.flip(),
+);
 
 window.addEventListener("DOMContentLoaded", async () => {
   const cardElem = drawPile.cardElements.find(

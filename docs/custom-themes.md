@@ -66,7 +66,7 @@ table.setBackground();
 
 ### Predefined Themes
 
-CardsJS comes with several predefined themes that you can use out of the box. These themes can be found and customized in `/src/components/table/themes.ts`:
+Card-Factory comes with several predefined themes that you can use out of the box. These themes can be found and customized in `/src/components/table/themes.ts`:
 
 #### greenFelt
 

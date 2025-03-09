@@ -6,4 +6,4 @@ outline: deep
 
 run the command:
 
-`npm -i card-factory`
+`npm install card-factory`

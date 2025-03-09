@@ -6,38 +6,10 @@ interface NavItem {
 }
 
 const navMenuData: NavItem[] = [
-  {
-    text: "Home",
-    slug: "/",
-  },
-  {
-    text: "Documentation",
-    slug: "/docs/",
-  },
-  {
-    text: "Card",
-    slug: "/card/",
-  },
-  {
-    text: "Deck",
-    slug: "/deck/",
-  },
-  {
-    text: "Pile Size",
-    slug: "/pile-size/",
-  },
-  {
-    text: "FreeCell",
-    slug: "/freecell/",
-  },
-  {
-    text: "Demo",
-    slug: "/demo/",
-  },
-  {
-    text: "Flash Card",
-    slug: "/flashCard/",
-  },
+  { text: "Home", slug: "/" },
+  { text: "Documentation", slug: "/docs/" },
+  { text: "FreeCell", slug: "/freecell/" },
+  { text: "Flash Card", slug: "/flashCard/" },
 ];
 
 const navMenu = (data: NavItem[]): void => {
@@ -45,7 +17,37 @@ const navMenu = (data: NavItem[]): void => {
   nav.className = "nav";
 
   const menuList = document.createElement("ul");
-  menuList.className = "nav__list";
+  menuList.className = "list";
+
+  // Create mobile nav button
+  const mobileButton = (() => {
+    nav.setAttribute("data-open", "false");
+    const element = document.createElement("button");
+
+    element.innerHTML = `
+    <label for="check">
+      <input type="checkbox" id="check"/> 
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+    `;
+
+    element.classList.add("mobile-button");
+
+    const checkbox = element.children[0].getElementsByTagName("input")[0];
+
+    checkbox.addEventListener("change", (e) => {
+      e.stopPropagation();
+      if (checkbox.checked === true) {
+        nav.setAttribute("data-open", "true");
+      } else {
+        nav.setAttribute("data-open", "false");
+      }
+    });
+
+    return element;
+  })();
 
   const createMenuItem = (item: NavItem): HTMLLIElement => {
     const listItem = document.createElement("li");
@@ -67,6 +69,7 @@ const navMenu = (data: NavItem[]): void => {
   const menuItems = data.map(createMenuItem);
   menuItems.forEach((item) => menuList.appendChild(item));
 
+  nav.appendChild(mobileButton);
   nav.appendChild(menuList);
 
   const navTarget = document.body.firstElementChild;

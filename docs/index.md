@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: "CardsJS"
+  name: "Card-Factory"
   text: "A Javascript library for creating card games"
   tagline: ""
 
