@@ -134,6 +134,8 @@ if (app) {
     await fanTitleCards();
     await flipTitleCards();
     dealer.topCardElement.flip(100);
+    titleCards.options.receiveCardAnimationCallback = fanTitleCards;
+    titleCards.options.passCardAnimationCallback = fanTitleCards;
   };
 
   initialize();
