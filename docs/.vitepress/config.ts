@@ -82,4 +82,14 @@ export default defineConfig({
     ],
   },
   ignoreDeadLinks: "localhostLinks",
+  head: [
+    [
+      "script",
+      {
+        async: "",
+        src: "https://analytics.chartleydesigns.ca/script.js",
+        "data-website-id": "1aaa3268-a415-42a2-a78f-f7490a3b51aa",
+      },
+    ],
+  ],
 });
