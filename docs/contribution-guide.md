@@ -6,6 +6,25 @@ outline: deep
 
 This guide outlines the development workflow, commit standards, and code quality requirements for contributing to the project.
 
+## Repositories
+
+This project has two repositories, one for the Card Factory package itself, and one for this website.
+
+### Card Game Package
+
+This contains the source code for the project, and determines what is installed to for the NPM package.
+
+[Github Repo](https://github.com/Daver067/cards-npm-package)
+
+### Home page
+
+This home page has two main functions:
+
+1. To serve as a demonstration of the project
+2. To provide documentation for setup and use of Card Factory.
+
+[Card Games home page](https://github.com/chartley1988/cards-homepage)
+
 ## Branches
 
 ### Main Branch
